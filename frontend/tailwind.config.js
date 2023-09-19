@@ -6,8 +6,11 @@ module.exports = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   theme: {
+    fontFamily: {
+      sans: ["Rubik", "sans-serif"],
+    },
     container: {
       center: true,
       padding: "2rem",

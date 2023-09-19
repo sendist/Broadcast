@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
 const app = express();
@@ -10,12 +9,18 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.post("/login", (req: Request, res: Response) => {
-  const user = {
-    id: 1,
-    username: "brad",
-    email: "",
-  };
+  //implement login using email and password
+  //implement jwt token and refresh token
   res.send();
+});
+
+app.post("refreshSession", (req: Request, res: Response) => {
+  //implement refresh session using refreshToken
+});
+
+app.use((req: Request, res: Response, next) => {
+  //implement jwt token verification
+  next();
 });
 
 app.listen(port, () => {
