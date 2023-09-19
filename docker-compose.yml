@@ -1,0 +1,29 @@
+version: "3"
+services:
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=5222d520fa145634b71e89e1273a49617e557b7283d86fd97ece7634435502ff
+      - POSTGRES_DB=postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: backend:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  frontend:
+    image: frontend:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
