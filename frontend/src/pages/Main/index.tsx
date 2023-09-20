@@ -7,10 +7,7 @@ export default function Main() {
         aria-label="Sidebar"
       >
         <div className="flex h-full flex-col overflow-y-auto border-r border-slate-200 bg-white px-3 py-4 dark:border-slate-700 dark:bg-slate-900">
-          <div
-            href="#"
-            className="mb-10 flex items-center rounded-lg px-3 py-2 text-slate-900 dark:text-white"
-          >
+          <div className="mb-10 flex items-center rounded-lg px-3 py-2 text-slate-900 dark:text-white">
             <svg
               className="h-5 w-5"
               aria-hidden="true"
