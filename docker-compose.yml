@@ -11,24 +11,27 @@ services:
       POSTGRES_PORT: 54321
       PGPORT: 54321
     ports:
-      - "127.0.0.1:54321:54321"
+      - "54321:54321"
     volumes:
       - broadcast:/var/lib/postgresql/data
     restart: unless-stopped
 
-  # backend:
-  #   image: backend:latest
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - db
+  backend:
+    build:
+        context: ./app
+    ports:
+        - "3000:3000"
+    depends_on:
+      - db
 
-  # frontend:
-  #   image: frontend:latest
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
+  nginx:
+    restart: always
+    build:
+        context: ./nginx
+    ports:
+        - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   broadcast:
