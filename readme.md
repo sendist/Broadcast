@@ -17,5 +17,5 @@ $ cd ../.. && npx prisma generate
 4. Run the app
 
 ```console
-$ npm run dev
+$ cd .. && npm run dev
 ```
