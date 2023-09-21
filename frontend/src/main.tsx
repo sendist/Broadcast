@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import "./index.css";
 import Login from "./pages/Login/index.tsx";
 import { AccountProvider } from "./context/account.tsx";
+import { Checkbox } from "./components/ui/checkbox.tsx";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "masjid",
-        element: <div>ini masjid</div>,
+        element: (
+          <div>
+            <Checkbox />
+          </div>
+        ),
       },
       {
         path: "mubaligh",
@@ -25,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: "masjid/:idMasjid",
-        element: <div></div>,
+        element: <div>ini masjid tapi ada id</div>,
       },
     ],
   },

@@ -126,7 +126,7 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="flex-1 flex flex-col h-screen w-full overflow-hidden p-4">
+        <div className="flex-1 flex flex-col h-screen w-full overflow-hidden p-4 bg-background">
           <Outlet />
         </div>
       </div>
