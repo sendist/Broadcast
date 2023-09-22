@@ -29,7 +29,13 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-app.use((req: Request, res: Response, next) => {
+//serve static assets if in production
+
+// prefix all other routes with /api
+const router = express.Router();
+app.use("/api", router);
+
+router.use((req: Request, res: Response, next) => {
   res.header("content-type", "application/json");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header(
@@ -38,12 +44,6 @@ app.use((req: Request, res: Response, next) => {
   );
   next();
 });
-
-//serve static assets if in production
-
-// prefix all other routes with /api
-const router = express.Router();
-app.use("/api", router);
 
 router.use("/auth", authRouter);
 

@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/popover";
 import useAccount from "./hooks/account";
 import { Button } from "./components/ui/button";
-import { useEffect } from "react";
 
 const menus = [
   {
