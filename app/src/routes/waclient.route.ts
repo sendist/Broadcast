@@ -9,12 +9,18 @@ import {
 } from "../utils/jwt.util";
 import validate from "../middlewares/validation.middleware";
 import { body, cookie } from "express-validator";
-import waClient from "../utils/waweb.util";
+import { client, data } from "../utils/waweb.util";
+import sendResponse from "../utils/response.util";
+import WAWebJS from "whatsapp-web.js";
 
 const router = express.Router();
 router.get("/qr", (req: Request, res: Response) => {
-    waClient
-    }
-);
+  client.getState().then((state) => {
+    sendResponse({
+      res,
+      data: { status: state },
+    });
+  });
+});
 
 export default router;

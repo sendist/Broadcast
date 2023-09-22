@@ -8,6 +8,7 @@ import { AccountProvider } from "./context/account.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
 import Masjid from "./pages/Masjid/index.tsx";
 import Mubaligh from "./pages/Mubaligh/index.tsx";
+import NotFound from "./pages/NotFound/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,12 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <NotFound />,
     children: [
+      {
+        path: "waclient",
+        element: <Masjid />,
+      },
       {
         path: "masjid",
         element: <Masjid />,

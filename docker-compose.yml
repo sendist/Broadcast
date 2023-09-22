@@ -23,9 +23,10 @@ services:
         - "3000:3000"
     depends_on:
       - db
+    restart: unless-stopped
 
   nginx:
-    restart: always
+    restart: unless-stopped
     build:
         context: ./nginx
     ports:
