@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useAccount from "@/hooks/account";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAccount();
+  const navigate = useNavigate();
 
   return (
     <div className="w-[100vw] h-[100vh] grid place-items-center">
@@ -23,7 +25,14 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button className="w-full" onClick={() => login(username, password)}>
+        <Button
+          className="w-full"
+          onClick={() => {
+            login(username, password).then((isLoggedIn) => {
+              isLoggedIn && navigate("/");
+            });
+          }}
+        >
           Login
         </Button>
       </div>

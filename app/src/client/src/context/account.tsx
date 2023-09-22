@@ -13,15 +13,15 @@ const AccountContext = createContext<{
   account: Account | null;
   loading: boolean;
   error: string | null;
-  login: (username: string, password: string) => void;
-  refresh: () => void;
+  login: (username: string, password: string) => Promise<boolean>;
+  refresh: () => Promise<void>;
   logout: () => void;
 }>({
   account: null,
   loading: true,
   error: null,
-  login: () => {},
-  refresh: () => {},
+  login: () => Promise.resolve(true),
+  refresh: () => Promise.resolve(),
   logout: () => {},
 });
 
@@ -37,7 +37,7 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
 
   function login(username: string, password: string) {
     setLoading(true);
-    fetch(BASE_URL + "/api/auth/login", {
+    return fetch(BASE_URL + "/api/auth/login", {
       headers: {
         "Content-Type": "application/json",
       },
@@ -53,10 +53,11 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
             title: "Error",
             description: data.error,
           });
-          return;
+          return false;
         }
         setError(null);
         setAccount(data.data);
+        return true;
       })
       .catch((err) => {
         toast({
@@ -64,12 +65,13 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
           description: err.message,
         });
         console.log(err);
+        return false;
       });
   }
 
   function refresh() {
     setLoading(true);
-    fetch(BASE_URL + "/api/auth/refresh")
+    return fetch(BASE_URL + "/api/auth/refresh")
       .then((res) => res.json())
       .then((data: { error: string; data: Account }) => {
         setLoading(false);

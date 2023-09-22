@@ -9,6 +9,7 @@ import { Toaster } from "./components/ui/toaster.tsx";
 import Masjid from "./pages/Masjid/index.tsx";
 import Mubaligh from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
+import WaClient from "./pages/WaClient/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "waclient",
-        element: <Masjid />,
+        element: <WaClient />,
       },
       {
         path: "masjid",

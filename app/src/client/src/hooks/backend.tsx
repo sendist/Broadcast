@@ -4,11 +4,11 @@ import useSession from "./account";
 import { BASE_URL } from "@/lib/constants";
 
 export function useCRUD<T>({
-  shouldGetData = true,
+  initialGet = true,
   url,
   params,
 }: {
-  shouldGetData?: boolean;
+  initialGet?: boolean;
   url: string;
   params?: Record<string, string>;
 }) {
@@ -20,6 +20,7 @@ export function useCRUD<T>({
   const { account } = useSession();
 
   const get = useCallback(() => {
+    setLoading(true);
     fetch(
       `${BASE_URL}/api${url}${params ? "?" + new URLSearchParams(params) : ""}`,
       {
@@ -51,11 +52,7 @@ export function useCRUD<T>({
       });
   }, [account?.accessToken, params, toast, url]);
 
-  function reload() {
-    get();
-  }
-
-  function create(data: unknown) {
+  function create(data: unknown, refresh = true) {
     setLoading(true);
     fetch(`${BASE_URL}/api${url}`, {
       headers: {
@@ -75,6 +72,7 @@ export function useCRUD<T>({
           });
           return;
         }
+        refresh && get();
       })
       .catch((err) => {
         toast({
@@ -85,7 +83,7 @@ export function useCRUD<T>({
       });
   }
 
-  function update(data: T) {
+  function update(data: unknown, refresh = true) {
     setLoading(true);
     fetch(
       `${BASE_URL}/api${url}${params ? "?" + new URLSearchParams(params) : ""}`,
@@ -98,7 +96,7 @@ export function useCRUD<T>({
       }
     )
       .then((res) => res.json())
-      .then((data: { error: string; data: T }) => {
+      .then((data: { error: string; data: unknown }) => {
         setLoading(false);
         if (data.error) {
           setError(data.error);
@@ -108,7 +106,7 @@ export function useCRUD<T>({
           });
           return;
         }
-        setData(data.data);
+        refresh && get();
       })
       .catch((err) => {
         toast({
@@ -119,7 +117,7 @@ export function useCRUD<T>({
       });
   }
 
-  function remove(id: string) {
+  function remove(id: unknown, refresh = true) {
     setLoading(true);
     fetch(`${BASE_URL}/api${url}/${id}`, {
       headers: {
@@ -128,7 +126,7 @@ export function useCRUD<T>({
       method: "DELETE",
     })
       .then((res) => res.json())
-      .then((data: { error: string; data: T }) => {
+      .then((data: { error: string; data: unknown }) => {
         setLoading(false);
         if (data.error) {
           setError(data.error);
@@ -138,7 +136,7 @@ export function useCRUD<T>({
           });
           return;
         }
-        setData(data.data);
+        refresh && get();
       })
       .catch((err) => {
         toast({
@@ -150,12 +148,56 @@ export function useCRUD<T>({
   }
 
   useEffect(() => {
-    if (!shouldGetData) {
+    if (!initialGet) {
       return;
     }
     get();
-    setLoading(true);
-  }, [account?.accessToken, get, params, shouldGetData, toast, url]);
+  }, [account?.accessToken, get, params, initialGet, toast, url]);
 
-  return { data, error, loading, create, update, remove, reload };
+  return { data, error, loading, create, update, remove, get };
+}
+
+export function useServerAction() {
+  const { toast } = useToast();
+  const { account } = useSession();
+
+  const serverAction = useCallback(
+    (
+      input: RequestInfo | URL,
+      methodAndData?: {
+        method?: "GET" | "POST" | "PUT" | "DELETE";
+        data?: object;
+      }
+    ) =>
+      fetch(`${BASE_URL}/api${input}`, {
+        headers: {
+          Authorization: `Bearer ${account?.accessToken}`,
+        },
+        method: methodAndData?.method || "GET",
+        body: methodAndData?.data
+          ? JSON.stringify(methodAndData.data)
+          : undefined,
+      })
+        .then((res) => res.json())
+        .then(({ error, data }) => {
+          if (error) {
+            toast({
+              title: "Error",
+              description: error,
+            });
+            return null;
+          }
+          return data;
+        })
+        .catch((err) => {
+          toast({
+            title: "Error",
+            description: err.message,
+          });
+          console.log(err);
+          return null;
+        }),
+    [account?.accessToken, toast]
+  );
+  return serverAction;
 }
