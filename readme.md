@@ -1,18 +1,16 @@
 # Broadcast
 
 ## About
-This is the repository that maintains the development of web applications intended for <bold>broadcasting</bold> "Jadwal Pengajian" (or Congregational Recitations/Lectures Schedule) and "Jadwal Jumatan" (or Friday Prayer Schedule) through <bold>WhatsApp</bold>.
+This is the repository that maintains the development of web applications intended for **broadcasting** "Jadwal Pengajian" (or Congregational Recitations/Lectures Schedule) and "Jadwal Jumatan" (or Friday Prayer Schedule) through **WhatsApp**.
 
 ## Tech Stack Used
 There are several tech stacks used, namely:
-<ol>
-  <li>React</li>
-  <li>Vite</li>
-  <li>Node.js and Express.js</li>
-  <li>PostgreSQL</li>
-  <li>Typescript</li>
-  <li>Docker (as container)</li>
-</ol>
+1. React
+2. Vite
+3. Node.js and Express.js
+4. PostgreSQL
+5. Typescript
+6. Docker (as container)
 
 ## Guide
 
