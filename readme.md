@@ -1,6 +1,18 @@
 # Broadcast
 
-ini adalah aplikasi web untuk broadcast jadwal pengajian dan jumatan melalui whatsapp
+## About
+This is the repository that maintains the development of web applications intended for <bold>broadcasting</bold> "Jadwal Pengajian" (or Congregational Recitations/Lectures Schedule) and "Jadwal Jumatan" (or Friday Prayer Schedule) through <bold>WhatsApp</bold>.
+
+## Tech Stack Used
+There are several tech stacks used, namely:
+<ol>
+  <li>React</li>
+  <li>Vite</li>
+  <li>Node.js and Express.js</li>
+  <li>PostgreSQL</li>
+  <li>Typescript</li>
+  <li>Docker (as container)</li>
+</ol>
 
 ## Guide
 
