@@ -10,6 +10,7 @@ import Masjid from "./pages/Masjid/index.tsx";
 import Mubaligh from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
 import WaClient from "./pages/WaClient/index.tsx";
+import Template from "./pages/Template/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <NotFound />,
     children: [
+      {
+        path: "template",
+        element: <Template />,
+      },
       {
         path: "waclient",
         element: <WaClient />,

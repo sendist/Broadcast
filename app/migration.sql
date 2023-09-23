@@ -2,8 +2,8 @@
 -- docker volume create --name broadcast
 -- docker run --name broadcast -e POSTGRES_PASSWORD=broadcast -p 54321:54321 -v /broadcast:/var/lib/postgresql/data -d postgres
 
-CREATE EXTENSION IF NOT EXISTS 'pgcrypto';
-CREATE EXTENSION IF NOT EXISTS 'uuid-ossp';
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- create table user with uuid as primary key and username as unique and password
 CREATE TABLE IF NOT EXISTS "user" (

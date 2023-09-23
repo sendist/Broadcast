@@ -10,11 +10,13 @@ export default function authentication(
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return sendResponse({ res, error: "No access token" });
-  try {
-    const user = verifyAccessToken(token);
-    req.user = user;
-    next();
-  } catch (err) {
+  const { error, data: user } = verifyAccessToken(token);
+  if (error) {
+    if (error === "TokenExpiredError") {
+      return sendResponse({ res, error: "Access token expired" });
+    }
     return sendResponse({ res, error: "Invalid access token" });
   }
+  req.user = user;
+  next();
 }

@@ -28,8 +28,9 @@ router.post(
           bcrypt
             .compare(password, user.password.replace(/^\$2y/, "$2a"))
             .then((result) => {
+              //if the user is authenticated
               if (result) {
-                const accessToken = generateAccessToken({
+                const token = generateAccessToken({
                   id: user.id,
                   username: user.username,
                 });
@@ -40,7 +41,11 @@ router.post(
                 });
                 sendResponse({
                   res,
-                  data: { id: user.id, username: user.username, accessToken },
+                  data: {
+                    id: user.id,
+                    username: user.username,
+                    accessToken: token,
+                  },
                 });
               } else {
                 sendResponse({
@@ -66,9 +71,16 @@ router.get(
   validate([cookie("refreshToken").notEmpty().isJWT()]),
   (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    try {
-      const user = verifyRefreshToken(refreshToken);
-      const accessToken = generateAccessToken({
+    const { error, data: user } = verifyRefreshToken(refreshToken);
+    if (error) {
+      return sendResponse({
+        res,
+        error: "Invalid refresh token",
+        status: 401,
+      });
+    }
+    if (user) {
+      const token = generateAccessToken({
         id: user.id,
         username: user.username,
       });
@@ -79,13 +91,7 @@ router.get(
       });
       return sendResponse({
         res,
-        data: { id: user.id, username: user.username, accessToken },
-      });
-    } catch (err) {
-      return sendResponse({
-        res,
-        error: "Invalid refresh token",
-        status: 401,
+        data: { id: user.id, username: user.username, accessToken: token },
       });
     }
   }

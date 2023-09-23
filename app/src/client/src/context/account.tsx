@@ -14,14 +14,14 @@ const AccountContext = createContext<{
   loading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<boolean>;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<boolean>;
   logout: () => void;
 }>({
   account: null,
   loading: true,
   error: null,
   login: () => Promise.resolve(true),
-  refresh: () => Promise.resolve(),
+  refresh: () => Promise.resolve(false),
   logout: () => {},
 });
 
@@ -82,18 +82,22 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
             title: "Error",
             description: data.error,
           });
-          return;
+          return false;
         }
         setError(null);
         setAccount(data.data);
-        setLoading(false);
+        return true;
       })
       .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        setAccount(null);
         toast({
           title: "Error",
           description: err.message,
         });
         console.log(err);
+        return false;
       });
   }
 

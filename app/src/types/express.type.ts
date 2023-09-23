@@ -1,10 +1,8 @@
 import Express from "express";
+import { User } from "./user.type";
 
 export type Request = Express.Request & {
-  user?: {
-    id: string;
-    username: string;
-  };
+  user?: User;
 };
 
 export type Response = Express.Response;

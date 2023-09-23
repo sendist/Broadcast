@@ -15,7 +15,6 @@ export default function validate(validations: ValidationChain[]) {
     if (errors.isEmpty()) {
       return next();
     }
-
     sendResponse({ res, error: "Bad Request", status: 400 });
   };
 }

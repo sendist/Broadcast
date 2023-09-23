@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import url from "url";
 import path from "path";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
@@ -9,7 +10,8 @@ import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import masjidRoute from "./src/routes/masjid.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
-import ws from "ws";
+import sendResponse from "./src/utils/response.util";
+import { verifyAccessToken, verifyWSToken } from "./src/utils/jwt.util";
 dotenv.config();
 
 const app = express();
@@ -50,6 +52,7 @@ router.use("/auth", authRoute);
 
 // all routes below this line will require authentication
 router.use(authentication);
+app.use(authentication);
 
 router.use("/waclient", waClientRoute);
 
@@ -75,7 +78,21 @@ const server = app.listen(port, () => {
 });
 
 server.on("upgrade", (req, socket, head) => {
-  waClientWs.handleUpgrade(req, socket, head, (socket) => {
-    waClientWs.emit("connection", socket, req);
-  });
+  // check JWT authentication from params "token" example: ?token=eyjhb...
+  // if valid, upgrade the connection
+  // else, close the connection
+  const queries = url.parse(req.url || "", true).query;
+  const token = queries.token;
+  if (typeof token === "string") {
+    const { error, data } = verifyWSToken(token);
+    if (error) {
+      socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+      socket.destroy();
+      return;
+    }
+    waClientWs.handleUpgrade(req, socket, head, (socket) => {
+      waClientWs.emit("connection", socket, req);
+    });
+  }
+  if (typeof token !== "string") throw new Error("Invalid token");
 });

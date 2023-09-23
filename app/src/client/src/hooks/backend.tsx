@@ -2,6 +2,23 @@ import { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import useSession from "./account";
 import { BASE_URL } from "@/lib/constants";
+import { isStringJson } from "@/lib/utils";
+
+export function checkTokenExpired(
+  error: string,
+  refresh: () => Promise<boolean>,
+  redoFunction: () => void
+) {
+  if (error === "TokenExpiredError") {
+    return refresh().then((successRefresh) => {
+      successRefresh && redoFunction();
+      return successRefresh;
+    });
+  }
+  return Promise.resolve(false);
+}
+
+// TODO: check for bug in checkTokenExpired
 
 export function useCRUD<T>({
   initialGet = true,
@@ -17,7 +34,7 @@ export function useCRUD<T>({
   const [loading, setLoading] = useState<boolean>(false);
 
   const { toast } = useToast();
-  const { account } = useSession();
+  const { account, refresh } = useSession();
 
   const get = useCallback(() => {
     setLoading(true);
@@ -34,10 +51,14 @@ export function useCRUD<T>({
       .then((data: { error: string; data: T }) => {
         setLoading(false);
         if (data.error) {
-          setError(data.error);
-          toast({
-            title: "Error",
-            description: data.error,
+          checkTokenExpired(data.error, refresh, get).then((successRefresh) => {
+            if (!successRefresh) {
+              setError(data.error);
+              toast({
+                title: "Error",
+                description: data.error,
+              });
+            }
           });
           return;
         }
@@ -50,9 +71,9 @@ export function useCRUD<T>({
         });
         console.log(err);
       });
-  }, [account?.accessToken, params, toast, url]);
+  }, [account?.accessToken, params, refresh, toast, url]);
 
-  function create(data: unknown, refresh = true) {
+  function create(data: unknown, shouldRefresh = true) {
     setLoading(true);
     fetch(`${BASE_URL}/api${url}`, {
       headers: {
@@ -65,14 +86,20 @@ export function useCRUD<T>({
       .then((data: { error: string; data: unknown }) => {
         setLoading(false);
         if (data.error) {
-          setError(data.error);
-          toast({
-            title: "Error",
-            description: data.error,
+          checkTokenExpired(data.error, refresh, () =>
+            create(data, shouldRefresh)
+          ).then((successRefresh) => {
+            if (!successRefresh) {
+              setError(data.error);
+              toast({
+                title: "Error",
+                description: data.error,
+              });
+            }
           });
           return;
         }
-        refresh && get();
+        shouldRefresh && get();
       })
       .catch((err) => {
         toast({
@@ -83,7 +110,7 @@ export function useCRUD<T>({
       });
   }
 
-  function update(data: unknown, refresh = true) {
+  function update(data: unknown, shouldRefresh = true) {
     setLoading(true);
     fetch(
       `${BASE_URL}/api${url}${params ? "?" + new URLSearchParams(params) : ""}`,
@@ -99,14 +126,20 @@ export function useCRUD<T>({
       .then((data: { error: string; data: unknown }) => {
         setLoading(false);
         if (data.error) {
-          setError(data.error);
-          toast({
-            title: "Error",
-            description: data.error,
+          checkTokenExpired(data.error, refresh, () =>
+            update(data, shouldRefresh)
+          ).then((successRefresh) => {
+            if (!successRefresh) {
+              setError(data.error);
+              toast({
+                title: "Error",
+                description: data.error,
+              });
+            }
           });
           return;
         }
-        refresh && get();
+        shouldRefresh && get();
       })
       .catch((err) => {
         toast({
@@ -117,7 +150,7 @@ export function useCRUD<T>({
       });
   }
 
-  function remove(id: unknown, refresh = true) {
+  function remove(id: unknown, shouldRefresh = true) {
     setLoading(true);
     fetch(`${BASE_URL}/api${url}/${id}`, {
       headers: {
@@ -129,14 +162,20 @@ export function useCRUD<T>({
       .then((data: { error: string; data: unknown }) => {
         setLoading(false);
         if (data.error) {
-          setError(data.error);
-          toast({
-            title: "Error",
-            description: data.error,
+          checkTokenExpired(data.error, refresh, () =>
+            create(data, shouldRefresh)
+          ).then((successRefresh) => {
+            if (!successRefresh) {
+              setError(data.error);
+              toast({
+                title: "Error",
+                description: data.error,
+              });
+            }
           });
           return;
         }
-        refresh && get();
+        shouldRefresh && get();
       })
       .catch((err) => {
         toast({
@@ -159,17 +198,17 @@ export function useCRUD<T>({
 
 export function useServerAction() {
   const { toast } = useToast();
-  const { account } = useSession();
+  const { account, refresh } = useSession();
 
   const serverAction = useCallback(
     (
-      input: RequestInfo | URL,
+      url: RequestInfo | URL,
       methodAndData?: {
         method?: "GET" | "POST" | "PUT" | "DELETE";
         data?: object;
       }
     ) =>
-      fetch(`${BASE_URL}/api${input}`, {
+      fetch(`${BASE_URL}/api${url}`, {
         headers: {
           Authorization: `Bearer ${account?.accessToken}`,
         },
@@ -181,9 +220,15 @@ export function useServerAction() {
         .then((res) => res.json())
         .then(({ error, data }) => {
           if (error) {
-            toast({
-              title: "Error",
-              description: error,
+            checkTokenExpired(data.error, refresh, () =>
+              serverAction(url, methodAndData)
+            ).then((successRefresh) => {
+              if (!successRefresh) {
+                toast({
+                  title: "Error",
+                  description: error,
+                });
+              }
             });
             return null;
           }
@@ -197,7 +242,45 @@ export function useServerAction() {
           console.log(err);
           return null;
         }),
-    [account?.accessToken, toast]
+    [account?.accessToken, refresh, toast]
   );
   return serverAction;
+}
+
+export function useWebSocket<T>(url: string, tokenUrl: string) {
+  //request token from tokenUrl
+  const { data } = useCRUD<{ token: string }>({
+    url: tokenUrl,
+  });
+  const [lastJsonMessage, setLastJsonMessage] = useState<T | null>(null);
+  const [lastMessage, setLastMessage] = useState<MessageEvent["data"] | null>(
+    null
+  );
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  useEffect(() => {
+    if (data) {
+      const ws = new WebSocket(
+        `${BASE_URL.replace(/^http/, "ws")}/api${url}?token=${data.token}`
+      );
+      setWs(ws);
+      ws.onmessage = (e) => {
+        setLastMessage(e.data);
+        const json = isStringJson(e.data);
+        json && setLastJsonMessage(json);
+      };
+      ws.onclose = (e) => {
+        console.log(e);
+      };
+      ws.onerror = (e) => {
+        console.log(e);
+      };
+    }
+  }, [data, url]);
+
+  function sendMessage(message: string) {
+    if (ws) {
+      ws.send(message);
+    }
+  }
+  return { lastJsonMessage, lastMessage, sendMessage };
 }

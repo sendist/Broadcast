@@ -1,9 +1,9 @@
-import useWebSocket, { SendMessage } from "react-use-websocket";
 import QRCode from "react-qr-code";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useCRUD } from "@/hooks/backend";
+import { useServerAction } from "@/hooks/backend";
 import { Badge } from "@/components/ui/badge";
+import { useWebSocket } from "@/hooks/backend";
 
 export default function WaClient() {
   const [waClientInfo, setWaClientInfo] = useState<{
@@ -13,31 +13,25 @@ export default function WaClient() {
     qr: "",
     state: "LOADING",
   });
-  const {
-    lastJsonMessage,
-    sendMessage,
-  }: {
-    lastJsonMessage: {
-      qr: string;
-      /*
-      LOADING
-      CONFLICT
-      CONNECTED
-      DEPRECATED_VERSION
-      OPENING
-      PAIRING
-      PROXYBLOCK
-      SMB_TOS_BLOCK
-      TIMEOUT
-      TOS_BLOCK
-      UNLAUNCHED
-      UNPAIRED
-      UNPAIRED_IDLE
-      */
-      state: "LOADING" | "CONNECTED" | "UNPAIRED" | "UNPAIRED_IDLE" | string;
-    } | null;
-    sendMessage: SendMessage;
-  } = useWebSocket("ws://localhost:3000/api/waclient/connect");
+  const { lastJsonMessage, sendMessage } = useWebSocket<{
+    qr: string;
+    /*
+    LOADING
+    CONFLICT
+    CONNECTED
+    DEPRECATED_VERSION
+    OPENING
+    PAIRING
+    PROXYBLOCK
+    SMB_TOS_BLOCK
+    TIMEOUT
+    TOS_BLOCK
+    UNLAUNCHED
+    UNPAIRED
+    UNPAIRED_IDLE
+    */
+    state: "LOADING" | "CONNECTED" | "UNPAIRED" | "UNPAIRED_IDLE" | string;
+  }>("/waclient/ws", "/waclient/connect");
 
   useEffect(() => {
     if (lastJsonMessage !== null) {
@@ -46,10 +40,7 @@ export default function WaClient() {
     console.log(lastJsonMessage);
   }, [lastJsonMessage]);
 
-  const { get } = useCRUD({
-    url: "/waclient/logout",
-    initialGet: false,
-  });
+  const serverAction = useServerAction();
 
   return (
     <>
@@ -78,7 +69,7 @@ export default function WaClient() {
       <div className="flex gap-4">
         <Button
           onClick={() => {
-            get();
+            serverAction("/waclient/logout");
           }}
         >
           Logout
