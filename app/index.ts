@@ -10,8 +10,7 @@ import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import masjidRoute from "./src/routes/masjid.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
-import sendResponse from "./src/utils/response.util";
-import { verifyAccessToken, verifyWSToken } from "./src/utils/jwt.util";
+import { verifyWSToken } from "./src/utils/jwt.util";
 dotenv.config();
 
 const app = express();

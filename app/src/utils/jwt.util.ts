@@ -8,9 +8,9 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "NO_SECRET";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "NO_SECRET";
 const WS_TOKEN_SECRET = process.env.WS_TOKEN_SECRET || "NO_SECRET";
 
-const ACCESS_TOKEN_EXPIRES_IN = 1000 * 60 * 60 * 2;
-const REFRESH_TOKEN_EXPIRES_IN = 1000 * 60 * 60 * 48;
-const WS_TOKEN_EXPIRES_IN = 1000 * 10;
+const ACCESS_TOKEN_EXPIRES_IN = 60 * 60 * 2;
+const REFRESH_TOKEN_EXPIRES_IN = 60 * 60 * 24 * 14;
+const WS_TOKEN_EXPIRES_IN = 10;
 
 export type VerifyErrors =
   | { name: "JsonWebTokenError" }
@@ -45,7 +45,7 @@ export function generateRefreshToken({
   res.cookie("refreshToken", token, {
     httpOnly: true,
     path: "/api/auth/refresh",
-    maxAge: REFRESH_TOKEN_EXPIRES_IN,
+    maxAge: 1000 * REFRESH_TOKEN_EXPIRES_IN,
   });
   return token;
 }

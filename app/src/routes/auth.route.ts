@@ -66,11 +66,9 @@ router.post(
   }
 );
 
-router.get(
-  "/refresh",
-  validate([cookie("refreshToken").notEmpty().isJWT()]),
-  (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
+router.get("/refresh", (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+  try {
     const { error, data: user } = verifyRefreshToken(refreshToken);
     if (error) {
       return sendResponse({
@@ -94,7 +92,21 @@ router.get(
         data: { id: user.id, username: user.username, accessToken: token },
       });
     }
+  } catch (err) {
+    return sendResponse({
+      res,
+      error: "Invalid refresh token",
+      status: 401,
+    });
   }
-);
+});
+
+router.get("/logout", (req: Request, res: Response) => {
+  res.clearCookie("refreshToken");
+  sendResponse({
+    res,
+    data: "Logged out successfully",
+  });
+});
 
 export default router;

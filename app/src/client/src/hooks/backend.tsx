@@ -3,22 +3,10 @@ import { useToast } from "@/components/ui/use-toast";
 import useSession from "./account";
 import { BASE_URL } from "@/lib/constants";
 import { isStringJson } from "@/lib/utils";
+import { redirect } from "react-router-dom";
+import { ServerResult } from "@/lib/types";
 
-export function checkTokenExpired(
-  error: string,
-  refresh: () => Promise<boolean>,
-  redoFunction: () => void
-) {
-  if (error === "TokenExpiredError") {
-    return refresh().then((successRefresh) => {
-      successRefresh && redoFunction();
-      return successRefresh;
-    });
-  }
-  return Promise.resolve(false);
-}
-
-// TODO: check for bug in checkTokenExpired
+export type Data<T> = T;
 
 export function useCRUD<T>({
   initialGet = true,
@@ -29,40 +17,56 @@ export function useCRUD<T>({
   url: string;
   params?: Record<string, string>;
 }) {
-  const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useState<Data<T>[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { toast } = useToast();
   const { account, refresh } = useSession();
 
+  const checkTokenExpired = useCallback(
+    // TODO: redesign redoFunction
+    (error: string, redoFunction: () => void) => {
+      if (error === "Invalid access token") {
+        return refresh().then((isRefreshSuccess) => {
+          console.log(isRefreshSuccess);
+          if (isRefreshSuccess === false) {
+            return redirect("/login");
+          }
+          // isRefreshSuccess && redoFunction();
+          return isRefreshSuccess;
+        });
+      } else {
+        setError(error);
+        toast({
+          title: "Error",
+          description: error,
+        });
+      }
+    },
+    [refresh, toast]
+  );
+
   const get = useCallback(() => {
     setLoading(true);
     fetch(
-      `${BASE_URL}/api${url}${params ? "?" + new URLSearchParams(params) : ""}`,
+      `${BASE_URL}${url}${params ? "?" + new URLSearchParams(params) : ""}`,
       {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${account?.accessToken}`,
         },
         method: "GET",
       }
     )
       .then((res) => res.json())
-      .then((data: { error: string; data: T }) => {
+      .then(({ error, data }: ServerResult<Data<T>[]>) => {
         setLoading(false);
-        if (data.error) {
-          checkTokenExpired(data.error, refresh, get).then((successRefresh) => {
-            if (!successRefresh) {
-              setError(data.error);
-              toast({
-                title: "Error",
-                description: data.error,
-              });
-            }
-          });
+        if (error) {
+          checkTokenExpired(error, () => get());
           return;
         }
-        setData(data.data);
+        setData(data);
       })
       .catch((err) => {
         toast({
@@ -71,34 +75,37 @@ export function useCRUD<T>({
         });
         console.log(err);
       });
-  }, [account?.accessToken, params, refresh, toast, url]);
+  }, [account?.accessToken, checkTokenExpired, params, toast, url]);
 
-  function create(data: unknown, shouldRefresh = true) {
+  function create(dataToInsert: Omit<T, "id">, shouldRefresh = true) {
     setLoading(true);
-    fetch(`${BASE_URL}/api${url}`, {
+    fetch(`${BASE_URL}${url}`, {
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${account?.accessToken}`,
       },
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(dataToInsert),
     })
       .then((res) => res.json())
-      .then((data: { error: string; data: unknown }) => {
+      .then(({ error }: ServerResult<Data<T>>) => {
         setLoading(false);
-        if (data.error) {
-          checkTokenExpired(data.error, refresh, () =>
-            create(data, shouldRefresh)
-          ).then((successRefresh) => {
-            if (!successRefresh) {
-              setError(data.error);
-              toast({
-                title: "Error",
-                description: data.error,
-              });
-            }
-          });
+        if (error) {
+          checkTokenExpired(error, () => create(dataToInsert));
           return;
         }
+        // update data with matching id
+        // setData((prevData) => {
+        //   if (prevData && data?.id) {
+        //     prevData.findIndex((item) => item.id === data.id) !== -1 &&
+        //       prevData.splice(
+        //         prevData.findIndex((item) => item.id === data.id),
+        //         1,
+        //         data as Data<T>
+        //       );
+        //   }
+        //   return prevData;
+        // });
         shouldRefresh && get();
       })
       .catch((err) => {
@@ -110,33 +117,26 @@ export function useCRUD<T>({
       });
   }
 
-  function update(data: unknown, shouldRefresh = true) {
+  function update(id: string, data: Partial<T>, shouldRefresh = true) {
     setLoading(true);
     fetch(
-      `${BASE_URL}/api${url}${params ? "?" + new URLSearchParams(params) : ""}`,
+      `${BASE_URL}${url}/${id}${
+        params ? "?" + new URLSearchParams(params) : ""
+      }`,
       {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${account?.accessToken}`,
         },
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify(data),
       }
     )
       .then((res) => res.json())
-      .then((data: { error: string; data: unknown }) => {
+      .then(({ error }: ServerResult<Data<unknown>>) => {
         setLoading(false);
-        if (data.error) {
-          checkTokenExpired(data.error, refresh, () =>
-            update(data, shouldRefresh)
-          ).then((successRefresh) => {
-            if (!successRefresh) {
-              setError(data.error);
-              toast({
-                title: "Error",
-                description: data.error,
-              });
-            }
-          });
+        if (error) {
+          checkTokenExpired(error, () => update(id, data, shouldRefresh));
           return;
         }
         shouldRefresh && get();
@@ -150,9 +150,9 @@ export function useCRUD<T>({
       });
   }
 
-  function remove(id: unknown, shouldRefresh = true) {
+  function remove(id: string, shouldRefresh = true) {
     setLoading(true);
-    fetch(`${BASE_URL}/api${url}/${id}`, {
+    fetch(`${BASE_URL}${url}/${id}`, {
       headers: {
         Authorization: `Bearer ${account?.accessToken}`,
       },
@@ -162,17 +162,7 @@ export function useCRUD<T>({
       .then((data: { error: string; data: unknown }) => {
         setLoading(false);
         if (data.error) {
-          checkTokenExpired(data.error, refresh, () =>
-            create(data, shouldRefresh)
-          ).then((successRefresh) => {
-            if (!successRefresh) {
-              setError(data.error);
-              toast({
-                title: "Error",
-                description: data.error,
-              });
-            }
-          });
+          checkTokenExpired(data.error, () => remove(id, shouldRefresh));
           return;
         }
         shouldRefresh && get();
@@ -191,7 +181,8 @@ export function useCRUD<T>({
       return;
     }
     get();
-  }, [account?.accessToken, get, params, initialGet, toast, url]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { data, error, loading, create, update, remove, get };
 }
@@ -200,16 +191,38 @@ export function useServerAction() {
   const { toast } = useToast();
   const { account, refresh } = useSession();
 
+  const checkTokenExpired = useCallback(
+    (error: string, redoFunction: () => void) => {
+      if (error === "Invalid access token") {
+        return refresh().then((successRefresh) => {
+          if (!successRefresh) {
+            successRefresh === false && redirect("/login");
+          }
+          successRefresh && redoFunction();
+          return successRefresh;
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error,
+        });
+      }
+      return Promise.resolve(false);
+    },
+    [refresh, toast]
+  );
+
   const serverAction = useCallback(
-    (
+    <T,>(
       url: RequestInfo | URL,
       methodAndData?: {
         method?: "GET" | "POST" | "PUT" | "DELETE";
         data?: object;
       }
     ) =>
-      fetch(`${BASE_URL}/api${url}`, {
+      fetch(`${BASE_URL}${url}`, {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${account?.accessToken}`,
         },
         method: methodAndData?.method || "GET",
@@ -220,19 +233,18 @@ export function useServerAction() {
         .then((res) => res.json())
         .then(({ error, data }) => {
           if (error) {
-            checkTokenExpired(data.error, refresh, () =>
+            checkTokenExpired(data.error, () =>
               serverAction(url, methodAndData)
-            ).then((successRefresh) => {
-              if (!successRefresh) {
-                toast({
-                  title: "Error",
-                  description: error,
-                });
-              }
-            });
-            return null;
+            );
+            return {
+              error,
+              data: null,
+            };
           }
-          return data;
+          return {
+            error: null,
+            data: data as T,
+          };
         })
         .catch((err) => {
           toast({
@@ -240,42 +252,70 @@ export function useServerAction() {
             description: err.message,
           });
           console.log(err);
-          return null;
+          return {
+            error: err.message,
+            data: null,
+          };
         }),
-    [account?.accessToken, refresh, toast]
+    [account?.accessToken, checkTokenExpired, toast]
   );
   return serverAction;
 }
 
-export function useWebSocket<T>(url: string, tokenUrl: string) {
+export function useWebSocket<T>(url: string) {
   //request token from tokenUrl
-  const { data } = useCRUD<{ token: string }>({
-    url: tokenUrl,
-  });
   const [lastJsonMessage, setLastJsonMessage] = useState<T | null>(null);
   const [lastMessage, setLastMessage] = useState<MessageEvent["data"] | null>(
     null
   );
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const serverAction = useServerAction();
+
   useEffect(() => {
-    if (data) {
-      const ws = new WebSocket(
-        `${BASE_URL.replace(/^http/, "ws")}/api${url}?token=${data.token}`
-      );
-      setWs(ws);
-      ws.onmessage = (e) => {
-        setLastMessage(e.data);
-        const json = isStringJson(e.data);
-        json && setLastJsonMessage(json);
-      };
-      ws.onclose = (e) => {
-        console.log(e);
-      };
-      ws.onerror = (e) => {
-        console.log(e);
-      };
-    }
-  }, [data, url]);
+    serverAction<{
+      token: string;
+    }>("/waclient/connect").then(({ data }) => {
+      if (data) {
+        const ws = new WebSocket(
+          `${location.protocol === "https:" ? "wss://" : "ws://"}${
+            location.hostname
+          }:3000${BASE_URL}${url}?token=${data.token}`
+        );
+        setWs(ws);
+        ws.onmessage = (e) => {
+          setLastMessage(e.data);
+          const json = isStringJson(e.data);
+          json && setLastJsonMessage(json);
+        };
+        ws.onclose = (e) => {
+          console.log(e);
+        };
+        ws.onerror = (e) => {
+          console.log(e);
+        };
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // useEffect(() => {
+  //   if (data) {
+  //     const ws = new WebSocket(
+  //       `${BASE_URL.replace(/^http/, "ws")}${url}?token=${data.token}`
+  //     );
+  //     setWs(ws);
+  //     ws.onmessage = (e) => {
+  //       setLastMessage(e.data);
+  //       const json = isStringJson(e.data);
+  //       json && setLastJsonMessage(json);
+  //     };
+  //     ws.onclose = (e) => {
+  //       console.log(e);
+  //     };
+  //     ws.onerror = (e) => {
+  //       console.log(e);
+  //     };
+  //   }
+  // }, [data, url]);
 
   function sendMessage(message: string) {
     if (ws) {

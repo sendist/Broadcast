@@ -15,11 +15,19 @@ import Template from "./pages/Template/index.tsx";
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <AccountProvider>
+        <Login />
+      </AccountProvider>
+    ),
   },
   {
     path: "/",
-    element: <App />,
+    element: (
+      <AccountProvider>
+        <App />
+      </AccountProvider>
+    ),
     errorElement: <NotFound />,
     children: [
       {
@@ -42,6 +50,14 @@ const router = createBrowserRouter([
         path: "masjid/:idMasjid",
         element: <div>ini masjid tapi ada id</div>,
       },
+      {
+        path: "jadwal-pengajian",
+        element: <div>Ini jadwal pengajian</div>,
+      },
+      {
+        path: "jadwal-jumatan",
+        element: <div>Ini jadwal jumatan</div>,
+      },
     ],
   },
 ]);
@@ -49,8 +65,6 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Toaster />
-    <AccountProvider>
-      <RouterProvider router={router} />
-    </AccountProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
