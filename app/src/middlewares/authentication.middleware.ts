@@ -13,9 +13,9 @@ export default function authentication(
   const { error, data: user } = verifyAccessToken(token);
   if (error) {
     if (error === "TokenExpiredError") {
-      return sendResponse({ res, error: "Access token expired" });
+      return sendResponse({ res, error: "Access token expired", status: 401 });
     }
-    return sendResponse({ res, error: "Invalid access token" });
+    return sendResponse({ res, error: "Invalid access token", status: 401 });
   }
   req.user = user;
   next();

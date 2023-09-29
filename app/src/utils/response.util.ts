@@ -1,14 +1,14 @@
 import { Response } from "../types/express.type";
-export default function sendResponse({
+export default function sendResponse<T>({
   res,
   error = null,
   data = null,
-  status = 200,
+  status,
 }:
   | {
       res: Response;
       error?: null;
-      data: unknown;
+      data: T;
       status?: number;
     }
   | {
@@ -17,7 +17,7 @@ export default function sendResponse({
       data?: null;
       status?: number;
     }) {
-  return res.status(status).send({
+  return res.status(status ?? (error === null ? 200 : 500)).send({
     error,
     data,
   });

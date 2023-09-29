@@ -1,40 +1,68 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useReducer } from "react";
 import { BASE_URL } from "@/lib/constants";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Account, ServerResult } from "@/lib/types";
+import { isStringJson } from "@/lib/utils";
 
 // account context
 
-const AccountContext = createContext<{
-  account: Account | null;
+interface State {
+  account?: Account;
+  error?: string;
   loading: boolean;
-  error: string | null;
-  login: (username: string, password: string) => Promise<void>;
-  refresh: () => Promise<boolean | null>;
-  logout: () => void;
-}>({
-  account: null,
+}
+
+type Action =
+  | { type: "loading" }
+  | { type: "success"; payload: Account }
+  | { type: "error"; payload: string }
+  | { type: "reset" };
+
+const AccountContext = createContext<
+  State & {
+    login: (username: string, password: string) => Promise<void>;
+    refresh: () => Promise<Account | false>;
+    logout: () => void;
+  }
+>({
+  account: undefined,
   loading: true,
-  error: null,
+  error: undefined,
   login: () => Promise.resolve(),
   refresh: () => Promise.resolve(false),
   logout: () => {},
 });
 
+const initialState: State = {
+  error: undefined,
+  account: isStringJson(localStorage.getItem("account")) || undefined,
+  loading: true,
+};
+
 const AccountProvider = ({ children }: { children: React.ReactNode }) => {
-  const [account, setAccount] = useState<Account | null>(
-    localStorage.getItem("account")
-      ? JSON.parse(localStorage.getItem("account")!)
-      : null
-  );
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const fetchReducer = (state: State, action: Action): State => {
+    switch (action.type) {
+      case "loading":
+        return { ...initialState };
+      case "success":
+        return { ...initialState, account: action.payload, loading: false };
+      case "error":
+        return { ...initialState, error: action.payload, loading: false };
+      case "reset":
+        return { ...initialState, loading: false };
+      default:
+        return state;
+    }
+  };
+  const [state, dispatch] = useReducer(fetchReducer, initialState);
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
   function login(username: string, password: string) {
-    setLoading(true);
+    dispatch({ type: "loading" });
+
     return fetch(BASE_URL + "/auth/login", {
       headers: {
         "Content-Type": "application/json",
@@ -45,15 +73,15 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
       .then((res) => res.json())
       .then(({ error, data }: ServerResult<Account>) => {
         if (error) {
-          setError(error);
+          dispatch({ type: "error", payload: error });
           toast({
             title: "Error",
             description: error,
           });
+        } else if (data) {
+          dispatch({ type: "success", payload: data });
+          navigate("/");
         }
-        setError(null);
-        setAccount(data);
-        navigate("/");
       })
       .catch((err) => {
         toast({
@@ -61,46 +89,43 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
           description: err.message,
         });
         console.log(err);
-      })
-      .finally(() => setLoading(false));
+      });
   }
 
-  function refresh() {
-    setLoading(true);
+  function refresh(): Promise<false | Account> {
     return fetch(BASE_URL + "/auth/refresh")
-      .then((res) => res.json())
-      .then(({ data, error }: ServerResult<Account>) => {
-        if (error && error === "Invalid refresh token") {
-          setError(error);
-          setAccount(null);
+      .then((res) => {
+        if (res.status === 401) {
+          dispatch({ type: "error", payload: "Session expired" });
           toast({
-            title: "Error",
-            description: error,
+            title: "Please re-login",
+            description: "Session expired",
           });
           navigate("/login");
           return false;
+        } else {
+          return res.json().then(({ data }: ServerResult<Account>) => {
+            if (data) {
+              dispatch({ type: "success", payload: data });
+              return data;
+            }
+            return false;
+          });
         }
-        setError(null);
-        setAccount(data);
-        return true;
       })
       .catch((err) => {
-        setError(err.message);
-        setAccount(null);
+        dispatch({ type: "error", payload: err.message });
         toast({
           title: "Error",
           description: err.message,
         });
-        console.log(err);
-        return null;
-      })
-      .finally(() => {
-        setLoading(false);
+        console.error(err);
+        return false;
       });
   }
 
   function logout() {
-    setLoading(true);
+    dispatch({ type: "loading" });
     return fetch(BASE_URL + "/auth/logout")
       .then((res) => res.json())
       .then(({ error }: ServerResult<unknown>) => {
@@ -111,40 +136,37 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
           });
           return;
         }
-        setAccount(null);
+        dispatch({ type: "reset" });
       })
       .catch((err) => {
         toast({
           title: "Error",
           description: err.message,
         });
-        console.log(err);
-      })
-      .finally(() => setLoading(false));
+        console.error(err);
+      });
   }
 
   useEffect(() => {
     // save or delete account from localStorage
-    if (account) {
-      localStorage.setItem("account", JSON.stringify(account));
+    if (state.account) {
+      localStorage.setItem("account", JSON.stringify(state.account));
     } else {
       localStorage.removeItem("account");
     }
-  }, [account]);
+  }, [state.account]);
 
-  useEffect(() => {
-    refresh().then((res) => {
-      if (res === false) {
-        navigate("/login");
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   refresh().then((res) => {
+  //     if (res === false) {
+  //       navigate("/login");
+  //     }
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
-    <AccountContext.Provider
-      value={{ account, loading, error, login, refresh, logout }}
-    >
+    <AccountContext.Provider value={{ ...state, login, refresh, logout }}>
       {children}
     </AccountContext.Provider>
   );

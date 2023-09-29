@@ -82,6 +82,8 @@ waClientWs.on("connection", (ws) => {
       sendData();
     }
   });
+
+  ws.on("error", console.error);
 });
 
 export default router;

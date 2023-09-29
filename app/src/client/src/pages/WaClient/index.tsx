@@ -1,9 +1,10 @@
 import QRCode from "react-qr-code";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useServerAction } from "@/hooks/backend";
 import { Badge } from "@/components/ui/badge";
 import { useWebSocket } from "@/hooks/backend";
+import { useApiFetch } from "@/hooks/fetch";
+import { BASE_URL } from "@/lib/constants";
 
 export default function WaClient() {
   const [waClientInfo, setWaClientInfo] = useState<{
@@ -40,7 +41,7 @@ export default function WaClient() {
     console.log(lastJsonMessage);
   }, [lastJsonMessage]);
 
-  const serverAction = useServerAction();
+  const httpCall = useApiFetch();
 
   return (
     <>
@@ -69,7 +70,7 @@ export default function WaClient() {
       <div className="flex gap-4">
         <Button
           onClick={() => {
-            serverAction("/waclient/logout");
+            httpCall({ url: `${BASE_URL}/waclient/logout` });
           }}
         >
           Logout

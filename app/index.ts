@@ -11,11 +11,19 @@ import masjidRoute from "./src/routes/masjid.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
+import fileUpload from "express-fileupload";
 dotenv.config();
 
 const app = express();
 export const port = process.env.PORT || 3000;
 
+//support upload for excel files (xlsx)
+// app.use(fileUpload());
+app.use(
+  bodyParser.raw({
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  })
+);
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -92,6 +100,8 @@ server.on("upgrade", (req, socket, head) => {
     waClientWs.handleUpgrade(req, socket, head, (socket) => {
       waClientWs.emit("connection", socket, req);
     });
+  } else {
+    socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+    socket.destroy();
   }
-  if (typeof token !== "string") throw new Error("Invalid token");
 });
