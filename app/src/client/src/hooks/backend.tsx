@@ -132,25 +132,33 @@ export function useCRUD<T>({
   return { ...state, get, create, update, remove };
 }
 
+// WEBSOCKET
+let websocket: WebSocket | null = null;
+
+function stopWebSocket() {
+  websocket?.close();
+  websocket = null;
+}
+
 export function useWebSocket<T>(url: string, getTokenURL: string) {
   const httpCall = useApiFetch();
   const [lastJsonMessage, setLastJsonMessage] = useState<T | null>(null);
   const [lastMessage, setLastMessage] = useState<MessageEvent["data"] | null>(
     null
   );
-  const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
     httpCall<{
       token: string;
     }>({ url: `${BASE_URL}${getTokenURL}` }).then((res) => {
       if (res?.data) {
+        stopWebSocket();
         const ws = new WebSocket(
           `${location.protocol === "https:" ? "wss://" : "ws://"}${
             location.hostname
           }:3000${BASE_URL}${url}?token=${res.data.token}`
         );
-        setWs(ws);
+        websocket = ws;
         ws.onmessage = (e) => {
           setLastMessage(e.data);
           const json = isStringJson(e.data);
@@ -166,12 +174,13 @@ export function useWebSocket<T>(url: string, getTokenURL: string) {
     });
 
     return () => {
-      ws?.close();
+      stopWebSocket();
     };
   }, []);
+
   function sendMessage(message: string) {
-    if (ws) {
-      ws.send(message);
+    if (websocket) {
+      websocket.send(message);
     }
   }
   return { lastJsonMessage, lastMessage, sendMessage };
