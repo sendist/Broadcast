@@ -13,7 +13,7 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 
-export function AddMasjidBulk({
+export function AddMubalighBulk({
   children,
   onSubmit,
 }: {
@@ -26,7 +26,7 @@ export function AddMasjidBulk({
 
   function downloadTemplate() {
     apiFetch({
-      url: `${BASE_URL}/masjid/template`,
+      url: `${BASE_URL}/mubaligh/template`,
     });
   }
 
@@ -38,7 +38,7 @@ export function AddMasjidBulk({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Upload Data Bulk</DialogTitle>
-          <DialogDescription>Input data masjid secara kolektif</DialogDescription>
+          <DialogDescription>Input data mubaligh secara kolektif</DialogDescription>
         </DialogHeader>
         <p>Step 1. Download File Template berikut terlebih dahulu.</p>
         <Button onClick={downloadTemplate}>Download Template</Button>
