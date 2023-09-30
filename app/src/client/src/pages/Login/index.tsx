@@ -9,7 +9,7 @@ export default function Login() {
   const { login } = useAccount();
 
   return (
-    <div className="w-[100vw] h-[100vh] grid place-items-center">
+    <div className="w-screen h-screen grid place-items-center">
       <div className="flex flex-col gap-4 items-center justify-stretch">
         <h1 className="text-xl font-bold">Login</h1>
         <Input
