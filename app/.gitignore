@@ -2,5 +2,3 @@ node_modules
 dist
 .env
 .wwebjs_*
-package-lock.json
-package.json
