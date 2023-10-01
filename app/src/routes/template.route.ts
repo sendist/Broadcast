@@ -19,10 +19,7 @@ router.get("/", (req: Request, res: Response) => {
 
 router.post(
   "/",
-  validate([
-    body("nama_template").notEmpty(),
-    body("content").notEmpty(),
-  ]),
+  validate([body("nama_template").notEmpty(), body("content").notEmpty()]),
   (req: Request, res: Response) => {
     const { nama_template, content } = req.body;
     prisma.template
@@ -64,7 +61,7 @@ router.get("/:id", (req: Request, res: Response) => {
   prisma.template
     .findUnique({
       where: {
-        id: parseInt(id),
+        id: BigInt(id),
       },
     })
     .then((template) => {
@@ -83,7 +80,7 @@ router.patch(
   ]),
   (req: Request, res: Response) => {
     const { id } = req.params;
-    const { nama_template, content} = req.body;
+    const { nama_template, content } = req.body;
     prisma.template
       .update({
         where: {

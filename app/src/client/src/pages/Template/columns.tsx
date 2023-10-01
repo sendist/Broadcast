@@ -14,7 +14,7 @@ import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Template= {
+export type Template = {
   id: string;
   nama_template: string;
   content: string;
@@ -58,7 +58,9 @@ export const columns: ColumnDef<Template>[] = [
   {
     accessorKey: "content",
     header: (header) => CellHeaderSortable(header, "Content"),
-    cell: EditCell,
+    cell: (props) => (
+      <EditCell {...props} textArea whatsappFormat />
+    ),
   },
   {
     id: "actions",
