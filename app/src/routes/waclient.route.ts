@@ -1,11 +1,13 @@
 import express from "express";
 import { Request, Response } from "../types/express.type";
-import { client, data as clientData } from "../utils/waweb.util";
+import { client, data as clientData, sendMessage } from "../utils/waweb.util";
 import sendResponse from "../utils/response.util";
 import { WebSocketServer } from "ws";
 import WAWebJS from "whatsapp-web.js";
 import { generateWSToken } from "../utils/jwt.util";
 import { User } from "../types/user.type";
+import validate from "../middlewares/validation.middleware";
+import { body } from "express-validator";
 
 const router = express.Router();
 
@@ -35,6 +37,30 @@ router.get("/connect", (req: Request, res: Response) => {
     data: { token },
   });
 });
+
+router.post(
+  "/sanitycheck",
+  validate([body("phone").isString().notEmpty()]),
+  (req: Request, res: Response) => {
+    const { phone } = req.body;
+    sendMessage(
+      phone,
+      "Sanity Check. If you receive this message, it means that the whatsapp client is running."
+    )
+      .then((message) => {
+        sendResponse({
+          res,
+          data: { message: "OK" },
+        });
+      })
+      .catch((err) => {
+        sendResponse({
+          res,
+          error: err.message,
+        });
+      });
+  }
+);
 
 //websocket
 export const waClientWs = new WebSocketServer({

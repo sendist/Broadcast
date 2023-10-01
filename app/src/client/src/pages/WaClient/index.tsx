@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useWebSocket } from "@/hooks/backend";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
+import { Input } from "@/components/ui/input";
 
 export default function WaClient() {
   const [waClientInfo, setWaClientInfo] = useState<{
@@ -43,6 +44,9 @@ export default function WaClient() {
 
   const httpCall = useApiFetch();
 
+  // TEMPORARY
+  const [noHP, setNoHP] = useState("");
+
   return (
     <>
       <div>
@@ -76,6 +80,28 @@ export default function WaClient() {
           Logout
         </Button>
         <Button onClick={() => sendMessage("refresh")}>Refresh</Button>
+        {waClientInfo.state === "CONNECTED" && (
+          <div>
+            <Input
+              placeholder="no. HP"
+              value={noHP}
+              onChange={(e) => setNoHP(e.target.value)}
+            />
+            <Button
+              onClick={() =>
+                httpCall({
+                  url: `${BASE_URL}/waclient/sanitycheck`,
+                  options: {
+                    body: JSON.stringify({ phone: noHP }),
+                    method: "POST",
+                  },
+                })
+              }
+            >
+              Send Test Message
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

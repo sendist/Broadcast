@@ -33,4 +33,20 @@ client.initialize().then(() => {
   });
 });
 
+export function sendMessage(
+  phone: string,
+  message: string
+): Promise<WAWebJS.Message> {
+  phone = phone.replace(/^0/, "62") + "@c.us";
+
+  return client.getState().then((state) => {
+    if (state === WAWebJS.WAState.CONNECTED) {
+      client.isRegisteredUser(phone);
+      return client.sendMessage(phone, message);
+    } else {
+      throw new Error("Client is not ready");
+    }
+  });
+}
+
 export { client, data };
