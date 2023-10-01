@@ -19,10 +19,7 @@ router.get("/", (req: Request, res: Response) => {
 
 router.post(
   "/",
-  validate([
-    body("nama_mubaligh").notEmpty(),
-    body("no_hp").notEmpty(),
-  ]),
+  validate([body("nama_mubaligh").notEmpty(), body("no_hp").notEmpty()]),
   (req: Request, res: Response) => {
     const { nama_mubaligh, no_hp } = req.body;
     prisma.mubaligh
@@ -73,7 +70,7 @@ router.get("/:id", (req: Request, res: Response) => {
   prisma.mubaligh
     .findUnique({
       where: {
-        id: parseInt(id),
+        id: BigInt(id),
       },
     })
     .then((mubaligh) => {
@@ -92,7 +89,7 @@ router.patch(
   ]),
   (req: Request, res: Response) => {
     const { id } = req.params;
-    const { nama_mubaligh,no_hp } = req.body;
+    const { nama_mubaligh, no_hp } = req.body;
     prisma.mubaligh
       .update({
         where: {
