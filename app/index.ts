@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import authentication from "./src/middlewares/authentication.middleware";
 import authRoute from "./src/routes/auth.route";
+import templateRoute from "./src/routes/template.route";
 import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import masjidRoute from "./src/routes/masjid.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
@@ -60,6 +61,8 @@ router.use("/auth", authRoute);
 // all routes below this line will require authentication
 router.use(authentication);
 app.use(authentication);
+
+router.use("/template", templateRoute);
 
 router.use("/waclient", waClientRoute);
 
