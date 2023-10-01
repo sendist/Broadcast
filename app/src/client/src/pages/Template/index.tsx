@@ -4,15 +4,11 @@ import { useCRUD } from "@/hooks/backend";
 import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { useApiFetch } from "@/hooks/fetch";
-import { BASE_URL } from "@/lib/constants";
 
 export default function Template() {
   const { data, loading, update, remove, create } = useCRUD<Template>({
     url: "/template",
   });
-
-  const apiFetch = useApiFetch();
 
   return (
     <div>
