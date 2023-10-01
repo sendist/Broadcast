@@ -98,6 +98,6 @@ CREATE TABLE IF NOT EXISTS "jumatan" (
 
 CREATE TABLE IF NOT EXISTS "template" (
     id BIGSERIAL PRIMARY KEY,
-    nama TEXT UNIQUE NOT NULL,
+    nama_template TEXT UNIQUE NOT NULL,
     content TEXT NOT NULL
 );
