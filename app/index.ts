@@ -9,6 +9,7 @@ import authRoute from "./src/routes/auth.route";
 import templateRoute from "./src/routes/template.route";
 import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import masjidRoute from "./src/routes/masjid.route";
+import jadwalPengajianRoute from "./src/routes/jadwalpengajian.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
@@ -69,6 +70,8 @@ router.use("/waclient", waClientRoute);
 router.use("/masjid", masjidRoute);
 
 router.use("/mubaligh", mubalighRoute);
+
+router.use("/jadwal-pengajian", jadwalPengajianRoute);
 
 router.get("/protected", (req: Request, res: Response) => {
   res.send("You are authenticated");
