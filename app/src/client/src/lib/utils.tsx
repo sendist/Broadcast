@@ -42,3 +42,30 @@ export function whatsappFormatting(str: string): JSX.Element {
     />
   );
 }
+
+export function resetDateTimeToMidnight(date: Date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+}
+
+export function formatDate(date: Date | string, isFromDatabase?: boolean) {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
+  if (isFromDatabase) {
+    // add time zone offset
+    new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  }
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+  }).format(date);
+}
+
+export function formatDateTime(date: Date | string) {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}

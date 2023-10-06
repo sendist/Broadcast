@@ -9,17 +9,17 @@ import authRoute from "./src/routes/auth.route";
 import templateRoute from "./src/routes/template.route";
 import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import masjidRoute from "./src/routes/masjid.route";
+import jadwalPengajianRoute from "./src/routes/jadwalpengajian.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
-import fileUpload from "express-fileupload";
+import prismaErrorHandler from "./src/middlewares/prismaErrorHandler.middleware";
 dotenv.config();
 
 const app = express();
 export const port = process.env.PORT || 3000;
 
 //support upload for excel files (xlsx)
-// app.use(fileUpload());
 app.use(
   bodyParser.raw({
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -70,6 +70,8 @@ router.use("/masjid", masjidRoute);
 
 router.use("/mubaligh", mubalighRoute);
 
+router.use("/jadwal-pengajian", jadwalPengajianRoute);
+
 router.get("/protected", (req: Request, res: Response) => {
   res.send("You are authenticated");
 });
@@ -81,6 +83,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+app.use(prismaErrorHandler);
 app.use(errorHandler);
 
 const server = app.listen(port, () => {
@@ -94,10 +97,11 @@ server.on("upgrade", (req, socket, head) => {
   const queries = url.parse(req.url || "", true).query;
   const token = queries.token;
   if (typeof token === "string") {
-    const { error, data } = verifyWSToken(token);
+    const { error } = verifyWSToken(token);
     if (error) {
       socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
       socket.destroy();
+
       return;
     }
     waClientWs.handleUpgrade(req, socket, head, (socket) => {

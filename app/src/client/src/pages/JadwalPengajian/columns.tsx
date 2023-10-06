@@ -7,18 +7,23 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  DotsHorizontalIcon,
+  TrashIcon,
+  RocketIcon,
+} from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Template = {
+export type JadwalPengajian = {
   id: string;
-  nama_template: string;
-  content: string;
-  type: "pengajian_bulanan" | "pengajian_reminder" | "jumatan_reminder";
+  tanggal: Date;
+  waktu: string;
+  id_masjid: number;
+  id_mubaligh: number;
 };
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
@@ -26,13 +31,15 @@ interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
 }
 
 export const columns: (
-  listTipe:
-    | {
-        value: string;
-        label: string;
-      }[]
-    | undefined
-) => ColumnDef<Template>[] = (listTipe) => [
+  selectMasjid: {
+    value: string;
+    label: string;
+  }[],
+  selectMubaligh: {
+    value: string;
+    label: string;
+  }[]
+) => ColumnDef<JadwalPengajian>[] = (selectMasjid, selectMubaligh) => [
   {
     id: "select",
     header: ({ table }) => (
@@ -58,26 +65,44 @@ export const columns: (
     enableSorting: true,
   },
   {
-    accessorKey: "nama_template",
-    header: (header) => CellHeaderSortable(header, "Nama Template"),
+    accessorKey: "tanggal",
+    header: (header) => CellHeaderSortable(header, "Tanggal Pengajian"),
+    cell: (props) => <EditCell {...props} calendar />,
+    enableSorting: true,
+  },
+  {
+    accessorKey: "waktu",
+    header: (header) => CellHeaderSortable(header, "Waktu Pengajian"),
     cell: EditCell,
     enableSorting: true,
   },
   {
-    accessorKey: "content",
-    header: (header) => CellHeaderSortable(header, "Content"),
-    cell: (props) => <EditCell {...props} textArea whatsappFormat />,
+    accessorKey: "id_masjid",
+    header: (header) => CellHeaderSortable(header, "Kode Masjid"),
+    cell: (props) => <EditCell {...props} select={selectMasjid} />,
   },
   {
-    accessorKey: "type",
-    header: (header) => CellHeaderSortable(header, "Tipe"),
-    cell: (props) => <EditCell {...props} whatsappFormat select={listTipe} />,
+    accessorKey: "id_mubaligh",
+    header: (header) => CellHeaderSortable(header, "Kode Mubaligh"),
+    cell: (props) => <EditCell {...props} select={selectMubaligh} />,
+  },
+  {
+    id: "broadcast",
+    enableHiding: false,
+    cell: ({ row, table }) => {
+      return (
+        <Button variant="ghost">
+          <RocketIcon className="mr-4" />
+          Broadcast
+        </Button>
+      );
+    },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const template = row.original;
+      const jadwalpengajian = row.original;
 
       return (
         <DropdownMenu>
@@ -92,9 +117,9 @@ export const columns: (
             <DropdownMenuItem
               className="text-red-600 focus:bg-red-600 focus:text-white"
               onClick={() =>
-                (table.options.meta as CustomTableMeta<Template>)?.removeData?.(
-                  template.id
-                )
+                (
+                  table.options.meta as CustomTableMeta<JadwalPengajian>
+                )?.removeData?.(jadwalpengajian.id)
               }
             >
               <TrashIcon className="mr-2" />

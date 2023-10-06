@@ -96,9 +96,7 @@ export function useCRUD<T>({
 
   const update = (id: string, newData: Partial<T>, shouldRefresh = true) =>
     request({
-      url: `${BASE_URL}${url}/${id}${
-        params ? "?" + new URLSearchParams(params) : ""
-      }`,
+      url: `${BASE_URL}${url}/${id}`,
       options: {
         method: "PATCH",
         body: JSON.stringify(newData),

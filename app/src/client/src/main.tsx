@@ -11,6 +11,7 @@ import Mubaligh from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
 import WaClient from "./pages/WaClient/index.tsx";
 import Template from "./pages/Template/index.tsx";
+import JadwalPengajian from "./pages/JadwalPengajian/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
       },
       {
         path: "jadwal-pengajian",
-        element: <div>Ini jadwal pengajian</div>,
+        element: <JadwalPengajian/>,
       },
       {
         path: "jadwal-jumatan",

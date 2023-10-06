@@ -9,12 +9,12 @@ import path from "path";
 
 const router = express.Router();
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  prisma.mubaligh
+  prisma.pengajian
     .findMany()
-    .then((mubalighs) => {
+    .then((jadwalpengajians) => {
       sendResponse({
         res,
-        data: mubalighs,
+        data: jadwalpengajians,
       });
     })
     .catch((err) => {
@@ -24,20 +24,28 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
 
 router.post(
   "/",
-  validate([body("nama_mubaligh").notEmpty(), body("no_hp").notEmpty()]),
+  validate([
+    body("tanggal").notEmpty(),
+    body("waktu").notEmpty(),
+    body("id_masjid").notEmpty(),
+    body("id_mubaligh").notEmpty(),
+  ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { nama_mubaligh, no_hp } = req.body;
-    prisma.mubaligh
+    const { tanggal, waktu, id_masjid, id_mubaligh } = req.body;
+    const parsedTanggal = new Date(tanggal);
+    prisma.pengajian
       .create({
         data: {
-          nama_mubaligh,
-          no_hp,
+          tanggal,
+          waktu,
+          id_masjid,
+          id_mubaligh,
         },
       })
-      .then((mubaligh) => {
+      .then((pengajian) => {
         sendResponse({
           res,
-          data: mubaligh,
+          data: pengajian,
         });
       })
       .catch((err) => {
@@ -45,30 +53,35 @@ router.post(
       });
   }
 );
+
 // TODO: still temporary
 router.get("/template", (req: Request, res: Response) => {
   res.header(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   );
-  const filePath = path.join("excelTemplates", "template_mubaligh.xlsx");
-  res.download(filePath, "template_mubaligh.xlsx");
+  const filePath = path.join("excelTemplates", "template_jadwalpengajian.xlsx");
+  res.download(filePath, "template_jadwalpengajian.xlsx");
 });
 
 router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
   const newObj = renameObjectKey(getContent(req.body), [
-    ["Nama Mubaligh", "nama_mubaligh"],
-    ["No. HP", "no_hp"],
+    ["Tanggal Pengajian", "tanggal"],
+    ["Waktu Pengajian", "waktu"],
+    ["Kode Masjid", "id_masjid"],
+    ["Kode Mubaligh", "id_mubaligh"],
   ]);
+  // TODO: JO BUAT CONVERT TIPE DATA
+
   console.log(newObj);
-  prisma.mubaligh
+  prisma.pengajian
     .createMany({
       data: newObj,
     })
-    .then((mubaligh) => {
+    .then((pengajian) => {
       sendResponse({
         res,
-        data: mubaligh,
+        data: pengajian,
       });
     })
     .catch((err) => {
@@ -78,16 +91,16 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
 
 router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  prisma.mubaligh
+  prisma.pengajian
     .findUnique({
       where: {
         id: BigInt(id),
       },
     })
-    .then((mubaligh) => {
+    .then((pengajian) => {
       sendResponse({
         res,
-        data: mubaligh,
+        data: pengajian,
       });
     })
     .catch((err) => {
@@ -98,26 +111,30 @@ router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
 router.patch(
   "/:id",
   validate([
-    body("nama_mubaligh").optional().isString(),
-    body("no_hp").optional().isString(),
+    body("tanggal").optional().isISO8601(),
+    body("waktu").optional().isString(),
+    body("id_masjid").optional().isInt(),
+    body("id_mubaligh").optional().isInt(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { nama_mubaligh, no_hp } = req.body;
-    prisma.mubaligh
+    const { tanggal, waktu, id_masjid, id_mubaligh } = req.body;
+    prisma.pengajian
       .update({
         where: {
           id: BigInt(id),
         },
         data: {
-          nama_mubaligh,
-          no_hp,
+          tanggal,
+          waktu,
+          id_masjid,
+          id_mubaligh,
         },
       })
-      .then((mubaligh) => {
+      .then((pengajian) => {
         sendResponse({
           res,
-          data: mubaligh,
+          data: pengajian,
         });
       })
       .catch((err) => {
@@ -128,16 +145,16 @@ router.patch(
 
 router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  prisma.mubaligh
+  prisma.pengajian
     .delete({
       where: {
         id: BigInt(id),
       },
     })
-    .then((mubaligh) => {
+    .then((pengajian) => {
       sendResponse({
         res,
-        data: mubaligh,
+        data: pengajian,
       });
     })
     .catch((err) => {

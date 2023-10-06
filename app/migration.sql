@@ -96,8 +96,11 @@ CREATE TABLE IF NOT EXISTS "jumatan" (
 -- "nama" text not null
 -- "content" text not null
 
+create TYPE template_t as enum('pengajian_bulanan', 'pengajian_reminder', 'jumatan_reminder');
+
 CREATE TABLE IF NOT EXISTS "template" (
     id BIGSERIAL PRIMARY KEY,
     nama_template TEXT UNIQUE NOT NULL, 
-    content TEXT NOT NULL
+    content TEXT NOT NULL,
+    type template_t NOT NULL
 );

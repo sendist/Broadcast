@@ -1,5 +1,4 @@
 import WAWebJS, { Client, LocalAuth } from "whatsapp-web.js";
-import puppeteer from "puppeteer";
 
 const client = new Client({
   authStrategy: new LocalAuth(),
