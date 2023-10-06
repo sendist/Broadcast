@@ -1,28 +1,14 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  ControllerRenderProps,
+  FieldValues,
+  Path,
+  useForm,
+} from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-
-import { cn } from "@/lib/utils";
+import { cn, formatDate, resetDateTimeToMidnight } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -30,6 +16,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState } from "react";
+import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import InputDropdown from "@/components/custom/inputDropdown";
 
 const jadwalPengajianFormSchema = z.object({
   tanggal: z.date({
@@ -38,42 +26,22 @@ const jadwalPengajianFormSchema = z.object({
   waktu: z.string().nonempty({
     message: "Waktu pengajian harus diisi",
   }),
-  id_masjid: z
-    .string()
-    .nonempty({
-      message: "Kode masjid harus diisi",
-    })
-    .transform((value) => parseInt(value, 10)),
-  id_mubaligh: z
-    .string()
-    .nonempty({
-      message: "Kode mubaligh harus diisi",
-    })
-    .transform((value) => parseInt(value, 10)),
+  id_masjid: z.string().nonempty({
+    message: "Kode masjid harus diisi",
+  }),
+  id_mubaligh: z.string().nonempty({
+    message: "Kode mubaligh harus diisi",
+  }),
 });
 
-const renderFormData = [
-  {
-    name: "waktu",
-    label: "Waktu Pengajian",
-    placeholder: "Waktu Pengajian",
-  },
-  {
-    name: "id_masjid",
-    label: "Kode Masjid",
-    placeholder: "Kode Masjid",
-  },
-  {
-    name: "id_mubaligh",
-    label: "Kode Mubaligh",
-    placeholder: "Kode Mubaligh",
-  },
-] as const;
-
 export function AddJadwalPengajianForm({
+  masjidDropdown,
+  mubalighDropdown,
   children,
   onSubmit,
 }: {
+  masjidDropdown: { label: string; value: string }[];
+  mubalighDropdown: { label: string; value: string }[];
   children: React.ReactNode;
   onSubmit: (data: {
     tanggal: Date;
@@ -91,89 +59,110 @@ export function AddJadwalPengajianForm({
     },
   });
 
-// TODO MEY BUAT DROPDOWN
+  const renderFormInput: RenderFormInput<typeof form> = [
+    {
+      name: "tanggal",
+      label: "Tanggal Pengajian",
+      customInput: <T extends FieldValues>({
+        field,
+      }: {
+        field: ControllerRenderProps<T, Path<T>>;
+      }) => {
+        return (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[240px] pl-3 text-left font-normal",
+                  !field.value && "text-muted-foreground"
+                )}
+              >
+                {field.value ? (
+                  formatDate(field.value)
+                ) : (
+                  <span>Pick a date</span>
+                )}
+                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={field.value}
+                onSelect={(date) =>
+                  date && field.onChange(resetDateTimeToMidnight(date))
+                }
+                defaultMonth={field.value}
+                initialFocus
+                required
+              />
+            </PopoverContent>
+          </Popover>
+        );
+      },
+    },
+    {
+      name: "waktu",
+      label: "Waktu Pengajian",
+      placeholder: "Waktu Pengajian",
+    },
+    {
+      name: "id_masjid",
+      label: "Masjid",
+      customInput: <T extends FieldValues>({
+        field,
+      }: {
+        field: ControllerRenderProps<T, Path<T>>;
+      }) => {
+        return (
+          <InputDropdown
+            value={field.value}
+            select={masjidDropdown}
+            onChange={field.onChange}
+            placeholder="Pilih Masjid..."
+            align={"start"}
+            side={"top"}
+          />
+        );
+      },
+    },
+    {
+      name: "id_mubaligh",
+      label: "Kode Mubaligh",
+      placeholder: "Kode Mubaligh",
+      customInput: <T extends FieldValues>({
+        field,
+      }: {
+        field: ControllerRenderProps<T, Path<T>>;
+      }) => {
+        return (
+          <InputDropdown
+            value={field.value}
+            select={mubalighDropdown}
+            onChange={field.onChange}
+            placeholder="Pilih Mubaligh..."
+            align={"start"}
+            side={"top"}
+          />
+        );
+      },
+    },
+  ];
+
+  // TODO MEY BUAT DROPDOWN
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild onClick={() => setDialogOpen(true)}>
-        {children}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Tambah Data Jadwal Pengajian</DialogTitle>
-          <DialogDescription>
-            Input data jadwal pengajian yang akan ditambahkan
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => {
-              setDialogOpen(false);
-              onSubmit(data);
-              form.reset();
-            })}
-            className="space-y-8"
-          >
-            <FormField
-              control={form.control}
-              name="tanggal"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Tanggal Pengajian</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => {
-                          field.onChange(date); 
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {renderFormData.map((item) => (
-              <FormField
-                key={item.name}
-                control={form.control}
-                name={item.name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{item.label}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={item.placeholder} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <AddForm
+      title="Tambah Data Jadwal Pengajian"
+      subtitle="Input data jadwal pengajian yang akan ditambahkan"
+      dialogOpen={dialogOpen}
+      setDialogOpen={setDialogOpen}
+      onSubmit={onSubmit}
+      form={form}
+      renderFormInput={renderFormInput}
+    >
+      {children}
+    </AddForm>
   );
 }

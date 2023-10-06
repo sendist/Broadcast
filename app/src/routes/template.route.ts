@@ -1,32 +1,44 @@
 import express from "express";
-import { Request, Response } from "../types/express.type";
+import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, checkExact, checkSchema, param } from "express-validator";
-import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx";
-import path from "path";
+import { body } from "express-validator";
+import { humanize } from "../utils/etc.util";
+import { $Enums } from "@prisma/client";
 
 const router = express.Router();
-router.get("/", (req: Request, res: Response) => {
-  prisma.template.findMany().then((templates) => {
-    sendResponse({
-      res,
-      data: templates,
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
+  prisma.template
+    .findMany()
+    .then((templates) => {
+      sendResponse({
+        res,
+        data: templates,
+      });
+    })
+    .catch((err) => {
+      next(err);
     });
-  });
 });
 
 router.post(
   "/",
-  validate([body("nama_template").notEmpty(), body("content").notEmpty()]),
-  (req: Request, res: Response) => {
-    const { nama_template, content } = req.body;
+  validate([
+    body("nama_template").isString().notEmpty(),
+    body("content").isString().notEmpty(),
+    body("type")
+      .matches(new RegExp(`${Object.values($Enums.template_t).join("|")}`))
+      .notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { nama_template, content, type } = req.body;
     prisma.template
       .create({
         data: {
           nama_template,
           content,
+          type,
         },
       })
       .then((template) => {
@@ -34,29 +46,50 @@ router.post(
           res,
           data: template,
         });
+      })
+      .catch((err) => {
+        next(err);
       });
   }
 );
 
-router.post("/upload", (req: Request, res: Response) => {
-  const newObj = renameObjectKey(getContent(req.body), [
-    ["Nama Template", "nama_template"],
-    ["Content", "content"],
-  ]);
-  console.log(newObj);
-  prisma.template
-    .createMany({
-      data: newObj,
-    })
-    .then((template) => {
-      sendResponse({
-        res,
-        data: template,
-      });
-    });
+// router.post("/upload", (req: Request, res: Response) => {
+//   const newObj = renameObjectKey(getContent(req.body), [
+//     ["Nama Template", "nama_template"],
+//     ["Content", "content"],
+//     ["Type", "type"],
+//   ]);
+//   console.log(newObj);
+//   prisma.template
+//     .createMany({
+//       data: newObj,
+//     })
+//     .then((template) => {
+//       sendResponse({
+//         res,
+//         data: template,
+//       });
+//     });
+// });
+
+const templateEnum: { value: string; label: string }[] = (
+  Object.keys($Enums.template_t) as Array<keyof typeof $Enums.template_t>
+).reduce((acc, key) => {
+  acc.push({
+    value: key,
+    label: humanize(key),
+  });
+  return acc;
+}, [] as { value: keyof typeof $Enums.template_t; label: string }[]);
+
+router.get("/enum_types", (req: Request, res: Response) => {
+  sendResponse({
+    res,
+    data: templateEnum,
+  });
 });
 
-router.get("/:id", (req: Request, res: Response) => {
+router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   prisma.template
     .findUnique({
@@ -69,6 +102,9 @@ router.get("/:id", (req: Request, res: Response) => {
         res,
         data: template,
       });
+    })
+    .catch((err) => {
+      next(err);
     });
 });
 
@@ -77,10 +113,13 @@ router.patch(
   validate([
     body("nama_template").optional().isString(),
     body("content").optional().isString(),
+    body("type")
+      .optional()
+      .matches(new RegExp(`${Object.values($Enums.template_t).join("|")}`)),
   ]),
-  (req: Request, res: Response) => {
+  (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { nama_template, content } = req.body;
+    const { nama_template, content, type } = req.body;
     prisma.template
       .update({
         where: {
@@ -89,6 +128,7 @@ router.patch(
         data: {
           nama_template,
           content,
+          type,
         },
       })
       .then((template) => {
@@ -96,11 +136,14 @@ router.patch(
           res,
           data: template,
         });
+      })
+      .catch((err) => {
+        next(err);
       });
   }
 );
 
-router.delete("/:id", (req: Request, res: Response) => {
+router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   prisma.template
     .delete({
@@ -113,6 +156,9 @@ router.delete("/:id", (req: Request, res: Response) => {
         res,
         data: template,
       });
+    })
+    .catch((err) => {
+      next(err);
     });
 });
 

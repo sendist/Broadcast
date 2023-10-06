@@ -7,14 +7,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  DotsHorizontalIcon,
+  TrashIcon,
+  RocketIcon,
+} from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type JadwalPengajian= {
+export type JadwalPengajian = {
   id: string;
   tanggal: Date;
   waktu: string;
@@ -26,7 +30,16 @@ interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
 }
 
-export const columns: ColumnDef<JadwalPengajian>[] = [
+export const columns: (
+  selectMasjid: {
+    value: string;
+    label: string;
+  }[],
+  selectMubaligh: {
+    value: string;
+    label: string;
+  }[]
+) => ColumnDef<JadwalPengajian>[] = (selectMasjid, selectMubaligh) => [
   {
     id: "select",
     header: ({ table }) => (
@@ -54,7 +67,7 @@ export const columns: ColumnDef<JadwalPengajian>[] = [
   {
     accessorKey: "tanggal",
     header: (header) => CellHeaderSortable(header, "Tanggal Pengajian"),
-    cell: EditCell,
+    cell: (props) => <EditCell {...props} calendar />,
     enableSorting: true,
   },
   {
@@ -66,12 +79,24 @@ export const columns: ColumnDef<JadwalPengajian>[] = [
   {
     accessorKey: "id_masjid",
     header: (header) => CellHeaderSortable(header, "Kode Masjid"),
-    cell: EditCell,
+    cell: (props) => <EditCell {...props} select={selectMasjid} />,
   },
   {
     accessorKey: "id_mubaligh",
     header: (header) => CellHeaderSortable(header, "Kode Mubaligh"),
-    cell: EditCell,
+    cell: (props) => <EditCell {...props} select={selectMubaligh} />,
+  },
+  {
+    id: "broadcast",
+    enableHiding: false,
+    cell: ({ row, table }) => {
+      return (
+        <Button variant="ghost">
+          <RocketIcon className="mr-4" />
+          Broadcast
+        </Button>
+      );
+    },
   },
   {
     id: "actions",
@@ -92,9 +117,9 @@ export const columns: ColumnDef<JadwalPengajian>[] = [
             <DropdownMenuItem
               className="text-red-600 focus:bg-red-600 focus:text-white"
               onClick={() =>
-                (table.options.meta as CustomTableMeta<JadwalPengajian>)?.removeData?.(
-                  jadwalpengajian.id
-                )
+                (
+                  table.options.meta as CustomTableMeta<JadwalPengajian>
+                )?.removeData?.(jadwalpengajian.id)
               }
             >
               <TrashIcon className="mr-2" />

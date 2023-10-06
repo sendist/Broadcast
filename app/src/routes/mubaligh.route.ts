@@ -1,26 +1,31 @@
 import express from "express";
-import { Request, Response } from "../types/express.type";
+import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
 import { body, checkExact, checkSchema, param } from "express-validator";
-import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx";
+import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
 import path from "path";
 
 const router = express.Router();
-router.get("/", (req: Request, res: Response) => {
-  prisma.mubaligh.findMany().then((mubalighs) => {
-    sendResponse({
-      res,
-      data: mubalighs,
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
+  prisma.mubaligh
+    .findMany()
+    .then((mubalighs) => {
+      sendResponse({
+        res,
+        data: mubalighs,
+      });
+    })
+    .catch((err) => {
+      next(err);
     });
-  });
 });
 
 router.post(
   "/",
   validate([body("nama_mubaligh").notEmpty(), body("no_hp").notEmpty()]),
-  (req: Request, res: Response) => {
+  (req: Request, res: Response, next: NextFunction) => {
     const { nama_mubaligh, no_hp } = req.body;
     prisma.mubaligh
       .create({
@@ -34,6 +39,9 @@ router.post(
           res,
           data: mubaligh,
         });
+      })
+      .catch((err) => {
+        next(err);
       });
   }
 );
@@ -47,7 +55,7 @@ router.get("/template", (req: Request, res: Response) => {
   res.download(filePath, "template_mubaligh.xlsx");
 });
 
-router.post("/upload", (req: Request, res: Response) => {
+router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
   const newObj = renameObjectKey(getContent(req.body), [
     ["Nama Mubaligh", "nama_mubaligh"],
     ["No. HP", "no_hp"],
@@ -62,10 +70,13 @@ router.post("/upload", (req: Request, res: Response) => {
         res,
         data: mubaligh,
       });
+    })
+    .catch((err) => {
+      next(err);
     });
 });
 
-router.get("/:id", (req: Request, res: Response) => {
+router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   prisma.mubaligh
     .findUnique({
@@ -78,6 +89,9 @@ router.get("/:id", (req: Request, res: Response) => {
         res,
         data: mubaligh,
       });
+    })
+    .catch((err) => {
+      next(err);
     });
 });
 
@@ -87,7 +101,7 @@ router.patch(
     body("nama_mubaligh").optional().isString(),
     body("no_hp").optional().isString(),
   ]),
-  (req: Request, res: Response) => {
+  (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { nama_mubaligh, no_hp } = req.body;
     prisma.mubaligh
@@ -105,11 +119,14 @@ router.patch(
           res,
           data: mubaligh,
         });
+      })
+      .catch((err) => {
+        next(err);
       });
   }
 );
 
-router.delete("/:id", (req: Request, res: Response) => {
+router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   prisma.mubaligh
     .delete({
@@ -122,6 +139,9 @@ router.delete("/:id", (req: Request, res: Response) => {
         res,
         data: mubaligh,
       });
+    })
+    .catch((err) => {
+      next(err);
     });
 });
 

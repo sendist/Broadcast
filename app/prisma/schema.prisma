@@ -12,8 +12,6 @@ model masjid {
   nama_masjid     String
   nama_ketua_dkm  String
   no_hp           String
-  jemaah          jemaah[]
-  jumatan         jumatan[]
   masjid_mubaligh masjid_mubaligh[]
   pengajian       pengajian[]
 }
@@ -22,7 +20,6 @@ model mubaligh {
   id              BigInt            @id @default(autoincrement())
   nama_mubaligh   String
   no_hp           String
-  jumatan         jumatan[]
   masjid_mubaligh masjid_mubaligh[]
   pengajian       pengajian[]
 }
@@ -38,31 +35,16 @@ model pengajian {
 }
 
 model template {
-  id            BigInt @id @default(autoincrement())
-  nama_template String @unique
+  id            BigInt     @id @default(autoincrement())
+  nama_template String     @unique
   content       String
+  type          template_t
 }
 
 model user {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   username String @unique
   password String
-}
-
-model jemaah {
-  id        BigInt @id @default(autoincrement())
-  no_hp     String
-  id_masjid BigInt
-  masjid    masjid @relation(fields: [id_masjid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model jumatan {
-  id          BigInt   @id @default(autoincrement())
-  tanggal     DateTime @db.Timestamptz(6)
-  id_masjid   BigInt
-  id_mubaligh BigInt
-  masjid      masjid   @relation(fields: [id_masjid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  mubaligh    mubaligh @relation(fields: [id_mubaligh], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model masjid_mubaligh {
@@ -72,4 +54,10 @@ model masjid_mubaligh {
   mubaligh    mubaligh @relation(fields: [id_mubaligh], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([id_masjid, id_mubaligh])
+}
+
+enum template_t {
+  pengajian_bulanan
+  pengajian_reminder
+  jumatan_reminder
 }

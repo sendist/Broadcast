@@ -8,8 +8,7 @@ import sendResponse from "../utils/response.util";
 
 export default function validate(validations: ValidationChain[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const result = await checkExact(validations).run(req);
-
+    await checkExact(validations).run(req);
     const errors = validationResult(req);
     if (errors.isEmpty()) {
       return next();

@@ -13,6 +13,33 @@ export default function Masjid() {
     url: "/jadwal-pengajian",
   });
 
+  const { data: masjidForDropdown } = useCRUD<{
+    id: string;
+    nama_masjid: string;
+  }>({
+    url: "/masjid",
+    params: {
+      fields: "id,nama_masjid",
+    },
+  });
+  const { data: mubalighForDropdown } = useCRUD<{
+    id: string;
+    nama_mubaligh: string;
+  }>({
+    url: "/mubaligh",
+    params: {
+      fields: "id,nama_mubaligh",
+    },
+  });
+  const masjidDropdown = masjidForDropdown?.map((item) => ({
+    label: item.nama_masjid,
+    value: item.id,
+  }));
+  const mubalighDropdown = mubalighForDropdown?.map((item) => ({
+    label: item.nama_mubaligh,
+    value: item.id,
+  }));
+
   const apiFetch = useApiFetch();
 
   function uploadTemplate(file: File) {
@@ -31,7 +58,11 @@ export default function Masjid() {
   return (
     <div>
       <div className="space-x-4">
-        <AddJadwalPengajianForm onSubmit={create}>
+        <AddJadwalPengajianForm
+          onSubmit={create}
+          mubalighDropdown={mubalighDropdown || []}
+          masjidDropdown={masjidDropdown || []}
+        >
           <Button variant="outline" className="mb-4">
             <PlusIcon className="mr-2" />
             Add
@@ -45,7 +76,7 @@ export default function Masjid() {
         </AddJadwalPengajianBulk>
       </div>
       <DataTable
-        columns={columns}
+        columns={columns(masjidDropdown || [], mubalighDropdown || [])}
         data={data}
         isLoading={loading}
         meta={{

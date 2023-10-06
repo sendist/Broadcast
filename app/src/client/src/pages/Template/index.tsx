@@ -9,6 +9,12 @@ export default function Template() {
   const { data, loading, update, remove, create } = useCRUD<Template>({
     url: "/template",
   });
+  const { data: enumTypes } = useCRUD<{
+    value: string;
+    label: string;
+  }>({
+    url: "/template/enum_types",
+  });
 
   return (
     <div>
@@ -21,7 +27,7 @@ export default function Template() {
         </AddTemplateForm>
       </div>
       <DataTable
-        columns={columns}
+        columns={columns(enumTypes)}
         data={data}
         isLoading={loading}
         meta={{

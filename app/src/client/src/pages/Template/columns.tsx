@@ -18,13 +18,21 @@ export type Template = {
   id: string;
   nama_template: string;
   content: string;
+  type: "pengajian_bulanan" | "pengajian_reminder" | "jumatan_reminder";
 };
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
 }
 
-export const columns: ColumnDef<Template>[] = [
+export const columns: (
+  listTipe:
+    | {
+        value: string;
+        label: string;
+      }[]
+    | undefined
+) => ColumnDef<Template>[] = (listTipe) => [
   {
     id: "select",
     header: ({ table }) => (
@@ -58,9 +66,12 @@ export const columns: ColumnDef<Template>[] = [
   {
     accessorKey: "content",
     header: (header) => CellHeaderSortable(header, "Content"),
-    cell: (props) => (
-      <EditCell {...props} textArea whatsappFormat />
-    ),
+    cell: (props) => <EditCell {...props} textArea whatsappFormat />,
+  },
+  {
+    accessorKey: "type",
+    header: (header) => CellHeaderSortable(header, "Tipe"),
+    cell: (props) => <EditCell {...props} whatsappFormat select={listTipe} />,
   },
   {
     id: "actions",
