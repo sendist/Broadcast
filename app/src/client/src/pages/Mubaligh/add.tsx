@@ -52,13 +52,12 @@ const renderFormData = [
   },
 ] as const;
 
-export function AddMubalighForm({
-  children,
-  onSubmit,
-}: {
+type Props = {
   children: React.ReactNode;
   onSubmit: (data: { nama_mubaligh: string; no_hp: string }) => void;
-}) {
+};
+
+export function AddMubalighForm({ children, onSubmit }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [date, setDate] = useState<Date>();
 

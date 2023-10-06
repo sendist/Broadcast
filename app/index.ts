@@ -11,6 +11,7 @@ import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import masjidRoute from "./src/routes/masjid.route";
 import jadwalPengajianRoute from "./src/routes/jadwalpengajian.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
+import messageLogsRoute from "./src/routes/messagelogs.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
 import prismaErrorHandler from "./src/middlewares/prismaErrorHandler.middleware";
@@ -71,6 +72,8 @@ router.use("/masjid", masjidRoute);
 router.use("/mubaligh", mubalighRoute);
 
 router.use("/jadwal-pengajian", jadwalPengajianRoute);
+
+router.use("/message-logs", messageLogsRoute);
 
 router.get("/protected", (req: Request, res: Response) => {
   res.send("You are authenticated");

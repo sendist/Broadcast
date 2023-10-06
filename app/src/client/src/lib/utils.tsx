@@ -31,13 +31,25 @@ export function whatsappFormatting(str: string): JSX.Element {
 
   str = str
     .replace(
-      /(?:{{)(?:(?!\s))((?:(?!\n|}}).)+)(?:}})/g,
+      /(?:{{)(?:(?!.*<\/?.*>))(?:(?!\s))((?:(?!\n|}}).)+)(?:}})/g,
       "<span class='text-primary'>{{$1}}</span>"
     )
-    .replace(/(?:\*)(?:(?!\s))((?:(?!\*|\n).)+)(?:\*)/g, "<b>$1</b>")
-    .replace(/(?:_)(?:(?!\s))((?:(?!\n|_).)+)(?:_)/g, "<i>$1</i>")
-    .replace(/(?:~)(?:(?!\s))((?:(?!\n|~).)+)(?:~)/g, "<s>$1</s>")
-    .replace(/(?:```)(?:(?!\s))((?:(?!\n|```).)+)(?:```)/g, "<code>$1</code>");
+    .replace(
+      /(?:```)(?:(?!.*<\/?.*>))(?:(?!\s))((?:(?!\n|```).)+)(?:```)/g,
+      "<code>$1</code>"
+    )
+    .replace(
+      /(?:\*)(?:(?!.*<\/?.*>))(?:(?!\s))((?:(?!\*|\n).)+)(?:\*)/g,
+      "<b>$1</b>"
+    )
+    .replace(
+      /(?:_)(?:(?!.*<\/?.*>))(?:(?!\s))((?:(?!\n|_).)+)(?:_)/g,
+      "<i>$1</i>"
+    )
+    .replace(
+      /(?:~)(?:(?!.*<\/?.*>))(?:(?!\s))((?:(?!\n|~).)+)(?:~)/g,
+      "<s>$1</s>"
+    );
 
   return (
     <span
@@ -71,5 +83,6 @@ export function formatDateTime(date: Date | string) {
   return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
+    hour12: true,
   }).format(date);
 }

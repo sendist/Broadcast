@@ -2,7 +2,11 @@ import useAccount from "@/hooks/account";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function SplashScreen({ children }: { children: JSX.Element }) {
+type Props = {
+  children: React.ReactNode;
+};
+
+export default function SplashScreen({ children }: Props) {
   const { account, loading } = useAccount();
   const navigate = useNavigate();
   useEffect(() => {

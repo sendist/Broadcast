@@ -13,6 +13,7 @@ import WaClient from "./pages/WaClient/index.tsx";
 import Template from "./pages/Template/index.tsx";
 import JadwalPengajian from "./pages/JadwalPengajian/index.tsx";
 import SplashScreen from "./pages/SplashScreen/index.tsx";
+import MessageLogs from "./pages/MessageLogs/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -53,16 +54,16 @@ const router = createBrowserRouter([
         element: <Mubaligh />,
       },
       {
-        path: "masjid/:idMasjid",
-        element: <div>ini masjid tapi ada id</div>,
-      },
-      {
         path: "jadwal-pengajian",
-        element: <JadwalPengajian/>,
+        element: <JadwalPengajian />,
       },
       {
         path: "jadwal-jumatan",
         element: <div>Ini jadwal jumatan</div>,
+      },
+      {
+        path: "message-logs",
+        element: <MessageLogs />,
       },
     ],
   },

@@ -1,6 +1,11 @@
 import express from "express";
 import { Request, Response } from "../types/express.type";
-import { client, data as clientData, sendMessage } from "../utils/waweb.util";
+import {
+  addToQueue,
+  client,
+  data as clientData,
+  sendMessage,
+} from "../utils/waweb.util";
 import sendResponse from "../utils/response.util";
 import { WebSocketServer } from "ws";
 import WAWebJS from "whatsapp-web.js";
@@ -43,22 +48,15 @@ router.post(
   validate([body("phone").isString().notEmpty()]),
   (req: Request, res: Response) => {
     const { phone } = req.body;
-    sendMessage(
-      phone,
-      "Sanity Check. If you receive this message, it means that the whatsapp client is running."
-    )
-      .then((message) => {
-        sendResponse({
-          res,
-          data: { message: "OK" },
-        });
-      })
-      .catch((err) => {
-        sendResponse({
-          res,
-          error: err.message,
-        });
-      });
+    addToQueue({
+      phone: phone,
+      message:
+        "Sanity Check. If you receive this message, it means that the whatsapp client is running.",
+    });
+    sendResponse({
+      res,
+      data: { message: "OK" },
+    });
   }
 );
 

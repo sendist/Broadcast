@@ -149,9 +149,6 @@ export function AddJadwalPengajianForm({
       },
     },
   ];
-
-  // TODO MEY BUAT DROPDOWN
-
   return (
     <AddForm
       title="Tambah Data Jadwal Pengajian"

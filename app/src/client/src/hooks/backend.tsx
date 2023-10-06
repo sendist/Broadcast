@@ -14,15 +14,13 @@ type Action<T> =
   | { type: "fetched"; payload: T[] }
   | { type: "error"; payload: string };
 
-export function useCRUD<T>({
-  initialGet = true,
-  url,
-  params,
-}: {
+type useCRUDType = {
   initialGet?: boolean;
   url: string;
   params?: Record<string, string>;
-}) {
+};
+
+export function useCRUD<T>({ initialGet = true, url, params }: useCRUDType) {
   const cancelRequest = useRef<boolean>(false);
   const httpCall = useApiFetch();
 

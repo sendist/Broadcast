@@ -3,24 +3,57 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, checkExact, checkSchema, param } from "express-validator";
+import { body, query } from "express-validator";
 import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
 import path from "path";
 
 const router = express.Router();
-router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  prisma.mubaligh
-    .findMany()
-    .then((mubalighs) => {
-      sendResponse({
-        res,
-        data: mubalighs,
+router.get(
+  "/",
+  validate([
+    query("fields").optional().isString().notEmpty(),
+    query("page").optional().isNumeric().notEmpty(),
+    query("limit").optional().isNumeric().notEmpty(),
+    query("orderBy").optional().isString().notEmpty(),
+    query("orderType").optional().isString().notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { page, limit, orderBy, orderType } = req.query;
+
+    const { fields } = req.query;
+    const fieldsArr = fields ? fields.toString().split(",") : undefined;
+    prisma.mubaligh
+      .findMany({
+        ...(fields && {
+          select: {
+            id: fieldsArr?.includes("id"),
+            nama_mubaligh: fieldsArr?.includes("nama_mubaligh"),
+            no_hp: fieldsArr?.includes("no_hp"),
+          },
+        }),
+        ...(page && {
+          skip: (Number(page) - 1) * (Number(limit) || 10),
+        }),
+        ...(limit && {
+          take: Number(limit),
+        }),
+        ...(orderBy && {
+          orderBy: {
+            [orderBy.toString()]: orderType?.toString() || "asc",
+          },
+        }),
+      })
+      .then((mubalighs) => {
+        sendResponse({
+          res,
+          data: mubalighs,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 router.post(
   "/",

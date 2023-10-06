@@ -51,17 +51,16 @@ const renderFormData = [
   },
 ] as const;
 
-export function AddMasjidForm({
-  children,
-  onSubmit,
-}: {
+type Props = {
   children: React.ReactNode;
   onSubmit: (data: {
     nama_masjid: string;
     nama_ketua_dkm: string;
     no_hp: string;
   }) => void;
-}) {
+};
+
+export function AddMasjidForm({ children, onSubmit }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof masjidFormSchema>>({

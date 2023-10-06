@@ -13,13 +13,12 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 
-export function AddMubalighBulk({
-  children,
-  onSubmit,
-}: {
+type Props = {
   children: React.ReactNode;
   onSubmit: (file: File) => void;
-}) {
+};
+
+export function AddMubalighBulk({ children, onSubmit }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [file, setFile] = useState<File | undefined>(undefined);
   const apiFetch = useApiFetch();
@@ -38,12 +37,18 @@ export function AddMubalighBulk({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Upload Data Bulk</DialogTitle>
-          <DialogDescription>Input data mubaligh secara kolektif</DialogDescription>
+          <DialogDescription>
+            Input data mubaligh secara kolektif
+          </DialogDescription>
         </DialogHeader>
         <p>Step 1. Download File Template berikut terlebih dahulu.</p>
         <Button onClick={downloadTemplate}>Download Template</Button>
-        <p>Step 2. Setelah didownload, edit file excel tadi di perangkat Anda.</p>
-        <p>Step 3. Upload file yang sudah Anda edit pada bagian di bawah ini:</p>
+        <p>
+          Step 2. Setelah didownload, edit file excel tadi di perangkat Anda.
+        </p>
+        <p>
+          Step 3. Upload file yang sudah Anda edit pada bagian di bawah ini:
+        </p>
         <Input
           type="file"
           accept=".xlsx"

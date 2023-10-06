@@ -3,24 +3,62 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 import { humanize } from "../utils/etc.util";
 import { $Enums } from "@prisma/client";
 
 const router = express.Router();
-router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  prisma.template
-    .findMany()
-    .then((templates) => {
-      sendResponse({
-        res,
-        data: templates,
+router.get(
+  "/",
+  validate([
+    query("fields").optional().isString().notEmpty(),
+    query("page").optional().isNumeric().notEmpty(),
+    query("limit").optional().isNumeric().notEmpty(),
+    query("orderBy").optional().isString().notEmpty(),
+    query("orderType").optional().isString().notEmpty(),
+    query("type").optional().matches(new RegExp(`${Object.values($Enums.template_t).join("|")}`)),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { page, limit, orderBy, orderType, fields, type } = req.query;
+    const fieldsArr = fields ? fields.toString().split(",") : undefined;
+    prisma.template
+      .findMany({
+        ...(type && {
+          where: {
+            type: type.toString() as $Enums.template_t,
+          },
+        }),
+        ...(fields && {
+          select: {
+            id: fieldsArr?.includes("id"),
+            nama_template: fieldsArr?.includes("nama_template"),
+            content: fieldsArr?.includes("content"),
+            type: fieldsArr?.includes("type"),
+          },
+        }),
+        ...(page && {
+          skip: (Number(page) - 1) * (Number(limit) || 10),
+        }),
+        ...(limit && {
+          take: Number(limit),
+        }),
+        ...(orderBy && {
+          orderBy: {
+            [orderBy.toString()]: orderType?.toString() || "asc",
+          },
+        }),
+      })
+      .then((templates) => {
+        sendResponse({
+          res,
+          data: templates,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 router.post(
   "/",

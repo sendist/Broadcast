@@ -31,6 +31,18 @@ export default function Masjid() {
       fields: "id,nama_mubaligh",
     },
   });
+  const { data: template } = useCRUD<{
+    id: string;
+    content: string;
+    nama_template: string;
+  }>({
+    url: "/template",
+    params: {
+      fields: "id,content,nama_template",
+      type: "pengajian_reminder"
+    },
+  });
+
   const masjidDropdown = masjidForDropdown?.map((item) => ({
     label: item.nama_masjid,
     value: item.id,
@@ -76,7 +88,11 @@ export default function Masjid() {
         </AddJadwalPengajianBulk>
       </div>
       <DataTable
-        columns={columns(masjidDropdown || [], mubalighDropdown || [])}
+        columns={columns(
+          masjidDropdown || [],
+          mubalighDropdown || [],
+          template || []
+        )}
         data={data}
         isLoading={loading}
         meta={{

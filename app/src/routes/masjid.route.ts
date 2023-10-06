@@ -3,19 +3,25 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, checkExact, checkSchema, param } from "express-validator";
+import { body, checkExact, checkSchema, param, query } from "express-validator";
 import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
 import path from "path";
 
 const router = express.Router();
 router.get(
   "/",
-  validate([param("fields").optional().isString().notEmpty()]),
+  validate([
+    query("fields").optional().isString().notEmpty(),
+    query("page").optional().isNumeric().notEmpty(),
+    query("limit").optional().isNumeric().notEmpty(),
+    query("orderBy").optional().isString().notEmpty(),
+    query("orderType").optional().isString().notEmpty(),
+  ]),
   (req: Request, res: Response, next: NextFunction) => {
     // pagination (optional)
     const { page, limit, orderBy, orderType } = req.query;
 
-    const { fields } = req.query; //example: fields=id,nama_masjid,nama_ketua_dkm,no_hp
+    const { fields } = req.query;
     const fieldsArr = fields ? fields.toString().split(",") : undefined;
     prisma.masjid
       .findMany({

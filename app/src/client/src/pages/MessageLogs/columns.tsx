@@ -8,48 +8,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  CheckCircledIcon,
+  CrossCircledIcon,
   DotsHorizontalIcon,
   TrashIcon,
-  RocketIcon,
 } from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
-import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
-import Broadcast from "./broadcast";
+import { formatDateTime, whatsappFormatting } from "@/lib/utils";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type JadwalPengajian = {
+export type MessageLog = {
   id: string;
-  tanggal: Date;
-  waktu: string;
-  id_masjid: number;
-  id_mubaligh: number;
+  no_hp: string;
+  message: string;
+  status: string;
+  send_time: Date;
+  error_reason: string;
 };
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
 }
 
-export const columns: (
-  selectMasjid: {
-    value: string;
-    label: string;
-  }[],
-  selectMubaligh: {
-    value: string;
-    label: string;
-  }[],
-  template: {
-    id: string;
-    content: string;
-    nama_template: string;
-  }[]
-) => ColumnDef<JadwalPengajian>[] = (
-  selectMasjid,
-  selectMubaligh,
-  template
-) => [
+export const columns: ColumnDef<MessageLog>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -75,46 +58,51 @@ export const columns: (
     enableSorting: true,
   },
   {
-    accessorKey: "tanggal",
-    header: (header) => CellHeaderSortable(header, "Tanggal Pengajian"),
-    cell: (props) => <EditCell {...props} calendar />,
+    accessorKey: "no_hp",
+    header: (header) => CellHeaderSortable(header, "No. HP"),
     enableSorting: true,
   },
   {
-    accessorKey: "waktu",
-    header: (header) => CellHeaderSortable(header, "Waktu Pengajian"),
-    cell: EditCell,
-    enableSorting: true,
+    accessorKey: "message",
+    header: (header) => CellHeaderSortable(header, "Message"),
+    cell: (props) => (
+      <span className="whitespace-pre-wrap">
+        {whatsappFormatting(props.getValue<string>())}
+      </span>
+    ),
   },
   {
-    accessorKey: "id_masjid",
-    header: (header) => CellHeaderSortable(header, "Masjid"),
-    cell: (props) => <EditCell {...props} select={selectMasjid} />,
+    accessorKey: "status",
+    header: (header) => CellHeaderSortable(header, "Status"),
+    cell: ({ getValue, row }) => (
+      <p>
+        {getValue<string>() === "success" ? (
+          <div className="flex flex-row items-center gap-2 text-green-600 ">
+            <CheckCircledIcon />
+            Success
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-row items-center gap-2 text-red-600">
+              <CrossCircledIcon />
+              Failed
+            </div>
+            {row.original.error_reason}
+          </>
+        )}
+      </p>
+    ),
   },
   {
-    accessorKey: "id_mubaligh",
-    header: (header) => CellHeaderSortable(header, "Mubaligh"),
-    cell: (props) => <EditCell {...props} select={selectMubaligh} />,
-  },
-  {
-    id: "broadcast",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <Broadcast template={template} idJadwal={row.original.id}>
-          <Button variant="ghost">
-            <RocketIcon className="mr-4" />
-            Broadcast
-          </Button>
-        </Broadcast>
-      );
-    },
+    accessorKey: "send_time",
+    header: (header) => CellHeaderSortable(header, "Waktu Pengiriman"),
+    cell: ({ getValue }) => formatDateTime(getValue<string>()),
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const jadwalpengajian = row.original;
+      const mubaligh = row.original;
 
       return (
         <DropdownMenu>
@@ -130,8 +118,8 @@ export const columns: (
               className="text-red-600 focus:bg-red-600 focus:text-white"
               onClick={() =>
                 (
-                  table.options.meta as CustomTableMeta<JadwalPengajian>
-                )?.removeData?.(jadwalpengajian.id)
+                  table.options.meta as CustomTableMeta<MessageLog>
+                )?.removeData?.(mubaligh.id)
               }
             >
               <TrashIcon className="mr-2" />

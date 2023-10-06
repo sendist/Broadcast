@@ -40,7 +40,11 @@ const initialState: State = {
   loading: true,
 };
 
-const AccountProvider = ({ children }: { children: React.ReactNode }) => {
+type AccountProviderProps = {
+  children: React.ReactNode;
+};
+
+const AccountProvider = ({ children }: AccountProviderProps) => {
   const fetchReducer = (state: State, action: Action): State => {
     switch (action.type) {
       case "loading":

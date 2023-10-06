@@ -1,7 +1,7 @@
 import { CheckIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { Button } from "../ui/button";
 import { CellContext, TableMeta } from "@tanstack/react-table";
-import { LegacyRef, forwardRef, useState } from "react";
+import { LegacyRef, forwardRef, useState, useEffect } from "react";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import {
@@ -24,17 +24,15 @@ interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   updateData?: (id: string, columnId: string, value: string) => void;
 }
 
+type TextPreviewProps = {
+  value: string;
+  whatsappFormat?: boolean;
+  setIsEditing: (value: boolean) => void;
+};
+
 const TextPreview = forwardRef(
   (
-    {
-      value,
-      whatsappFormat,
-      setIsEditing,
-    }: {
-      value: string;
-      whatsappFormat?: boolean;
-      setIsEditing: (value: boolean) => void;
-    },
+    { value, whatsappFormat, setIsEditing }: TextPreviewProps,
     ref: LegacyRef<HTMLDivElement>
   ) => {
     return (
@@ -61,16 +59,7 @@ const TextPreview = forwardRef(
   }
 );
 
-export function EditCell<T extends { id: string }>({
-  row,
-  getValue,
-  table,
-  cell,
-  textArea,
-  whatsappFormat,
-  select,
-  calendar,
-}: CellContext<T, unknown> & {
+type EditCellProps<T extends { id: string }> = CellContext<T, unknown> & {
   whatsappFormat?: boolean;
 } & (
     | {
@@ -93,7 +82,18 @@ export function EditCell<T extends { id: string }>({
         select?: undefined;
         calendar?: undefined;
       }
-  )) {
+  );
+
+export function EditCell<T extends { id: string }>({
+  row,
+  getValue,
+  table,
+  cell,
+  textArea,
+  whatsappFormat,
+  select,
+  calendar,
+}: EditCellProps<T>) {
   const [isEditing, setIsEditing] = useState(false);
   const [dataChanged, setDataChanged] = useState(false);
   const [value, setValue] = useState(getValue<string>());
