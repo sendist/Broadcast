@@ -65,7 +65,14 @@ export default function WaClient() {
       {waClientInfo.state !== "CONNECTED" && (
         <div className="m-4">
           {waClientInfo.qr ? (
-            <QRCode value={waClientInfo.qr} />
+            <div className="w-[256px] h-[256px] relative p-4 box-content bg-white">
+              <div className="absolute top-0 left-0 right-0 bottom-0 grid place-items-center">
+                <QRCode value={waClientInfo.qr} />
+              </div>
+              <div className="absolute z-10 left-0 right-0 bottom-0 top-0 text-center grid place-items-center">
+                {/* TODO: logo */}
+              </div>
+            </div>
           ) : (
             <p>QR Code Loading...</p>
           )}

@@ -168,6 +168,7 @@ function App() {
   return (
     <>
       <div className="h-screen w-screen bg-white flex flex-row">
+        {/* sidebar */}
         <div
           className="z-40 h-screen w-64 transition-transform"
           aria-label="Sidebar"
@@ -229,6 +230,7 @@ function App() {
             </div>
           </div>
         </div>
+        {/* content */}
         <div className="flex-1 flex flex-col h-screen w-full overflow-auto p-4 bg-background">
           <Outlet />
         </div>

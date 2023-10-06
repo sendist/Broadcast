@@ -99,6 +99,10 @@ export function EditCell<T extends { id: string }>({
   const [value, setValue] = useState(getValue<string>());
   const id = row.original.id;
 
+  useEffect(() => {
+    setValue(getValue<string>());
+  }, [cell.row.index, getValue]);
+
   function edit(overrideVal?: string) {
     setIsEditing(false);
     if (!dataChanged && !select && !calendar) {

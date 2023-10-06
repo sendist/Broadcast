@@ -30,6 +30,10 @@ export function whatsappFormatting(str: string): JSX.Element {
   str = escapeHtml(str);
 
   str = str
+    .replace(
+      /(?:{{)(?:(?!\s))((?:(?!\n|}}).)+)(?:}})/g,
+      "<span class='text-primary'>{{$1}}</span>"
+    )
     .replace(/(?:\*)(?:(?!\s))((?:(?!\*|\n).)+)(?:\*)/g, "<b>$1</b>")
     .replace(/(?:_)(?:(?!\s))((?:(?!\n|_).)+)(?:_)/g, "<i>$1</i>")
     .replace(/(?:~)(?:(?!\s))((?:(?!\n|~).)+)(?:~)/g, "<s>$1</s>")

@@ -101,7 +101,6 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
             title: "Please re-login",
             description: "Session expired",
           });
-          navigate("/login");
           return false;
         } else {
           return res.json().then(({ data }: ServerResult<Account>) => {
@@ -136,6 +135,7 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
           });
           return;
         }
+        localStorage.removeItem("account");
         dispatch({ type: "reset" });
       })
       .catch((err) => {
@@ -156,14 +156,14 @@ const AccountProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [state.account]);
 
-  // useEffect(() => {
-  //   refresh().then((res) => {
-  //     if (res === false) {
-  //       navigate("/login");
-  //     }
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    if (localStorage.getItem("account")) {
+      refresh();
+    } else {
+      dispatch({ type: "reset" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AccountContext.Provider value={{ ...state, login, refresh, logout }}>
