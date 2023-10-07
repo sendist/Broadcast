@@ -89,7 +89,6 @@ export function sendMessage(phone: string, message: string): void {
                     .catch(console.error);
             })
             .catch((err) => {
-              console.log("prisma error 3");
               prisma.message_logs
                 .create({
                   data: {

@@ -18,7 +18,7 @@ export type Template = {
   id: string;
   nama_template: string;
   content: string;
-  type: "pengajian_bulanan" | "pengajian_reminder" | "jumatan_reminder";
+  type: string;
 };
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
@@ -30,6 +30,8 @@ export const columns: (
     | {
         value: string;
         label: string;
+        replacements: string[];
+        repetition: boolean;
       }[]
     | undefined
 ) => ColumnDef<Template>[] = (listTipe) => [
@@ -66,12 +68,23 @@ export const columns: (
   {
     accessorKey: "content",
     header: (header) => CellHeaderSortable(header, "Content"),
-    cell: (props) => <EditCell {...props} textArea whatsappFormat />,
+    cell: (props) => {
+      return (
+        <EditCell
+          {...props}
+          textArea
+          whatsappFormat
+          extendedFormatting={listTipe?.find(
+            (tipe) => tipe.value === props.row.original.type
+          )}
+        />
+      );
+    },
   },
   {
     accessorKey: "type",
     header: (header) => CellHeaderSortable(header, "Tipe"),
-    cell: (props) => <EditCell {...props} whatsappFormat select={listTipe} />,
+    cell: (props) => <EditCell {...props} select={listTipe} />,
   },
   {
     id: "actions",

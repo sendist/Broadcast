@@ -27,12 +27,21 @@ interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
 type TextPreviewProps = {
   value: string;
   whatsappFormat?: boolean;
+  extendedFormatting?: {
+    replacements: string[];
+    repetition: boolean;
+  };
   setIsEditing: (value: boolean) => void;
 };
 
 const TextPreview = forwardRef(
   (
-    { value, whatsappFormat, setIsEditing }: TextPreviewProps,
+    {
+      value,
+      whatsappFormat,
+      extendedFormatting,
+      setIsEditing,
+    }: TextPreviewProps,
     ref: LegacyRef<HTMLDivElement>
   ) => {
     return (
@@ -42,7 +51,7 @@ const TextPreview = forwardRef(
         onDoubleClick={() => setIsEditing(true)}
       >
         {whatsappFormat ? (
-          whatsappFormatting(value)
+          whatsappFormatting(value, extendedFormatting)
         ) : (
           <p className="whitespace-pre-wrap">{value}</p>
         )}
@@ -61,6 +70,10 @@ const TextPreview = forwardRef(
 
 type EditCellProps<T extends { id: string }> = CellContext<T, unknown> & {
   whatsappFormat?: boolean;
+  extendedFormatting?: {
+    replacements: string[];
+    repetition: boolean;
+  };
 } & (
     | {
         textArea?: true;
@@ -91,6 +104,7 @@ export function EditCell<T extends { id: string }>({
   cell,
   textArea,
   whatsappFormat,
+  extendedFormatting,
   select,
   calendar,
 }: EditCellProps<T>) {
@@ -98,7 +112,6 @@ export function EditCell<T extends { id: string }>({
   const [dataChanged, setDataChanged] = useState(false);
   const [value, setValue] = useState(getValue<string>());
   const id = row.original.id;
-
   useEffect(() => {
     setValue(getValue<string>());
   }, [cell.row.index, getValue]);
@@ -127,6 +140,7 @@ export function EditCell<T extends { id: string }>({
                   : formatDate(value, true)
               }
               whatsappFormat={whatsappFormat}
+              extendedFormatting={extendedFormatting}
               setIsEditing={() => setIsEditing(true)}
             />
           </PopoverTrigger>
@@ -218,6 +232,7 @@ export function EditCell<T extends { id: string }>({
         <TextPreview
           value={value}
           whatsappFormat={whatsappFormat}
+          extendedFormatting={extendedFormatting}
           setIsEditing={setIsEditing}
         />
       )}

@@ -13,6 +13,8 @@ export default function TemplatePage() {
   const { data: types } = useCRUD<{
     value: string;
     label: string;
+    replacements: string[];
+    repetition: boolean;
   }>({
     url: "/template/types",
   });
