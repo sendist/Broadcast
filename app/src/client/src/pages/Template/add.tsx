@@ -1,111 +1,122 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
+  ControllerRenderProps,
+  FieldValues,
+  Path,
+  useForm,
+} from "react-hook-form";
+
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import InputDropdown from "@/components/custom/inputDropdown";
 
-const templateFormSchema = z.object({
-  nama_template: z.string().nonempty({
-    message: "Nama Template harus diisi",
-  }),
-  content: z.string().nonempty({
-    message: "Content harus diisi",
-  }),
-});
-
-const renderFormData = [
-  {
-    name: "nama_template",
-    label: "Nama Template",
-    placeholder: "Nama Template",
-  },
-  {
-    name: "content",
-    label: "Content",
-    placeholder: "Content",
-  },
-] as const;
+const templateFormSchema = (typeValues: string[]) =>
+  z.object({
+    nama_template: z.string().nonempty({
+      message: "Nama Template harus diisi",
+    }),
+    content: z.string().nonempty({
+      message: "Content harus diisi",
+    }),
+    type: z.enum(typeValues),
+  });
 
 export function AddTemplateForm({
+  types,
   children,
   onSubmit,
 }: {
+  types: {
+    label: string;
+    value: string;
+    replacements: string[];
+    repetition: boolean;
+  }[];
   children: React.ReactNode;
-  onSubmit: (data: { nama_template: string; content: string }) => void;
+  onSubmit: (data: {
+    nama_template: string;
+    content: string;
+    type: string;
+  }) => void;
 }) {
+  // Open dialog when adding new data
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const typeDropdownData = [
+    { label: "Pengajian Bulanan", value: "pengajian_bulanan" },
+    { label: "Pengajian Reminder", value: "pengajian_reminder" },
+    { label: "Jumatan Reminder", value: "jumatan_reminder" },
+  ];
+
   const form = useForm<z.infer<typeof templateFormSchema>>({
-    resolver: zodResolver(templateFormSchema),
+    resolver: zodResolver(templateFormSchema(types.map((type) => type.value))),
     defaultValues: {
       nama_template: "",
       content: "",
     },
   });
 
+  const renderFormInput: RenderFormInput<typeof form> = [
+    {
+      name: "nama_template",
+      label: "Nama Template",
+      customInput: <T extends FieldValues>({
+        field,
+      }: {
+        field: ControllerRenderProps<T, Path<T>>;
+      }) => {
+        return <Input placeholder="Nama Template" {...field} />;
+      },
+    },
+    {
+      name: "content",
+      label: "Content Pesan",
+      customInput: <T extends FieldValues>({
+        field,
+      }: {
+        field: ControllerRenderProps<T, Path<T>>;
+      }) => {
+        return <Textarea placeholder="Content Pesan" {...field} />;
+      },
+    },
+    {
+      name: "type",
+      label: "Tipe Pesan Broadcast",
+      customInput: <T extends FieldValues>({
+        field,
+      }: {
+        field: ControllerRenderProps<T, Path<T>>;
+      }) => {
+        return (
+          <InputDropdown
+            value={field.value}
+            select={types}
+            onChange={field.onChange}
+            placeholder="Pilih Tipe..."
+            align={"start"}
+            side={"top"}
+          />
+        );
+      },
+    },
+  ];
+
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild onClick={() => setDialogOpen(true)}>
-        {children}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Tambah Data Template</DialogTitle>
-          <DialogDescription>
-            Input data template yang akan ditambahkan ke dalam daftar
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => {
-              setDialogOpen(false);
-              onSubmit(data);
-              form.reset();
-            })}
-            className="space-y-8"
-          >
-            {renderFormData.map((item, index) => (
-              <FormField
-                key={item.name}
-                control={form.control}
-                name={item.name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{item.label}</FormLabel>
-                    <FormControl>
-                      {index === 0 ? (
-                        <Input placeholder={item.placeholder} {...field} />
-                      ) : (
-                        <Textarea placeholder={item.placeholder} {...field} />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <AddForm
+      title="Tambah Data Template"
+      subtitle="Input data template yang akan ditambahkan ke dalam daftar"
+      dialogOpen={dialogOpen}
+      setDialogOpen={setDialogOpen}
+      typeDropdown={typeDropdownData}
+      onSubmit={onSubmit}
+      form={form}
+      renderFormInput={renderFormInput}
+    >
+      {children}
+    </AddForm>
   );
 }
