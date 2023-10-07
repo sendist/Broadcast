@@ -6,33 +6,21 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@radix-ui/react-icons";
 
 export default function TemplatePage() {
-  const { data, loading, update, remove, create } =
-  useCRUD<Template>({
+  const { data, loading, update, remove, create } = useCRUD<Template>({
     url: "/template",
   });
 
-  const { data: enumTypes } = useCRUD<{
+  const { data: types } = useCRUD<{
     value: string;
     label: string;
   }>({
-    url: "/template/enum_types",
-    params: {
-      fields: "value,label",
-    },
+    url: "/template/types",
   });
-  
-  const typeDropdown = enumTypes?.map((item) => ({
-    label: item.label,
-    value: item.value,
-  }));
-  
+
   return (
     <div>
       <div className="space-x-4">
-        <AddTemplateForm 
-          onSubmit={create}
-          typeDropdown={typeDropdown || []}
-        >
+        <AddTemplateForm onSubmit={create} types={types || []}>
           <Button variant="outline" className="mb-4">
             <PlusIcon className="mr-2" />
             Add
@@ -40,9 +28,7 @@ export default function TemplatePage() {
         </AddTemplateForm>
       </div>
       <DataTable
-        columns={columns(
-          typeDropdown || []
-        )}
+        columns={columns(types || [])}
         data={data}
         isLoading={loading}
         meta={{
