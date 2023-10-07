@@ -5,21 +5,34 @@ import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@radix-ui/react-icons";
 
-export default function Template() {
-  const { data, loading, update, remove, create } = useCRUD<Template>({
+export default function TemplatePage() {
+  const { data, loading, update, remove, create } =
+  useCRUD<Template>({
     url: "/template",
   });
+
   const { data: enumTypes } = useCRUD<{
     value: string;
     label: string;
   }>({
     url: "/template/enum_types",
+    params: {
+      fields: "value,label",
+    },
   });
-
+  
+  const typeDropdown = enumTypes?.map((item) => ({
+    label: item.label,
+    value: item.value,
+  }));
+  
   return (
     <div>
       <div className="space-x-4">
-        <AddTemplateForm onSubmit={create}>
+        <AddTemplateForm 
+          onSubmit={create}
+          typeDropdown={typeDropdown || []}
+        >
           <Button variant="outline" className="mb-4">
             <PlusIcon className="mr-2" />
             Add
@@ -27,7 +40,9 @@ export default function Template() {
         </AddTemplateForm>
       </div>
       <DataTable
-        columns={columns(enumTypes)}
+        columns={columns(
+          typeDropdown || []
+        )}
         data={data}
         isLoading={loading}
         meta={{
