@@ -7,7 +7,7 @@ import { body, checkExact, checkSchema, param, query } from "express-validator";
 import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
 import path from "path";
 import { addToQueue } from "../utils/waweb.util";
-import { formatDateTime } from "../utils/etc.util";
+import { formatDate, formatDateTime } from "../utils/etc.util";
 
 const router = express.Router();
 router.get(
@@ -67,7 +67,6 @@ router.post(
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { tanggal, id_masjid, id_mubaligh } = req.body;
-    const parsedTanggal = new Date(tanggal);
     prisma.jumatan
       .create({
         data: {
@@ -167,7 +166,7 @@ router.get(
           });
         }
         const message = template.content
-          .replace("{{tanggal}}", formatDateTime(jumatan.tanggal))
+          .replace("{{tanggal}}", formatDate(jumatan.tanggal))
           .replace("{{nama_masjid}}", jumatan.masjid.nama_masjid.toString())
           .replace(
             "{{nama_mubaligh}}",
@@ -194,28 +193,33 @@ router.get(
   }
 );
 
-router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.jumatan
-    .findUnique({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((jumatan) => {
-      sendResponse({
-        res,
-        data: jumatan,
+router.get(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.jumatan
+      .findUnique({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((jumatan) => {
+        sendResponse({
+          res,
+          data: jumatan,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 router.patch(
   "/:id",
   validate([
+    param("id").isNumeric().notEmpty(),
     body("tanggal").optional().isISO8601(),
     body("id_masjid").optional().isInt(),
     body("id_mubaligh").optional().isInt(),
@@ -246,23 +250,27 @@ router.patch(
   }
 );
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.jumatan
-    .delete({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((jumatan) => {
-      sendResponse({
-        res,
-        data: jumatan,
+router.delete(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.jumatan
+      .delete({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((jumatan) => {
+        sendResponse({
+          res,
+          data: jumatan,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 export default router;

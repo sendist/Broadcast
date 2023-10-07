@@ -57,6 +57,7 @@ export function AddTemplateForm({
     defaultValues: {
       nama_template: "",
       content: "",
+      type: "",
     },
   });
 

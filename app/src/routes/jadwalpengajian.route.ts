@@ -7,7 +7,7 @@ import { body, checkExact, checkSchema, param, query } from "express-validator";
 import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
 import path from "path";
 import { addToQueue } from "../utils/waweb.util";
-import { formatDateTime } from "../utils/etc.util";
+import { formatDate, formatDateTime } from "../utils/etc.util";
 
 const router = express.Router();
 router.get(
@@ -69,7 +69,6 @@ router.post(
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { tanggal, waktu, id_masjid, id_mubaligh } = req.body;
-    const parsedTanggal = new Date(tanggal);
     prisma.pengajian
       .create({
         data: {
@@ -172,7 +171,7 @@ router.get(
           });
         }
         const message = template.content
-          .replace("{{tanggal}}", formatDateTime(pengajian.tanggal))
+          .replace("{{tanggal}}", formatDate(pengajian.tanggal))
           .replace("{{waktu}}", pengajian.waktu.toString())
           .replace("{{nama_masjid}}", pengajian.masjid.nama_masjid.toString())
           .replace(
@@ -200,28 +199,33 @@ router.get(
   }
 );
 
-router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.pengajian
-    .findUnique({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((pengajian) => {
-      sendResponse({
-        res,
-        data: pengajian,
+router.get(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.pengajian
+      .findUnique({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((pengajian) => {
+        sendResponse({
+          res,
+          data: pengajian,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 router.patch(
   "/:id",
   validate([
+    param("id").isNumeric().notEmpty(),
     body("tanggal").optional().isISO8601(),
     body("waktu").optional().isString(),
     body("id_masjid").optional().isInt(),
@@ -254,23 +258,27 @@ router.patch(
   }
 );
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.pengajian
-    .delete({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((pengajian) => {
-      sendResponse({
-        res,
-        data: pengajian,
+router.delete(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.pengajian
+      .delete({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((pengajian) => {
+        sendResponse({
+          res,
+          data: pengajian,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 export default router;

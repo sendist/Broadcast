@@ -39,8 +39,10 @@ const prismaErrorHandler = (
     }
   } else if (err instanceof Prisma.PrismaClientUnknownRequestError) {
     // Handle unknown errors
-    return res.status(500).json({
-      message: `Something went wrong: ${err.message}`,
+    return sendResponse({
+      res,
+      error: `Something went wrong: ${err.message}`,
+      status: 500,
     });
   } else {
     next(err);

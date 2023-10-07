@@ -11,6 +11,7 @@ import {
   CheckCircledIcon,
   CrossCircledIcon,
   DotsHorizontalIcon,
+  PaperPlaneIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
@@ -30,6 +31,7 @@ export type MessageLog = {
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
+  resend?: (id: string) => void;
 }
 
 export const columns: ColumnDef<MessageLog>[] = [
@@ -102,7 +104,7 @@ export const columns: ColumnDef<MessageLog>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const mubaligh = row.original;
+      const messageLog = row.original;
 
       return (
         <DropdownMenu>
@@ -115,11 +117,21 @@ export const columns: ColumnDef<MessageLog>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
+              onClick={() =>
+                (table.options.meta as CustomTableMeta<MessageLog>)?.resend?.(
+                  messageLog.id
+                )
+              }
+            >
+              <PaperPlaneIcon className="mr-2" />
+              Kirim Ulang
+            </DropdownMenuItem>
+            <DropdownMenuItem
               className="text-red-600 focus:bg-red-600 focus:text-white"
               onClick={() =>
                 (
                   table.options.meta as CustomTableMeta<MessageLog>
-                )?.removeData?.(mubaligh.id)
+                )?.removeData?.(messageLog.id)
               }
             >
               <TrashIcon className="mr-2" />

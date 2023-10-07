@@ -34,8 +34,9 @@ client.initialize().then(() => {
 });
 
 export function sendMessage(phone: string, message: string): void {
-  const convertedPhone = phone.replace(/^0/, "62") + "@c.us";
-  // TODO masih ga masuk ke MESSAGE LOG
+  //replace 0 with 62 and remove all characters except numbers
+  const convertedPhone =
+    phone.replace(/[^0-9]/g, "").replace(/^0/, "62") + "@c.us";
   client
     .getState()
     .then((state) => {
@@ -43,11 +44,11 @@ export function sendMessage(phone: string, message: string): void {
         ? client
             .isRegisteredUser(convertedPhone)
             .then((isRegistered) => {
+              console.log("IS REGISTERED", isRegistered);
               isRegistered
                 ? client
                     .sendMessage(convertedPhone, message)
                     .then((msg) => {
-                      console.log("kekirim");
                       prisma.message_logs
                         .create({
                           data: {
@@ -57,61 +58,77 @@ export function sendMessage(phone: string, message: string): void {
                             send_time: new Date(),
                           },
                         })
-                        .then(() => console.log("kekirim 2"));
+                        .then()
+                        .catch(console.error);
                     })
                     .catch((err) => {
-                      console.log("prisma error");
-                      prisma.message_logs.create({
-                        data: {
-                          message: message,
-                          no_hp: phone,
-                          status: "failed",
-                          error_reason: err?.message ?? String(err),
-                          send_time: new Date(),
-                        },
-                      });
+                      prisma.message_logs
+                        .create({
+                          data: {
+                            message: message,
+                            no_hp: phone,
+                            status: "failed",
+                            error_reason: err?.message ?? String(err),
+                            send_time: new Date(),
+                          },
+                        })
+                        .then()
+                        .catch(console.error);
                     })
-                : prisma.message_logs.create({
-                    data: {
-                      message: message,
-                      no_hp: phone,
-                      status: "failed",
-                      error_reason: "User not registered in whatsapp",
-                      send_time: new Date(),
-                    },
-                  });
+                : prisma.message_logs
+                    .create({
+                      data: {
+                        message: message,
+                        no_hp: phone,
+                        status: "failed",
+                        error_reason: "User not registered in whatsapp",
+                        send_time: new Date(),
+                      },
+                    })
+                    .then()
+                    .catch(console.error);
             })
             .catch((err) => {
-              prisma.message_logs.create({
-                data: {
-                  message: message,
-                  no_hp: phone,
-                  status: "failed",
-                  error_reason: err?.message ?? String(err),
-                  send_time: new Date(),
-                },
-              });
+              console.log("prisma error 3");
+              prisma.message_logs
+                .create({
+                  data: {
+                    message: message,
+                    no_hp: phone,
+                    status: "failed",
+                    error_reason: err?.message ?? String(err),
+                    send_time: new Date(),
+                  },
+                })
+                .then()
+                .catch(console.error);
             })
-        : prisma.message_logs.create({
-            data: {
-              message: message,
-              no_hp: phone,
-              status: "failed",
-              error_reason: "Whatsapp not connected",
-              send_time: new Date(),
-            },
-          });
+        : prisma.message_logs
+            .create({
+              data: {
+                message: message,
+                no_hp: phone,
+                status: "failed",
+                error_reason: "Whatsapp not connected",
+                send_time: new Date(),
+              },
+            })
+            .then()
+            .catch(console.error);
     })
     .catch((err) => {
-      prisma.message_logs.create({
-        data: {
-          message: message,
-          no_hp: phone,
-          status: "failed",
-          error_reason: err?.message ?? String(err),
-          send_time: new Date(),
-        },
-      });
+      prisma.message_logs
+        .create({
+          data: {
+            message: message,
+            no_hp: phone,
+            status: "failed",
+            error_reason: err?.message ?? String(err),
+            send_time: new Date(),
+          },
+        })
+        .then()
+        .catch(console.error);
     });
 }
 

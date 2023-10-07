@@ -18,6 +18,9 @@ export default function MessageLogs() {
           removeData: (id: string) => {
             remove(id);
           },
+          resend: (id: string) => {
+            console.log(id);
+          },
         }}
       />
     </div>
