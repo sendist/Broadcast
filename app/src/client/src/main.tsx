@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound/index.tsx";
 import WaClient from "./pages/WaClient/index.tsx";
 import Template from "./pages/Template/index.tsx";
 import JadwalPengajian from "./pages/JadwalPengajian/index.tsx";
+import JadwalJumatan from "./pages/JadwalJumatan/index.tsx";
 import SplashScreen from "./pages/SplashScreen/index.tsx";
 import MessageLogs from "./pages/MessageLogs/index.tsx";
 
@@ -59,7 +60,7 @@ const router = createBrowserRouter([
       },
       {
         path: "jadwal-jumatan",
-        element: <div>Ini jadwal jumatan</div>,
+        element: <JadwalJumatan />,
       },
       {
         path: "message-logs",
