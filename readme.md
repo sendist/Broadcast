@@ -21,16 +21,11 @@ We used these tech stacks to develop this app:
 2. copy `.env.example` to `.env` in app folder.
 
 3. Install dependencies.
+
    ```console
    $ cd app && npm i
    $ cd src/client && npm i
    $ cd ../.. && npx prisma generate
-   ```
-
-   Worth noting:
-   Before running the app, make sure you have concurrently installed locally by running this command:
-   ```console
-   $ npm i -D concurrently
    ```
 
 4. Run the 'app'.

@@ -24,10 +24,10 @@ const jadwalJumatanFormSchema = z.object({
     required_error: "Tanggal jumatan harus diisi",
   }),
   id_masjid: z.string().nonempty({
-    message: "Kode masjid harus diisi",
+    message: "Masjid harus diisi",
   }),
   id_mubaligh: z.string().nonempty({
-    message: "Kode mubaligh harus diisi",
+    message: "Mubaligh harus diisi",
   }),
 });
 
