@@ -7,6 +7,15 @@ export function humanize(str: string) {
   return frags.join(" ");
 }
 
+export function formatDate(date: Date | string) {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "long",
+  }).format(date);
+}
+
 export function formatDateTime(date: Date | string) {
   if (typeof date === "string") {
     date = new Date(date);

@@ -46,17 +46,12 @@ export function AddTemplateForm({
   // Open dialog when adding new data
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const typeDropdownData = [
-    { label: "Pengajian Bulanan", value: "pengajian_bulanan" },
-    { label: "Pengajian Reminder", value: "pengajian_reminder" },
-    { label: "Jumatan Reminder", value: "jumatan_reminder" },
-  ];
-
   const form = useForm<z.infer<typeof templateFormSchema>>({
     resolver: zodResolver(templateFormSchema(types.map((type) => type.value))),
     defaultValues: {
       nama_template: "",
       content: "",
+      type: "",
     },
   });
 
@@ -111,7 +106,10 @@ export function AddTemplateForm({
       subtitle="Input data template yang akan ditambahkan ke dalam daftar"
       dialogOpen={dialogOpen}
       setDialogOpen={setDialogOpen}
-      typeDropdown={typeDropdownData}
+      typeDropdown={types.map((type) => ({
+        label: type.label,
+        value: type.value,
+      }))}
       onSubmit={onSubmit}
       form={form}
       renderFormInput={renderFormInput}

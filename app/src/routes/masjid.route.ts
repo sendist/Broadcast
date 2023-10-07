@@ -120,7 +120,7 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
 
 router.get(
   "/:id",
-  validate([param("id").isNumeric().toInt().isInt({ min: 1 })]),
+  validate([param("id").isNumeric().notEmpty()]),
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     prisma.masjid
@@ -144,6 +144,7 @@ router.get(
 router.patch(
   "/:id",
   validate([
+    param("id").isNumeric().notEmpty(),
     body("nama_masjid").optional().isString(),
     body("nama_ketua_dkm").optional().isString(),
     body("no_hp").optional().isString(),
@@ -174,23 +175,27 @@ router.patch(
   }
 );
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.masjid
-    .delete({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((masjid) => {
-      sendResponse({
-        res,
-        data: masjid,
+router.delete(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.masjid
+      .delete({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((masjid) => {
+        sendResponse({
+          res,
+          data: masjid,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 export default router;

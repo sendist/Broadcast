@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { query } from "express-validator";
+import { param, query } from "express-validator";
 
 const router = express.Router();
 router.get(
@@ -56,23 +56,27 @@ router.get(
   }
 );
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.message_logs
-    .delete({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((message_log) => {
-      sendResponse({
-        res,
-        data: message_log,
+router.delete(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.message_logs
+      .delete({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((message_log) => {
+        sendResponse({
+          res,
+          data: message_log,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 export default router;

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
 import path from "path";
 
@@ -109,28 +109,33 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.mubaligh
-    .findUnique({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((mubaligh) => {
-      sendResponse({
-        res,
-        data: mubaligh,
+router.get(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.mubaligh
+      .findUnique({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((mubaligh) => {
+        sendResponse({
+          res,
+          data: mubaligh,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 router.patch(
   "/:id",
   validate([
+    param("id").isNumeric().notEmpty(),
     body("nama_mubaligh").optional().isString(),
     body("no_hp").optional().isString(),
   ]),
@@ -159,23 +164,27 @@ router.patch(
   }
 );
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.mubaligh
-    .delete({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((mubaligh) => {
-      sendResponse({
-        res,
-        data: mubaligh,
+router.delete(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.mubaligh
+      .delete({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((mubaligh) => {
+        sendResponse({
+          res,
+          data: mubaligh,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 export default router;

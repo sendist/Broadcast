@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import { humanize } from "../utils/etc.util";
 import { $Enums } from "@prisma/client";
 
@@ -16,7 +16,9 @@ router.get(
     query("limit").optional().isNumeric().notEmpty(),
     query("orderBy").optional().isString().notEmpty(),
     query("orderType").optional().isString().notEmpty(),
-    query("type").optional().matches(new RegExp(`${Object.values($Enums.template_t).join("|")}`)),
+    query("type")
+      .optional()
+      .matches(new RegExp(`${Object.values($Enums.template_t).join("|")}`)),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { page, limit, orderBy, orderType, fields, type } = req.query;
@@ -110,45 +112,66 @@ router.post(
 //     });
 // });
 
-const templateEnum: { value: string; label: string }[] = (
-  Object.keys($Enums.template_t) as Array<keyof typeof $Enums.template_t>
-).reduce((acc, key) => {
-  acc.push({
-    value: key,
-    label: humanize(key),
-  });
-  return acc;
-}, [] as { value: keyof typeof $Enums.template_t; label: string }[]);
+const templateEnum: {
+  value: $Enums.template_t;
+  label: string;
+  replacements: string[];
+  repetition: boolean;
+}[] = [
+  {
+    value: "pengajian_bulanan",
+    label: "Pengajian Bulanan",
+    replacements: ["bulan", "tanggal", "waktu", "nama_masjid", "nama_mubaligh"],
+    repetition: true,
+  },
+  {
+    value: "pengajian_reminder",
+    label: "Pengajian Reminder",
+    replacements: ["tanggal", "waktu", "nama_masjid", "nama_mubaligh"],
+    repetition: false,
+  },
+  {
+    value: "jumatan_reminder",
+    label: "Jumatan Reminder",
+    replacements: ["tanggal", "nama_masjid", "nama_mubaligh"],
+    repetition: false,
+  },
+];
 
-router.get("/enum_types", (req: Request, res: Response) => {
+router.get("/types", (req: Request, res: Response) => {
   sendResponse({
     res,
     data: templateEnum,
   });
 });
 
-router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.template
-    .findUnique({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((template) => {
-      sendResponse({
-        res,
-        data: template,
+router.get(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.template
+      .findUnique({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((template) => {
+        sendResponse({
+          res,
+          data: template,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 router.patch(
   "/:id",
   validate([
+    param("id").isNumeric().notEmpty(),
     body("nama_template").optional().isString(),
     body("content").optional().isString(),
     body("type")
@@ -181,23 +204,27 @@ router.patch(
   }
 );
 
-router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  prisma.template
-    .delete({
-      where: {
-        id: BigInt(id),
-      },
-    })
-    .then((template) => {
-      sendResponse({
-        res,
-        data: template,
+router.delete(
+  "/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.template
+      .delete({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((template) => {
+        sendResponse({
+          res,
+          data: template,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 export default router;
