@@ -56,7 +56,7 @@ export default function WaClient() {
               <h1 className="font-thin text-4xl mb-6">
                 Hubungkan WhatsApp Anda
               </h1>
-              <ol className="list-decimal text-lg mx-8">
+              <ol className="list-decimal text-md mx-8">
                 <li>Buka WhatsApp di telepon Anda</li>
                 <li>
                   Buka setelan dengan mengetuk foto profil Anda,{" "}
@@ -119,10 +119,9 @@ export default function WaClient() {
               <div className="mt-4 flex flex-col gap-y-2">
                 <h2 className="text-xl">Test WhatsApp Client</h2>
                 <p>
-                  Anda bisa memeriksa apakah nomor telepon yang terhubung sudah
-                  benar dan apakah broadcasting berjalan dengan sesuai dengan
-                  cara memasukkan nomor WhatsApp untuk pengujian pada kolom di
-                  bawah ini.
+                  Untuk memeriksa apakah fitur WA Client ataupun Broadcasting
+                  sudah berjalan atau tidak, cobalah untuk mengisi nomor
+                  WhatsApp Anda pada kolom ini untuk dikirimkan pesan default.
                 </p>
                 <div></div>
                 <Input
@@ -176,11 +175,11 @@ export default function WaClient() {
                     <div className="relative">
                       <img
                         src="\..\..\..\..\public\broadcast-logo.svg"
-                        className="w-20 h-20 absolute"
+                        className="w-16 h-16 absolute"
                       />
                       <img
                         src="\..\..\..\..\public\background-logo.svg"
-                        className="w-20 h-20"
+                        className="w-16 h-16"
                       />
                     </div>
                   </div>
