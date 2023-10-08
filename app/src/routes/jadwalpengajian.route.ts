@@ -127,7 +127,7 @@ router.get("/template", (req: Request, res: Response) => {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "Content-Disposition":
-          "attachment; filename=template_jadwaljumatan.xlsx",
+          "attachment; filename=template_jadwalpengajian.xlsx",
       });
       res.end(buffer);
     });
