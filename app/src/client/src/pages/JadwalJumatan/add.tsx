@@ -50,9 +50,6 @@ export function AddJadwalJumatanForm({
 
   const form = useForm<z.infer<typeof jadwalJumatanFormSchema>>({
     resolver: zodResolver(jadwalJumatanFormSchema),
-    // defaultValues: {
-    //   waktu: "",
-    // },
   });
 
   const renderFormInput: RenderFormInput<typeof form> = [

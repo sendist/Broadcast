@@ -4,7 +4,7 @@ import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
 import { body, checkExact, checkSchema, param, query } from "express-validator";
-import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
+import { getExcelContent, renameObjectKey } from "../utils/xlsx.util";
 import path from "path";
 
 const router = express.Router();
@@ -86,7 +86,6 @@ router.post(
   }
 );
 
-// TODO: still temporary
 router.get("/template", (req: Request, res: Response) => {
   res.header(
     "Content-Type",
@@ -97,22 +96,19 @@ router.get("/template", (req: Request, res: Response) => {
 });
 
 router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
-  const newObj = renameObjectKey(getContent(req.body), [
-    ["Nama Masjid", "nama_masjid"],
-    ["Nama Ketua DKM", "nama_ketua_dkm"],
-    ["No. HP", "no_hp"],
-  ]);
-  console.log(newObj);
-  prisma.masjid
-    .createMany({
-      data: newObj,
-    })
-    .then((masjid) => {
-      sendResponse({
-        res,
-        data: masjid,
-      });
-    })
+  getExcelContent(req.body, "masjid")
+    .then((data) =>
+      prisma.masjid
+        .createMany({
+          data,
+        })
+        .then((jumatan) => {
+          sendResponse({
+            res,
+            data: "OK",
+          });
+        })
+    )
     .catch((err) => {
       next(err);
     });
