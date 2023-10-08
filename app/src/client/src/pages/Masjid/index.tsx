@@ -9,7 +9,7 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 
 export default function Masjid() {
-  const { data, loading, update, remove, create } = useCRUD<Masjid>({
+  const { data, loading, update, remove, create, get } = useCRUD<Masjid>({
     url: "/masjid",
   });
 
@@ -25,6 +25,8 @@ export default function Masjid() {
         method: "POST",
         body: file,
       },
+    }).then(() => {
+      get();
     });
   }
 

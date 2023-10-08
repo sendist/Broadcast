@@ -4,6 +4,7 @@ import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
 import { param, query } from "express-validator";
+import { addToQueue } from "../utils/waweb.util";
 
 const router = express.Router();
 router.get(
@@ -49,6 +50,41 @@ router.get(
           res,
           data: logs,
         });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
+router.get(
+  "/resend/:id",
+  validate([param("id").isNumeric().notEmpty()]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    prisma.message_logs
+      .findUnique({
+        where: {
+          id: BigInt(id),
+        },
+      })
+      .then((message_log) => {
+        if (message_log) {
+          addToQueue({
+            message: message_log.message,
+            phone: message_log.no_hp,
+          });
+          sendResponse({
+            res,
+            data: message_log,
+          });
+        } else {
+          sendResponse({
+            res,
+            error: "Message log not found",
+            status: 404,
+          });
+        }
       })
       .catch((err) => {
         next(err);

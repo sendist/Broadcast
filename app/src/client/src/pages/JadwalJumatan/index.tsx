@@ -9,9 +9,11 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 
 export default function Masjid() {
-  const { data, loading, update, remove, create } = useCRUD<JadwalJumatan>({
-    url: "/jadwal-jumatan",
-  });
+  const { data, loading, update, remove, create, get } = useCRUD<JadwalJumatan>(
+    {
+      url: "/jadwal-jumatan",
+    }
+  );
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;
@@ -64,6 +66,8 @@ export default function Masjid() {
         method: "POST",
         body: file,
       },
+    }).then(() => {
+      get();
     });
   }
 

@@ -9,7 +9,7 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 
 export default function Mubaligh() {
-  const { data, loading, update, remove, create } = useCRUD<Mubaligh>({
+  const { data, loading, update, remove, create, get } = useCRUD<Mubaligh>({
     url: "/mubaligh",
   });
 
@@ -25,6 +25,8 @@ export default function Mubaligh() {
         method: "POST",
         body: file,
       },
+    }).then(() => {
+      get();
     });
   }
 

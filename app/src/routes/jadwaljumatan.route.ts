@@ -195,10 +195,10 @@ router.get(
         }
         const message = template.content
           .replace("{{tanggal}}", formatDate(jumatan.tanggal))
-          .replace("{{nama_masjid}}", jumatan.masjid.nama_masjid.toString())
+          .replace("{{nama_masjid}}", jumatan.masjid.nama_masjid)
           .replace(
             "{{nama_mubaligh}}",
-            jumatan.mubaligh.nama_mubaligh.toString()
+            jumatan.mubaligh.nama_mubaligh
           );
         addToQueue([
           {

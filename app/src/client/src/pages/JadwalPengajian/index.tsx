@@ -9,7 +9,7 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 
 export default function Masjid() {
-  const { data, loading, update, remove, create } = useCRUD<JadwalPengajian>({
+  const { data, loading, update, remove, create, get } = useCRUD<JadwalPengajian>({
     url: "/jadwal-pengajian",
   });
 
@@ -39,7 +39,7 @@ export default function Masjid() {
     url: "/template",
     params: {
       fields: "id,content,nama_template",
-      type: "pengajian_reminder"
+      type: "pengajian_reminder",
     },
   });
 
@@ -64,6 +64,8 @@ export default function Masjid() {
         method: "POST",
         body: file,
       },
+    }).then(() => {
+      get();
     });
   }
 
