@@ -107,7 +107,7 @@ export default function WaClient() {
             </>
           ) : (
             <>
-              <h1 className="font-thin text-4xl mb-6">
+              <h1 className="font-thin text-3xl mb-6">
                 WhatsApp Anda Telah Terhubung
               </h1>
               <p>
@@ -149,9 +149,9 @@ export default function WaClient() {
           )}
         </div>
         <div className="flex flex-col items-start justify-start ml-8">
-          <div className="w-full mb-4">
-            <div className="mx-4 flex justify-between">
-              <span className="text-xl font-light">STATUS: </span>
+          <div className="flex flex-col justify-between w-full h-full">
+            <div className="ml-4 flex gap-x-2">
+              <span className="text-xl font-light">STATUS:{" "}</span>
               <Badge
                 className={
                   { LOADING: "bg-orange-400", CONNECTED: "bg-green-400" }[
@@ -162,6 +162,18 @@ export default function WaClient() {
                 {waClientInfo.state}
               </Badge>
             </div>
+            {waClientInfo.state === "CONNECTED" && (
+              <div className="self-end">
+                <Button
+                  onClick={() => {
+                    httpCall({ url: `${BASE_URL}/waclient/logout` });
+                  }}
+                  className="w-full bg-red-600"
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
           </div>
 
           {waClientInfo.state !== "CONNECTED" && (
@@ -213,21 +225,6 @@ export default function WaClient() {
               )}
             </div>
           )}
-          <div className="gap-4 px-4 w-full">
-            <div className="flex flex-row justify-between gap-x-2">
-              <Button
-                onClick={() => {
-                  httpCall({ url: `${BASE_URL}/waclient/logout` });
-                }}
-                className="w-1/2"
-              >
-                Logout
-              </Button>
-              <Button onClick={() => sendMessage("refresh")} className="w-1/2">
-                Refresh
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
