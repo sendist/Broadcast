@@ -4,7 +4,11 @@ import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
 import { body, checkExact, checkSchema, param, query } from "express-validator";
-import { getContent, renameObjectKey, saveExcel } from "../utils/xlsx.util";
+import {
+  getFilledTemplate,
+  getExcelContent,
+  renameObjectKey,
+} from "../utils/xlsx.util";
 import path from "path";
 import { addToQueue } from "../utils/waweb.util";
 import { formatDate, formatDateTime } from "../utils/etc.util";
@@ -87,35 +91,59 @@ router.post(
   }
 );
 
-// TODO: still temporary
 router.get("/template", (req: Request, res: Response) => {
   res.header(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   );
-  const filePath = path.join("excelTemplates", "template_jadwaljumatan.xlsx");
-  res.download(filePath, "template_jadwaljumatan.xlsx");
+  Promise.all([
+    prisma.masjid.findMany({
+      select: {
+        id: true,
+        nama_masjid: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    }),
+    prisma.mubaligh.findMany({
+      select: {
+        id: true,
+        nama_mubaligh: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    }),
+  ])
+    .then(([masjids, mubalighs]) =>
+      getFilledTemplate("jumatan", masjids, mubalighs)
+    )
+    .then((buffer) => {
+      res.writeHead(200, {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition":
+          "attachment; filename=template_jadwaljumatan.xlsx",
+      });
+      res.end(buffer);
+    });
 });
 
 router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
-  const newObj = renameObjectKey(getContent(req.body), [
-    ["Tanggal Jumatan", "tanggal"],
-    ["Kode Masjid", "id_masjid"],
-    ["Kode Mubaligh", "id_mubaligh"],
-  ]);
-  // TODO: JO BUAT CONVERT TIPE DATA
-
-  console.log(newObj);
-  prisma.jumatan
-    .createMany({
-      data: newObj,
-    })
-    .then((jumatan) => {
-      sendResponse({
-        res,
-        data: jumatan,
-      });
-    })
+  getExcelContent(req.body, "jumatan")
+    .then((data) =>
+      prisma.jumatan
+        .createMany({
+          data,
+        })
+        .then((jumatan) => {
+          sendResponse({
+            res,
+            data: "OK",
+          });
+        })
+    )
     .catch((err) => {
       next(err);
     });
