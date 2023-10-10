@@ -6,18 +6,11 @@ import {
   Path,
   useForm,
 } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { cn, formatDate, resetDateTimeToMidnight } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { useState } from "react";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 import InputDropdown from "@/components/custom/inputDropdown";
+import InputCalendar from "@/components/custom/inputCalendar";
+import { resetDateTimeToMidnight } from "@/lib/utils";
 
 const jadwalJumatanFormSchema = z.object({
   tanggal: z.date({
@@ -62,36 +55,12 @@ export function AddJadwalJumatanForm({
         field: ControllerRenderProps<T, Path<T>>;
       }) => {
         return (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[240px] pl-3 text-left font-normal",
-                  !field.value && "text-muted-foreground"
-                )}
-              >
-                {field.value ? (
-                  formatDate(field.value)
-                ) : (
-                  <span>Pick a date</span>
-                )}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={field.value}
-                onSelect={(date) =>
-                  date && field.onChange(resetDateTimeToMidnight(date))
-                }
-                defaultMonth={field.value}
-                initialFocus
-                required
-              />
-            </PopoverContent>
-          </Popover>
+          <InputCalendar
+            value={field.value}
+            onChange={(date) => field.onChange(resetDateTimeToMidnight(date))}
+            placeholder="Pilih Tanggal Jumatan..."
+            align={"start"}
+          />
         );
       },
     },

@@ -46,7 +46,7 @@
     "jsonwebtoken": "^9.0.2",
     "puppeteer": "^21.3.1",
     "supertest": "^6.3.3",
-    "whatsapp-web.js": "next",
+    "whatsapp-web.js": "next || latest",
     "ws": "^8.14.2"
   }
 }

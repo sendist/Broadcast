@@ -21,6 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import { useState } from "react";
 import { Input } from "../ui/input";
 
 export type RenderFormInput<T extends FieldValues> = {
@@ -33,8 +34,6 @@ export type RenderFormInput<T extends FieldValues> = {
 type Props<T extends FieldValues> = {
   title: string;
   subtitle: string;
-  dialogOpen: boolean;
-  setDialogOpen: (value: boolean) => void;
   children: React.ReactNode;
   onSubmit: (data: T) => void;
   form: UseFormReturn<T, unknown, undefined>;
@@ -44,13 +43,12 @@ type Props<T extends FieldValues> = {
 export default function AddForm<T extends FieldValues>({
   title,
   subtitle,
-  dialogOpen,
-  setDialogOpen,
   children,
   onSubmit,
   form,
   renderFormInput: renderFormData,
 }: Props<T>) {
+  const [dialogOpen, setDialogOpen] = useState(false);
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild onClick={() => setDialogOpen(true)}>

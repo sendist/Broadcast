@@ -1,34 +1,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 
 const mubalighFormSchema = z.object({
   nama_mubaligh: z.string().nonempty({
@@ -39,7 +12,7 @@ const mubalighFormSchema = z.object({
   }),
 });
 
-const renderFormData = [
+const renderFormInput: RenderFormInput<typeof form> = [
   {
     name: "nama_mubaligh",
     label: "Nama Mubaligh",
@@ -58,8 +31,6 @@ type Props = {
 };
 
 export function AddMubalighForm({ children, onSubmit }: Props) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [date, setDate] = useState<Date>();
 
   const form = useForm<z.infer<typeof mubalighFormSchema>>({
     resolver: zodResolver(mubalighFormSchema),
@@ -70,46 +41,14 @@ export function AddMubalighForm({ children, onSubmit }: Props) {
   });
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild onClick={() => setDialogOpen(true)}>
-        {children}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Tambah Data Mubaligh</DialogTitle>
-          <DialogDescription>
-            Input data mubaligh yang akan ditambahkan ke dalam daftar
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => {
-              setDialogOpen(false);
-              onSubmit(data);
-              form.reset();
-            })}
-            className="space-y-8"
-          >
-            {renderFormData.map((item) => (
-              <FormField
-                key={item.name}
-                control={form.control}
-                name={item.name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{item.label}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={item.placeholder} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <AddForm
+      title="Tambah Data Mubaligh"
+      subtitle="Input data mubaligh yang akan ditambahkan ke dalam daftar"
+      onSubmit={onSubmit}
+      form={form}
+      renderFormInput={renderFormInput}
+    >
+      {children}
+    </AddForm>
   );
 }

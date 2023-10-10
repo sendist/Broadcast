@@ -6,24 +6,8 @@ import {
   Path,
   useForm,
 } from "react-hook-form";
-
-import { Input } from "@/components/ui/input";
-
-import { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 import InputDropdown from "@/components/custom/inputDropdown";
-
-const templateFormSchema = (typeValues: string[]) =>
-  z.object({
-    nama_template: z.string().nonempty({
-      message: "Nama Template harus diisi",
-    }),
-    content: z.string().nonempty({
-      message: "Content harus diisi",
-    }),
-    type: z.enum(typeValues),
-  });
 
 export function AddTemplateForm({
   types,
@@ -43,11 +27,25 @@ export function AddTemplateForm({
     type: string;
   }) => void;
 }) {
-  // Open dialog when adding new data
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const templateFormSchema = z.object({
+    nama_template: z.string().nonempty({
+      message: "Nama Template harus diisi",
+    }),
+    content: z.string().nonempty({
+      message: "Content harus diisi",
+    }),
+    type: z.nativeEnum(
+      types.map((type) => type.value),
+      {
+        errorMap: () => {
+          return { message: "Pilih Tipe Pesan" };
+        },
+      }
+    ),
+  });
 
   const form = useForm<z.infer<typeof templateFormSchema>>({
-    resolver: zodResolver(templateFormSchema(types.map((type) => type.value))),
+    resolver: zodResolver(templateFormSchema),
     defaultValues: {
       nama_template: "",
       content: "",
@@ -55,28 +53,16 @@ export function AddTemplateForm({
     },
   });
 
-  const renderFormInput: RenderFormInput<typeof form> = [
+  const renderFormInput: RenderFormInput = [
     {
       name: "nama_template",
       label: "Nama Template",
-      customInput: <T extends FieldValues>({
-        field,
-      }: {
-        field: ControllerRenderProps<T, Path<T>>;
-      }) => {
-        return <Input placeholder="Nama Template" {...field} />;
-      },
+      placeholder: "Nama Template",
     },
     {
       name: "content",
       label: "Content Pesan",
-      customInput: <T extends FieldValues>({
-        field,
-      }: {
-        field: ControllerRenderProps<T, Path<T>>;
-      }) => {
-        return <Textarea placeholder="Content Pesan" {...field} />;
-      },
+      placeholder: "Content Pesan",
     },
     {
       name: "type",
@@ -104,12 +90,6 @@ export function AddTemplateForm({
     <AddForm
       title="Tambah Data Template"
       subtitle="Input data template yang akan ditambahkan ke dalam daftar"
-      dialogOpen={dialogOpen}
-      setDialogOpen={setDialogOpen}
-      typeDropdown={types.map((type) => ({
-        label: type.label,
-        value: type.value,
-      }))}
       onSubmit={onSubmit}
       form={form}
       renderFormInput={renderFormInput}
