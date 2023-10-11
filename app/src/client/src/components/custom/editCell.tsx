@@ -19,6 +19,7 @@ import {
   CommandItem,
 } from "../ui/command";
 import { Calendar } from "../ui/calendar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   updateData?: (id: string, columnId: string, value: string) => void;
@@ -150,23 +151,25 @@ export function EditCell<T extends { id: string }>({
                 <CommandInput placeholder="Search..." className="h-9" />
                 <CommandEmpty>No item found.</CommandEmpty>
                 <CommandGroup>
-                  {select.map((item) => (
-                    <CommandItem
-                      key={item.value}
-                      onSelect={() => {
-                        setValue(item.value);
-                        edit(item.value);
-                      }}
-                    >
-                      {item.label}
-                      <CheckIcon
-                        className={cn(
-                          "ml-auto h-4 w-4",
-                          value === item.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
+                  <ScrollArea className="max-h-[200px]">
+                    {select.map((item) => (
+                      <CommandItem
+                        key={item.value}
+                        onSelect={() => {
+                          setValue(item.value);
+                          edit(item.value);
+                        }}
+                      >
+                        {item.label}
+                        <CheckIcon
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            value === item.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </ScrollArea>
                 </CommandGroup>
               </Command>
             )}

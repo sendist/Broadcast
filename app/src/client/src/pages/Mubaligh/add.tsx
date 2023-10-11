@@ -4,26 +4,14 @@ import { useForm } from "react-hook-form";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 
 const mubalighFormSchema = z.object({
-  nama_mubaligh: z.string().nonempty({
-    message: "Nama Mubaligh harus diisi",
-  }),
-  no_hp: z.string().regex(/^08[0-9]{8,11}$/, {
-    message: "No HP harus dimulai dengan 08 dan berjumlah 10-13 digit",
-  }),
+  nama_mubaligh: z.string().min(1, "Nama Mubaligh harus diisi"),
+  no_hp: z
+    .string()
+    .regex(
+      /^(62|0)8[0-9]{7,11}$/,
+      "No HP harus dimulai dengan 08 atau 628 dan berjumlah 10-14 digit"
+    ),
 });
-
-const renderFormInput: RenderFormInput<typeof form> = [
-  {
-    name: "nama_mubaligh",
-    label: "Nama Mubaligh",
-    placeholder: "Nama Mubaligh",
-  },
-  {
-    name: "no_hp",
-    label: "No HP",
-    placeholder: "No HP Mubaligh",
-  },
-] as const;
 
 type Props = {
   children: React.ReactNode;
@@ -31,7 +19,6 @@ type Props = {
 };
 
 export function AddMubalighForm({ children, onSubmit }: Props) {
-
   const form = useForm<z.infer<typeof mubalighFormSchema>>({
     resolver: zodResolver(mubalighFormSchema),
     defaultValues: {
@@ -39,6 +26,19 @@ export function AddMubalighForm({ children, onSubmit }: Props) {
       no_hp: "",
     },
   });
+
+  const renderFormInput: RenderFormInput<typeof form> = [
+    {
+      name: "nama_mubaligh",
+      label: "Nama Mubaligh",
+      placeholder: "Nama Mubaligh",
+    },
+    {
+      name: "no_hp",
+      label: "No HP",
+      placeholder: "No HP Mubaligh",
+    },
+  ] as const;
 
   return (
     <AddForm

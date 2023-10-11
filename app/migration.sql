@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS "pengajian" (
     waktu TEXT NOT NULL,
     id_masjid BIGINT NOT NULL,
     id_mubaligh BIGINT NOT NULL,
+    broadcasted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (id_masjid) REFERENCES masjid(id) ON DELETE CASCADE,
     FOREIGN KEY (id_mubaligh) REFERENCES mubaligh(id) ON DELETE CASCADE
 );
@@ -88,9 +89,14 @@ CREATE TABLE IF NOT EXISTS "jumatan" (
     tanggal TIMESTAMPTZ NOT NULL,
     id_masjid BIGINT NOT NULL,
     id_mubaligh BIGINT NOT NULL,
+    broadcasted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (id_masjid) REFERENCES masjid(id) ON DELETE CASCADE,
     FOREIGN KEY (id_mubaligh) REFERENCES mubaligh(id) ON DELETE CASCADE
 );
+
+-- kalo mau nambahin broadcasted di jumatan dan pengajian:
+-- alter table "jumatan" add column broadcasted boolean not null default false;
+-- alter table "pengajian" add column broadcasted boolean not null default false;
 
 
 -- create table "template"

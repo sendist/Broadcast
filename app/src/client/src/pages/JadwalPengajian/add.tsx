@@ -16,15 +16,9 @@ const jadwalPengajianFormSchema = z.object({
   tanggal: z.date({
     required_error: "Tanggal pengajian harus diisi",
   }),
-  waktu: z.string().nonempty({
-    message: "Waktu pengajian harus diisi",
-  }),
-  id_masjid: z.string().nonempty({
-    message: "Kode masjid harus diisi",
-  }),
-  id_mubaligh: z.string().nonempty({
-    message: "Kode mubaligh harus diisi",
-  }),
+  waktu: z.string().min(1, "Waktu pengajian harus diisi"),
+  id_masjid: z.string().min(1, "Kode masjid harus diisi"),
+  id_mubaligh: z.string().min(1, "Kode mubaligh harus diisi"),
 });
 
 export function AddJadwalPengajianForm({

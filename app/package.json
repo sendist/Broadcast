@@ -28,13 +28,13 @@
     "jest": "^29.7.0",
     "jest-mock-extended": "^3.0.5",
     "nodemon": "^3.0.1",
-    "prisma": "^5.4.1",
+    "prisma": "^5.4.2",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@prisma/client": "^5.4.1",
+    "@prisma/client": "^5.4.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
@@ -46,7 +46,7 @@
     "jsonwebtoken": "^9.0.2",
     "puppeteer": "^21.3.1",
     "supertest": "^6.3.3",
-    "whatsapp-web.js": "next || latest",
+    "whatsapp-web.js": "next",
     "ws": "^8.14.2"
   }
 }

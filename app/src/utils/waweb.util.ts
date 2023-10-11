@@ -165,16 +165,13 @@ export function addToQueue(
   }
 
   if (!intervalFunc) {
-    console.log("CREATING INTERVAL");
     intervalFunc = setInterval(() => {
       if (queue.length > 0) {
         const { phone, message } = queue.shift()!;
         sendMessage(phone, message);
-        console.log("SENDING", phone, message);
       } else if (queue.length === 0 && intervalFunc) {
         clearInterval(intervalFunc);
         intervalFunc = null;
-        console.log("ALL SENT");
       }
     }, 5000);
   }

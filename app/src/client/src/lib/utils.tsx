@@ -83,7 +83,6 @@ export function whatsappFormatting(
       const newNode = document.createElement("span");
       newNode.innerHTML =
         node.textContent?.replace(regex.regex, regex.replacement) || "";
-      console.log(newNode.firstChild);
       node.replaceWith(...newNode.childNodes);
     });
   });

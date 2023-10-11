@@ -4,34 +4,15 @@ import { useForm } from "react-hook-form";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 
 const masjidFormSchema = z.object({
-  nama_masjid: z.string().nonempty({
-    message: "Nama Masjid harus diisi",
-  }),
-  nama_ketua_dkm: z.string().nonempty({
-    message: "Nama Ketua DKM harus diisi",
-  }),
-  no_hp: z.string().regex(/^08[0-9]{8,11}$/, {
-    message: "No HP harus dimulai dengan 08 dan berjumlah 10-13 digit",
-  }),
+  nama_masjid: z.string().min(1, "Nama Masjid harus diisi"),
+  nama_ketua_dkm: z.string().min(1, "Nama Ketua DKM harus diisi"),
+  no_hp: z
+    .string()
+    .regex(
+      /^(62|0)8[0-9]{7,11}$/,
+      "No HP harus dimulai dengan 08 atau 628 dan berjumlah 10-14 digit"
+    ),
 });
-
-const renderFormInput: RenderFormInput = [
-  {
-    name: "nama_masjid",
-    label: "Nama Masjid",
-    placeholder: "Nama Masjid",
-  },
-  {
-    name: "nama_ketua_dkm",
-    label: "Nama Ketua DKM",
-    placeholder: "Nama Ketua DKM",
-  },
-  {
-    name: "no_hp",
-    label: "No HP",
-    placeholder: "No HP",
-  },
-] as const;
 
 type Props = {
   children: React.ReactNode;
@@ -51,6 +32,24 @@ export function AddMasjidForm({ children, onSubmit }: Props) {
       no_hp: "",
     },
   });
+
+  const renderFormInput: RenderFormInput<typeof form> = [
+    {
+      name: "nama_masjid",
+      label: "Nama Masjid",
+      placeholder: "Nama Masjid",
+    },
+    {
+      name: "nama_ketua_dkm",
+      label: "Nama Ketua DKM",
+      placeholder: "Nama Ketua DKM",
+    },
+    {
+      name: "no_hp",
+      label: "No HP",
+      placeholder: "No HP",
+    },
+  ] as const;
 
   return (
     <AddForm

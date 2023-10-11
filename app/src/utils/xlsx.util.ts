@@ -131,7 +131,6 @@ export async function getExcelContent(
       }[] = [];
       (dataWorksheet.getRows(2, dataWorksheet.rowCount - 1) ?? []).forEach(
         (row) => {
-          console.log(row.values);
           data.push({
             tanggal: ((row.values as unknown[])[1] as Date).toISOString(),
             id_masjid: BigInt(listMasjid[(row.values as string[])[2]]),
@@ -149,7 +148,6 @@ export async function getExcelContent(
       }[] = [];
       (dataWorksheet.getRows(2, dataWorksheet.rowCount - 1) ?? []).forEach(
         (row) => {
-          console.log(row.values);
           data.push({
             tanggal: ((row.values as unknown[])[1] as Date).toISOString(),
             waktu: (row.values as string[])[2],
@@ -168,7 +166,6 @@ export async function getExcelContent(
     }[] = [];
     (dataWorksheet.getRows(2, dataWorksheet.rowCount - 1) ?? []).forEach(
       (row) => {
-        console.log(row.values);
         data.push({
           nama_masjid: (row.values as string[])[1],
           nama_ketua_dkm: (row.values as string[])[2],
@@ -184,7 +181,6 @@ export async function getExcelContent(
     }[] = [];
     (dataWorksheet.getRows(2, dataWorksheet.rowCount - 1) ?? []).forEach(
       (row) => {
-        console.log(row.values);
         data.push({
           nama_mubaligh: (row.values as string[])[1],
           no_hp: (row.values as string[])[2],

@@ -11,7 +11,11 @@ import {
 } from "../utils/xlsx.util";
 import path from "path";
 import { addToQueue } from "../utils/waweb.util";
-import { formatDate, formatDateTime } from "../utils/etc.util";
+import {
+  formatDate,
+  formatDateTime,
+  templateReplacer,
+} from "../utils/etc.util";
 
 const router = express.Router();
 router.get(
@@ -37,6 +41,7 @@ router.get(
             waktu: fieldsArr?.includes("waktu"),
             id_masjid: fieldsArr?.includes("id_masjid"),
             id_mubaligh: fieldsArr?.includes("id_mubaligh"),
+            broadcasted: fieldsArr?.includes("broadcasted"),
           },
         }),
         ...(page && {
@@ -153,18 +158,22 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.get(
-  "/broadcast",
+  "/broadcast-preview",
   validate([
-    query("id").isNumeric().notEmpty(),
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
     query("template").isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { id, template } = req.query;
-    console.log(req.params);
+    const idArr = (id as string).split(",").map((id) => BigInt(id));
     Promise.all([
-      prisma.pengajian.findUnique({
+      prisma.pengajian.findMany({
         where: {
-          id: BigInt(id as string),
+          id: {
+            in: idArr,
+          },
         },
         select: {
           tanggal: true,
@@ -188,37 +197,126 @@ router.get(
         where: {
           id: BigInt(template as string),
         },
+        select: {
+          content: true,
+        },
+      }),
+    ]).then(([pengajians, template]) => {
+      if (!pengajians.length || !template) {
+        return sendResponse({
+          res,
+          error: "Jadwal pengajian atau template tidak ditemukan",
+        });
+      }
+      const previews: string[] = [];
+      for (const pengajian of pengajians) {
+        const message = templateReplacer(template.content, [
+          ["tanggal", formatDate(pengajian.tanggal)],
+          ["waktu", pengajian.waktu.toString()],
+          ["nama_masjid", pengajian.masjid.nama_masjid.toString()],
+          ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh.toString()],
+        ]);
+        previews.push(message);
+      }
+      sendResponse({
+        res,
+        data: previews,
+      });
+    });
+  }
+);
+
+router.get(
+  "/broadcast",
+  validate([
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
+    query("template").isNumeric().notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id, template } = req.query;
+    const idArr = (id as string).split(",").map((id) => BigInt(id));
+
+    Promise.all([
+      prisma.pengajian.findMany({
+        where: {
+          id: {
+            in: idArr,
+          },
+        },
+        select: {
+          tanggal: true,
+          waktu: true,
+          masjid: {
+            select: {
+              no_hp: true,
+              nama_ketua_dkm: true,
+              nama_masjid: true,
+            },
+          },
+          mubaligh: {
+            select: {
+              no_hp: true,
+              nama_mubaligh: true,
+            },
+          },
+        },
+      }),
+      prisma.template.findUnique({
+        where: {
+          id: BigInt(template as string),
+        },
+        select: {
+          content: true,
+        },
       }),
     ])
-      .then(([pengajian, template]) => {
-        if (!pengajian || !template) {
+      .then(([pengajians, template]) => {
+        if (!pengajians.length || !template) {
           return sendResponse({
             res,
             error: "Jadwal pengajian atau template tidak ditemukan",
           });
         }
-        const message = template.content
-          .replace("{{tanggal}}", formatDate(pengajian.tanggal))
-          .replace("{{waktu}}", pengajian.waktu.toString())
-          .replace("{{nama_masjid}}", pengajian.masjid.nama_masjid.toString())
-          .replace(
-            "{{nama_mubaligh}}",
-            pengajian.mubaligh.nama_mubaligh.toString()
-          );
-        addToQueue([
-          {
-            phone: pengajian.masjid.no_hp,
-            message: message,
-          },
-          {
-            phone: pengajian.mubaligh.no_hp,
-            message: message,
-          },
-        ]);
-        sendResponse({
-          res,
-          data: "Success",
-        });
+        for (const pengajian of pengajians) {
+          const message = templateReplacer(template.content, [
+            ["tanggal", formatDate(pengajian.tanggal)],
+            ["waktu", pengajian.waktu.toString()],
+            ["nama_masjid", pengajian.masjid.nama_masjid.toString()],
+            ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh.toString()],
+          ]);
+          addToQueue([
+            {
+              phone: pengajian.masjid.no_hp,
+              message: message,
+            },
+            {
+              phone: pengajian.mubaligh.no_hp,
+              message: message,
+            },
+          ]);
+        }
+        prisma.pengajian
+          .updateMany({
+            where: {
+              id: {
+                in: idArr,
+              },
+            },
+            data: {
+              broadcasted: true,
+            },
+          })
+          .then((pengajian) => {
+            sendResponse({
+              res,
+              data: "Success",
+            });
+          })
+          .catch((err) => {
+            next(err);
+          });
       })
       .catch((err) => {
         next(err);

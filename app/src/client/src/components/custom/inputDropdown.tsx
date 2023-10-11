@@ -10,6 +10,7 @@ import {
 } from "../ui/command";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Props = {
   value: string;
@@ -49,23 +50,25 @@ export default function InputDropdown({
           <CommandInput placeholder="Search..." className="h-9" />
           <CommandEmpty>No item found.</CommandEmpty>
           <CommandGroup>
-            {select.map((item) => (
-              <CommandItem
-                key={item.value}
-                onSelect={() => {
-                  onChange(item.value);
-                  setOpen(false);
-                }}
-              >
-                {item.label}
-                <CheckIcon
-                  className={cn(
-                    "ml-auto h-4 w-4",
-                    value === item.value ? "opacity-100" : "opacity-0"
-                  )}
-                />
-              </CommandItem>
-            ))}
+            <ScrollArea className="max-h-[200px]">
+              {select.map((item) => (
+                <CommandItem
+                  key={item.value}
+                  onSelect={() => {
+                    onChange(item.value);
+                    setOpen(false);
+                  }}
+                >
+                  {item.label}
+                  <CheckIcon
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      value === item.value ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </ScrollArea>
           </CommandGroup>
         </Command>
       </PopoverContent>

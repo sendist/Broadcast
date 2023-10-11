@@ -11,6 +11,7 @@ import {
   DotsHorizontalIcon,
   TrashIcon,
   RocketIcon,
+  CheckCircledIcon,
 } from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
@@ -95,6 +96,22 @@ export const columns: (
     accessorKey: "id_mubaligh",
     header: (header) => CellHeaderSortable(header, "Mubaligh"),
     cell: (props) => <EditCell {...props} select={selectMubaligh} />,
+  },
+  {
+    accessorKey: "broadcasted",
+    header: (header) => CellHeaderSortable(header, "Status Broadcast"),
+    cell: ({ getValue }) => (
+      <p>
+        {getValue<boolean>() ? (
+          <div className="flex flex-row items-center gap-2 text-green-600 ">
+            <CheckCircledIcon />
+            Sudah Broadcast
+          </div>
+        ) : (
+          "Belum Broadcast"
+        )}
+      </p>
+    ),
   },
   {
     id: "broadcast",
