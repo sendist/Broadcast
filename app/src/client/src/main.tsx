@@ -6,8 +6,8 @@ import "./index.css";
 import Login from "./pages/Login/index.tsx";
 import { AccountProvider } from "./context/account.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
-import Masjid from "./pages/Masjid/index.tsx";
-import Mubaligh from "./pages/Mubaligh/index.tsx";
+import MasjidPage from "./pages/Masjid/index.tsx";
+import MubalighPage from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
 import WaClient from "./pages/WaClient/index.tsx";
 import Template from "./pages/Template/index.tsx";
@@ -48,11 +48,11 @@ const router = createBrowserRouter([
       },
       {
         path: "masjid",
-        element: <Masjid />,
+        element: <MasjidPage />,
       },
       {
         path: "mubaligh",
-        element: <Mubaligh />,
+        element: <MubalighPage />,
       },
       {
         path: "jadwal-pengajian",

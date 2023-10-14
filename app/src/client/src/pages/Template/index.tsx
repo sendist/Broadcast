@@ -3,12 +3,21 @@ import { Template, columns } from "./columns";
 import { useCRUD } from "@/hooks/backend";
 import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { useApiFetch } from "@/hooks/fetch";
+import { useState, useRef } from "react";
+import ConfirmDialog from "@/components/custom/confirmDialog";
+import { Row, Table as TableType } from "@tanstack/react-table";
+import { BASE_URL } from "@/lib/constants";
 
 export default function TemplatePage() {
-  const { data, loading, update, remove, create } = useCRUD<Template>({
+  const [selectedRows, setSelectedRows] = useState<Row<Template>[]>([]);
+  const { data, loading, update, remove, create, get } = useCRUD<Template>({
     url: "/template",
   });
+
+  const apiFetch = useApiFetch();
+  const tableRef = useRef<TableType<Template>>(null);
 
   const { data: types } = useCRUD<{
     value: string;
@@ -19,6 +28,23 @@ export default function TemplatePage() {
     url: "/template/types",
   });
 
+  function deleteBatch() {
+    apiFetch({
+      url: `${BASE_URL}/template/batch?${
+        new URLSearchParams({
+          id: selectedRows.map((row) => row.original.id).join(","),
+        }).toString() || ""
+      }`,
+      options: {
+        method: "DELETE",
+      },
+    }).then(() => {
+      get().then(() => {
+        tableRef.current?.toggleAllPageRowsSelected(false);
+      });
+    });
+  }
+
   return (
     <div>
       <div className="space-x-4">
@@ -28,8 +54,29 @@ export default function TemplatePage() {
             Add
           </Button>
         </AddTemplateForm>
+        {selectedRows?.length ? (
+          <>
+            <ConfirmDialog
+              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Template?`}
+              description="Data yang sudah dihapus tidak dapat dikembalikan"
+              cancelText="Batal"
+              confirmText="Hapus"
+              onConfirm={deleteBatch}
+              dangerous
+            >
+              <Button
+                variant="outline"
+                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+              >
+                <TrashIcon className="mr-2" />
+                Delete Selected ({selectedRows?.length})
+              </Button>
+            </ConfirmDialog>
+          </>
+        ) : null}
       </div>
       <DataTable
+        ref={tableRef}
         columns={columns(types || [])}
         data={data}
         isLoading={loading}
@@ -43,6 +90,7 @@ export default function TemplatePage() {
             remove(id);
           },
         }}
+        onSelectedRowsChange={setSelectedRows}
       />
     </div>
   );

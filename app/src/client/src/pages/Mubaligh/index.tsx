@@ -3,17 +3,22 @@ import { Mubaligh, columns } from "./columns";
 import { useCRUD } from "@/hooks/backend";
 import { AddMubalighForm } from "./add";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { AddMubalighBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
+import { useState, useRef } from "react";
+import ConfirmDialog from "@/components/custom/confirmDialog";
+import { Row, Table as TableType } from "@tanstack/react-table";
 
-export default function Mubaligh() {
+export default function MubalighPage() {
+  const [selectedRows, setSelectedRows] = useState<Row<Mubaligh>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Mubaligh>({
     url: "/mubaligh",
   });
 
   const apiFetch = useApiFetch();
+  const tableRef = useRef<TableType<Mubaligh>>(null);
 
   function uploadTemplate(file: File) {
     apiFetch({
@@ -27,6 +32,23 @@ export default function Mubaligh() {
       },
     }).then(() => {
       get();
+    });
+  }
+
+  function deleteBatch() {
+    apiFetch({
+      url: `${BASE_URL}/mubaligh/batch?${
+        new URLSearchParams({
+          id: selectedRows.map((row) => row.original.id).join(","),
+        }).toString() || ""
+      }`,
+      options: {
+        method: "DELETE",
+      },
+    }).then(() => {
+      get().then(() => {
+        tableRef.current?.toggleAllPageRowsSelected(false);
+      });
     });
   }
 
@@ -45,8 +67,29 @@ export default function Mubaligh() {
             Bulk Upload
           </Button>
         </AddMubalighBulk>
+        {selectedRows?.length ? (
+          <>
+            <ConfirmDialog
+              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Mubaligh?`}
+              description="Data yang sudah dihapus tidak dapat dikembalikan"
+              cancelText="Batal"
+              confirmText="Hapus"
+              onConfirm={deleteBatch}
+              dangerous
+            >
+              <Button
+                variant="outline"
+                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+              >
+                <TrashIcon className="mr-2" />
+                Delete Selected ({selectedRows?.length})
+              </Button>
+            </ConfirmDialog>
+          </>
+        ) : null}
       </div>
       <DataTable
+        ref={tableRef}
         columns={columns}
         data={data}
         isLoading={loading}
@@ -60,6 +103,7 @@ export default function Mubaligh() {
             remove(id);
           },
         }}
+        onSelectedRowsChange={setSelectedRows}
       />
     </div>
   );

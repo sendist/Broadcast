@@ -4,7 +4,7 @@ import { BASE_URL } from "@/lib/constants";
 import { useState } from "react";
 
 type Props = {
-  idJadwal: string;
+  idJadwal: string[];
   children: React.ReactNode;
   template: {
     id: string;
@@ -21,7 +21,7 @@ export default function Broadcast({ idJadwal, children, template }: Props) {
     setIdTemplate(id);
     apiFetch<string[]>({
       url: `${BASE_URL}/jadwal-jumatan/broadcast-preview?${new URLSearchParams({
-        id: idJadwal,
+        id: idJadwal.join(","),
         template: id,
       }).toString()}`,
     }).then((res) => {
@@ -43,7 +43,7 @@ export default function Broadcast({ idJadwal, children, template }: Props) {
             BASE_URL +
             "/jadwal-jumatan/broadcast?" +
             new URLSearchParams({
-              id: idJadwal,
+              id: idJadwal.join(","),
               template: idTemplate,
             }).toString(),
         })

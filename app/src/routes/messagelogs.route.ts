@@ -57,6 +57,36 @@ router.get(
   }
 );
 
+router.delete(
+  "/batch",
+  validate([
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.query;
+    const idArr = (id as string).split(",").map((id) => BigInt(id));
+    prisma.message_logs
+      .deleteMany({
+        where: {
+          id: {
+            in: idArr,
+          },
+        },
+      })
+      .then((message_logs) => {
+        sendResponse({
+          res,
+          data: message_logs,
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
 router.get(
   "/resend/:id",
   validate([param("id").isNumeric().notEmpty()]),

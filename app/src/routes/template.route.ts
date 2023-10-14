@@ -93,24 +93,35 @@ router.post(
   }
 );
 
-// router.post("/upload", (req: Request, res: Response) => {
-//   const newObj = renameObjectKey(getContent(req.body), [
-//     ["Nama Template", "nama_template"],
-//     ["Content", "content"],
-//     ["Type", "type"],
-//   ]);
-//   console.log(newObj);
-//   prisma.template
-//     .createMany({
-//       data: newObj,
-//     })
-//     .then((template) => {
-//       sendResponse({
-//         res,
-//         data: template,
-//       });
-//     });
-// });
+router.delete(
+  "/batch",
+  validate([
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.query;
+    const idArr = (id as string).split(",").map((id) => BigInt(id));
+    prisma.template
+      .deleteMany({
+        where: {
+          id: {
+            in: idArr,
+          },
+        },
+      })
+      .then((template) => {
+        sendResponse({
+          res,
+          data: template,
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
 
 const templateEnum: {
   value: $Enums.template_t;

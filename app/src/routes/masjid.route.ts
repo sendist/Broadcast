@@ -114,6 +114,36 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
     });
 });
 
+router.delete(
+  "/batch",
+  validate([
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.query;
+    const idArr = (id as string).split(",").map((id) => BigInt(id));
+    prisma.masjid
+      .deleteMany({
+        where: {
+          id: {
+            in: idArr,
+          },
+        },
+      })
+      .then((masjid) => {
+        sendResponse({
+          res,
+          data: masjid,
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
 router.get(
   "/:id",
   validate([param("id").isNumeric().notEmpty()]),

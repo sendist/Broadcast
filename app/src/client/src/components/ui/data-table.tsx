@@ -1,10 +1,12 @@
 import {
   ColumnDef,
   SortingState,
+  Table as TableType,
   TableMeta,
   flexRender,
   getCoreRowModel,
   useReactTable,
+  Row,
 } from "@tanstack/react-table";
 
 import {
@@ -15,7 +17,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import {
+  useImperativeHandle,
+  useState,
+  ForwardedRef,
+  forwardRef,
+  useEffect,
+} from "react";
 import { Button } from "./button";
 
 interface DataTableProps<TData, TValue> {
@@ -23,14 +31,19 @@ interface DataTableProps<TData, TValue> {
   data: TData[] | undefined;
   meta?: TableMeta<TData>;
   isLoading?: boolean;
+  onSelectedRowsChange?: (rows: Row<TData>[]) => void;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  meta,
-  isLoading,
-}: DataTableProps<TData, TValue>) {
+function DataTable1<TData, TValue>(
+  {
+    columns,
+    data,
+    meta,
+    isLoading,
+    onSelectedRowsChange,
+  }: DataTableProps<TData, TValue>,
+  ref: ForwardedRef<TableType<TData>>
+) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
     data: data || [],
@@ -42,6 +55,14 @@ export function DataTable<TData, TValue>({
       sorting,
     },
   });
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+
+  useEffect(() => {
+    onSelectedRowsChange && onSelectedRowsChange(selectedRows);
+  }, [onSelectedRowsChange, selectedRows]);
+
+  useImperativeHandle(ref, () => table);
 
   return (
     <>
@@ -106,8 +127,8 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {selectedRows.length} of {table.getFilteredRowModel().rows.length}{" "}
+          row(s) selected.
         </div>
         <div className="space-x-2">
           <Button
@@ -131,3 +152,9 @@ export function DataTable<TData, TValue>({
     </>
   );
 }
+
+export const DataTable = forwardRef(DataTable1) as <TData, TValue>(
+  props: DataTableProps<TData, TValue> & {
+    ref?: ForwardedRef<TableType<TData>>;
+  }
+) => ReturnType<typeof DataTable1>;

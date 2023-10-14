@@ -157,7 +157,9 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
 router.get(
   "/broadcast-preview",
   validate([
-    query("id").isNumeric().notEmpty(),
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
     query("template").isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
@@ -309,6 +311,36 @@ router.get(
           .catch((err) => {
             next(err);
           });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
+router.delete(
+  "/batch",
+  validate([
+    query("id")
+      .matches(/^[0-9]+(,[0-9]+)*$/)
+      .notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.query;
+    const idArr = (id as string).split(",").map((id) => BigInt(id));
+    prisma.jumatan
+      .deleteMany({
+        where: {
+          id: {
+            in: idArr,
+          },
+        },
+      })
+      .then((jumatan) => {
+        sendResponse({
+          res,
+          data: jumatan,
+        });
       })
       .catch((err) => {
         next(err);

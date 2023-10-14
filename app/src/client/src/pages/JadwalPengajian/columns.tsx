@@ -118,7 +118,7 @@ export const columns: (
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <Broadcast template={template} idJadwal={row.original.id}>
+        <Broadcast template={template} idJadwal={[row.original.id]}>
           <Button variant="ghost">
             <RocketIcon className="mr-4" />
             Broadcast
