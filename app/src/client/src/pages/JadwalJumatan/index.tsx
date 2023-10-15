@@ -98,13 +98,13 @@ export default function JadwalMasjidPage() {
     <div>
       <div className="flex flex-row justify-between items-center mb-4">
         <h1 className="inline-block text-xl font-semibold">Jumatan</h1>
-        <div className="space-x-4">
+        <div className="space-x-4 space-y-2 -mt-2">
           <AddJadwalJumatanForm
             onSubmit={create}
             mubalighDropdown={mubalighDropdown || []}
             masjidDropdown={masjidDropdown || []}
           >
-            <Button variant="outline">
+            <Button variant="outline" className="ml-4 mt-2">
               <PlusIcon className="mr-2" />
               Add
             </Button>
@@ -126,7 +126,7 @@ export default function JadwalMasjidPage() {
                 dangerous
               >
                 <Button
-                  variant="outline"
+                  variant="outline" 
                   className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />

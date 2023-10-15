@@ -96,14 +96,14 @@ export default function JadwalPengajianPage() {
   return (
     <div>
       <div className="flex flex-row justify-between items-center mb-4">
-        <h1 className="inline-block text-xl font-semibold">Pengajian</h1>
-        <div className="space-x-4">
+        <h1 className="text-xl font-semibold">Pengajian</h1>
+        <div className="space-x-4 space-y-2 -mt-2">
           <AddJadwalPengajianForm
             onSubmit={create}
             mubalighDropdown={mubalighDropdown || []}
             masjidDropdown={masjidDropdown || []}
           >
-            <Button variant="outline">
+            <Button variant="outline" className="ml-4 mt-2">
               <PlusIcon className="mr-2" />
               Add
             </Button>
