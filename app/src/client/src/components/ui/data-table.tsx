@@ -26,11 +26,19 @@ import {
 } from "react";
 import { Button } from "./button";
 
-interface DataTableProps<TData, TValue> {
+interface CustomTableMeta<TData> extends TableMeta<TData> {
+  previousPage?: () => void;
+  nextPage?: () => void;
+  updateData?: (id: string, key: string, value: unknown) => void;
+  removeData?: (id: string) => void;
+}
+
+interface DataTableProps<TData, TValue, TMeta> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[] | undefined;
-  meta?: TableMeta<TData>;
+  meta?: TMeta;
   isLoading?: boolean;
+  page: number;
   onSelectedRowsChange?: (rows: Row<TData>[]) => void;
 }
 
@@ -40,8 +48,9 @@ function DataTable1<TData, TValue>(
     data,
     meta,
     isLoading,
+    page,
     onSelectedRowsChange,
-  }: DataTableProps<TData, TValue>,
+  }: DataTableProps<TData, TValue, CustomTableMeta<TData>>,
   ref: ForwardedRef<TableType<TData>>
 ) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -134,16 +143,24 @@ function DataTable1<TData, TValue>(
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => {
+              if (meta && meta.previousPage) {
+                meta.previousPage();
+              }
+            }}
+            disabled={page === 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => {
+              if (meta && meta.nextPage) {
+                meta.nextPage();
+              }
+            }}
+            disabled={table.getRowModel().rows?.length < 10}
           >
             Next
           </Button>
@@ -153,8 +170,8 @@ function DataTable1<TData, TValue>(
   );
 }
 
-export const DataTable = forwardRef(DataTable1) as <TData, TValue>(
-  props: DataTableProps<TData, TValue> & {
+export const DataTable = forwardRef(DataTable1) as <TData, TValue, TMeta>(
+  props: DataTableProps<TData, TValue, TMeta> & {
     ref?: ForwardedRef<TableType<TData>>;
   }
 ) => ReturnType<typeof DataTable1>;

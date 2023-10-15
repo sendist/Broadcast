@@ -8,16 +8,26 @@ import { AddJadwalPengajianBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { Row, Table as TableType } from "@tanstack/react-table";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import Broadcast from "./broadcast";
 
 export default function JadwalPengajianPage() {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<JadwalPengajian>[]>([]);
   const { data, loading, update, remove, create, get } =
     useCRUD<JadwalPengajian>({
       url: "/jadwal-pengajian",
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+      },
     });
+
+  useEffect(() => {
+    get();
+  }, [page, limit]);
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;
@@ -154,7 +164,16 @@ export default function JadwalPengajianPage() {
         )}
         data={data}
         isLoading={loading}
+        page={page}
         meta={{
+          previousPage: () => {
+            if (page > 1) {
+              setPage(page - 1);
+            }
+          },
+          nextPage: () => {
+            setPage(page + 1);
+          },
           updateData: (id: string, key: string, value: unknown) => {
             update(id, {
               [key]: value,

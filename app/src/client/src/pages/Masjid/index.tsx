@@ -7,15 +7,25 @@ import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { AddMasjidBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 
 export default function MasjidPage() {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<Masjid>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Masjid>({
     url: "/masjid",
+    params: {
+      page: page.toString(),
+      limit: limit.toString(),
+    },
   });
+
+  useEffect(() => {
+    get();
+  }, [page, limit]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Masjid>>(null);
@@ -96,7 +106,16 @@ export default function MasjidPage() {
         columns={columns}
         data={data}
         isLoading={loading}
+        page={page}
         meta={{
+          previousPage: () => {
+            if (page > 1) {
+              setPage(page - 1);
+            }
+          },
+          nextPage: () => {
+            setPage(page + 1);
+          },
           updateData: (id: string, key: string, value: unknown) => {
             update(id, {
               [key]: value,
