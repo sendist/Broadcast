@@ -95,23 +95,25 @@ export default function JadwalPengajianPage() {
 
   return (
     <div>
-      <div className="space-x-4">
-        <AddJadwalPengajianForm
-          onSubmit={create}
-          mubalighDropdown={mubalighDropdown || []}
-          masjidDropdown={masjidDropdown || []}
-        >
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddJadwalPengajianForm>
-        <AddJadwalPengajianBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Bulk Upload
-          </Button>
-        </AddJadwalPengajianBulk>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="text-xl font-semibold">Pengajian</h1>
+        <div className="space-x-4 space-y-2 -mt-2">
+          <AddJadwalPengajianForm
+            onSubmit={create}
+            mubalighDropdown={mubalighDropdown || []}
+            masjidDropdown={masjidDropdown || []}
+          >
+            <Button variant="outline" className="ml-4 mt-2">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddJadwalPengajianForm>
+          <AddJadwalPengajianBulk onSubmit={uploadTemplate}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Bulk Upload
+            </Button>
+          </AddJadwalPengajianBulk>
         {selectedRows?.length ? (
           <>
             <ConfirmDialog
@@ -124,7 +126,7 @@ export default function JadwalPengajianPage() {
             >
               <Button
                 variant="outline"
-                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+                className="text-red-600 hover:text-red-600 hover:bg-red-100"
               >
                 <TrashIcon className="mr-2" />
                 Delete Selected ({selectedRows?.length})
@@ -134,13 +136,14 @@ export default function JadwalPengajianPage() {
               template={template || []}
               idJadwal={selectedRows.map((row) => row.original.id)}
             >
-              <Button variant="outline" className="mb-4">
+              <Button variant="outline">
                 <RocketIcon className="mr-2" />
                 Broadcast Selected ({selectedRows?.length})
               </Button>
             </Broadcast>
           </>
         ) : null}
+        </div>
       </div>
       <DataTable
         ref={tableRef}

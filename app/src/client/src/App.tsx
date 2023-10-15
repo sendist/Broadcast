@@ -6,6 +6,9 @@ import {
 } from "@/components/ui/popover";
 import useAccount from "./hooks/account";
 import { Button } from "./components/ui/button";
+import { useWindowSize } from "./hooks/windowSize";
+import { HamburgerMenuIcon, ChevronDownIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
 
 const menus = [
   {
@@ -43,8 +46,8 @@ const menus = [
         width="20"
         height="20"
         stroke="currentColor"
+        fill="currentColor"
       >
-        <title>layout, template, web design, design, web page</title>
         <g data-name="Layer 2">
           <path d="M27,2H5A3,3,0,0,0,2,5v5a3,3,0,0,0,3,3H27a3,3,0,0,0,3-3V5A3,3,0,0,0,27,2Zm1,8a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V5A1,1,0,0,1,5,4H27a1,1,0,0,1,1,1Z"></path>
           <path d="M13,16H5a3,3,0,0,0-3,3v8a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V19A3,3,0,0,0,13,16Zm1,11a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V19a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1Z"></path>
@@ -131,7 +134,7 @@ const menus = [
         height="20"
         aria-hidden="true"
         viewBox="0 0 16 16"
-        fill="black"
+        fill="currentColor"
         stroke="currentColor"
         strokeWidth="0.5"
         strokeLinecap="round"
@@ -155,6 +158,7 @@ const menus = [
         width="24"
         height="21.328046502319676"
         stroke="currentColor"
+        fill="currentColor"
         strokeWidth="2"
       >
         <svg
@@ -185,6 +189,8 @@ const menus = [
         xmlSpace="preserve"
         width="20"
         height="20"
+        stroke="currentColor"
+        fill="currentColor"
       >
         <path d="M77.5,25c-7.81-7.81-12.189-12.189-20-20h-40c-5.523,0-10,4.477-10,10v70c0,5.523,4.477,10,10,10h50   c5.523,0,10-4.477,10-10v-5H95V40H77.5V25z M55,13.107L69.393,27.5H57.5c-1.378,0-2.5-1.122-2.5-2.5V13.107z M70,85   c0,1.378-1.121,2.5-2.5,2.5h-50c-1.378,0-2.5-1.122-2.5-2.5V15c0-1.379,1.122-2.5,2.5-2.5h30V25c0,5.523,4.477,10,10,10H70v5H27.5   v40H70V85z M90,45v30H32.5V45H90z"></path>
         <path d="M60,70c4.136,0,7.5-3.364,7.5-7.5v-5c0-4.136-3.364-7.5-7.5-7.5s-7.5,3.364-7.5,7.5v5   C52.5,66.636,55.864,70,60,70z M57.5,57.5c0-1.378,1.122-2.5,2.5-2.5s2.5,1.122,2.5,2.5v5c0,1.378-1.122,2.5-2.5,2.5   s-2.5-1.122-2.5-2.5V57.5z"></path>
@@ -198,16 +204,104 @@ const menus = [
 function App() {
   const { account, logout } = useAccount();
   const navigate = useNavigate();
+  const { width } = useWindowSize();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState(menus[0].name);
+  const logoutAdmin = (
+    <div className="mt-auto flex">
+      <Popover>
+        <PopoverTrigger className="flex w-full justify-between">
+          <span className="text-sm font-medium text-black">
+            {account?.username}
+          </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            aria-roledescription="more menu"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="h-5 w-5 text-black"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            <circle cx="5" cy="12" r="1" />
+          </svg>
+        </PopoverTrigger>
+        <PopoverContent>
+          <Button
+            onClick={() => {
+              logout();
+              navigate("/login");
+            }}
+          >
+            Logout
+          </Button>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
   return (
     <>
-      <div className="h-screen w-screen bg-white flex flex-row">
+      <div className="h-screen w-screen bg-dark flex flex-row">
         {/* sidebar */}
-        <div
-          className="z-40 h-screen w-64 transition-transform"
-          aria-label="Sidebar"
-        >
-          <div className="flex h-full flex-col overflow-y-auto border-r border-slate-200 bg-white px-3 py-4">
-            <div className="mb-10 flex items-center rounded-lg px-3 py-2 text-slate-900">
+        {width > 1024 ? (
+          <div
+            className="z-40 h-screen w-64 transition-transform"
+            aria-label="Sidebar"
+          >
+            <div className="flex h-full flex-col overflow-y-auto border-r border-slate-200 bg-white px-3 py-4">
+              <div className="mb-10 flex items-center rounded-lg px-3 py-2 text-slate-900">
+                <svg
+                  className="h-9 w-9"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0.2999999999999998 89 102.1"
+                  width="50.4"
+                  height="58.1643594"
+                  x="4.800000000000001"
+                  y="5.539463443183575"
+                  fill="#557A82"
+                >
+                  <path
+                    d="M24.6 89V57.7c0-11 19.9-19.9 19.9-19.9s19.9 8.9 19.9 19.9V89m-.1-16.2v-28c0-11-19.9-19.9-19.9-19.9s-19.9 8.9-19.9 19.9v28m39.8-11.1v-28c0-11-19.9-19.9-19.9-19.9s-19.9 8.9-19.9 19.9v28M2 75.9l42.5 24.5L87 75.9V26.8L44.5 2.3 2 26.8v49.1zm73.9-55.4v61.8M13.1 20.5v61.8"
+                    fill="none"
+                    stroke="#557A82"
+                    stroke-width="4px"
+                    stroke-miterlimit="10"
+                  ></path>
+                </svg>
+                <span className="ml-1 text-base font-semibold">Broadcast</span>
+              </div>
+              <ul className="space-y-2 text-sm font-medium">
+                {menus.map((menu, index) => (
+                  <li key={index} onClick={() => setSelectedMenu(menu.name)}>
+                    <Link
+                      to={menu.path}
+                      className={`flex items-center rounded-lg px-3 py-2 hover:bg-slate-100 ${
+                        selectedMenu === menu.name
+                          ? "text-green-600"
+                          : "text-slate-900"
+                      }`}
+                    >
+                      {menu.icon}
+                      <span className="ml-3 flex-1 whitespace-nowrap">
+                        {menu.name}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {logoutAdmin}
+            </div>
+          </div>
+        ) : (
+          <header>
+            <div className="fixed w-full p-2 flex items-center border border-r border-slate-200 bg-white z-10">
               <svg
                 className="h-9 w-9"
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -227,63 +321,74 @@ function App() {
                   stroke-miterlimit="10"
                 ></path>
               </svg>
-              <span className="ml-1 text-base font-semibold">Broadcast</span>
+              <span className="ml-1 font-semibold">Broadcast</span>
+              <button
+                type="button"
+                className="ml-auto p-1 border rounded hover:border-slate-400"
+                onClick={() => {
+                  setIsMenuOpen(!isMenuOpen);
+                }}
+              >
+                <HamburgerMenuIcon className="w-6 h-6" />
+              </button>
             </div>
-            <ul className="space-y-2 text-sm font-medium">
-              {menus.map((menu, index) => (
-                <li key={index}>
-                  <Link
-                    to={menu.path}
-                    className="flex items-center rounded-lg px-3 py-2 text-slate-900 hover:bg-slate-100 "
-                  >
-                    {menu.icon}
-                    <span className="ml-3 flex-1 whitespace-nowrap">
-                      {menu.name}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-auto flex">
-              <Popover>
-                <PopoverTrigger className="flex w-full justify-between">
-                  <span className="text-sm font-medium text-black">
-                    {account?.username}
+          </header>
+        )}
+
+        {/* overlay */}
+        {isMenuOpen && (
+          <div
+            className="fixed inset-0 z-40 transition-opacity duration-300 backdrop-blur-sm opacity-91"
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          ></div>
+        )}
+
+        {/* menu drawer */}
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-50 flex h-3/4 max-h-full max-w-full flex-col bg-white border transition-transform duration-300 ease-in-out ${
+            isMenuOpen ? "translate-y-0" : "translate-y-full"
+          }`}
+        >
+          <button
+            className="border-b hover:bg-slate-50 mb-2"
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          >
+            <ChevronDownIcon className="w-5 h-5 mx-auto my-1" />
+          </button>
+          <ul className="space-y-2 text-sm font-medium">
+            {menus.map((menu, index) => (
+              <li
+                key={index}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setSelectedMenu(menu.name);
+                }}
+              >
+                <Link
+                  to={menu.path}
+                  className={`flex items-center rounded-lg px-3 py-2 hover:bg-slate-100 ${
+                    selectedMenu === menu.name
+                      ? "text-green-600"
+                      : "text-slate-900"
+                  }`}
+                >
+                  {menu.icon}
+                  <span className="ml-3 flex-1 whitespace-nowrap">
+                    {menu.name}
                   </span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    aria-roledescription="more menu"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="h-5 w-5 text-black"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="19" cy="12" r="1" />
-                    <circle cx="5" cy="12" r="1" />
-                  </svg>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <Button
-                    onClick={() => {
-                      logout();
-                      navigate("/login");
-                    }}
-                  >
-                    Logout
-                  </Button>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="px-4 mt-auto pb-4">{logoutAdmin}</div>
         </div>
+
         {/* content */}
-        <div className="flex-1 flex flex-col h-screen w-full overflow-auto p-4 bg-background">
+        <div className="flex-1 flex flex-col h-screen w-full overflow-auto p-4 bg-background max-lg:pt-16">
           <Outlet />
         </div>
       </div>

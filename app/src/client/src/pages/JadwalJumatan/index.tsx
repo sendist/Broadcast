@@ -96,52 +96,55 @@ export default function JadwalMasjidPage() {
 
   return (
     <div>
-      <div className="space-x-4">
-        <AddJadwalJumatanForm
-          onSubmit={create}
-          mubalighDropdown={mubalighDropdown || []}
-          masjidDropdown={masjidDropdown || []}
-        >
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddJadwalJumatanForm>
-        <AddJadwalJumatanBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Bulk Upload
-          </Button>
-        </AddJadwalJumatanBulk>
-        {selectedRows?.length ? (
-          <>
-            <ConfirmDialog
-              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Jadwal Jumatan?`}
-              description="Data yang sudah dihapus tidak dapat dikembalikan"
-              cancelText="Batal"
-              confirmText="Hapus"
-              onConfirm={deleteBatch}
-              dangerous
-            >
-              <Button
-                variant="outline"
-                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold">Jumatan</h1>
+        <div className="space-x-4 space-y-2 -mt-2">
+          <AddJadwalJumatanForm
+            onSubmit={create}
+            mubalighDropdown={mubalighDropdown || []}
+            masjidDropdown={masjidDropdown || []}
+          >
+            <Button variant="outline" className="ml-4 mt-2">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddJadwalJumatanForm>
+          <AddJadwalJumatanBulk onSubmit={uploadTemplate}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Bulk Upload
+            </Button>
+          </AddJadwalJumatanBulk>
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Jadwal Jumatan?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
               >
-                <TrashIcon className="mr-2" />
-                Delete Selected ({selectedRows?.length})
-              </Button>
-            </ConfirmDialog>
-            <Broadcast
-              template={template || []}
-              idJadwal={selectedRows.map((row) => row.original.id)}
-            >
-              <Button variant="outline" className="mb-4">
-                <RocketIcon className="mr-2" />
-                Broadcast Selected ({selectedRows?.length})
-              </Button>
-            </Broadcast>
-          </>
-        ) : null}
+                <Button
+                  variant="outline" 
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+              <Broadcast
+                template={template || []}
+                idJadwal={selectedRows.map((row) => row.original.id)}
+              >
+                <Button variant="outline">
+                  <RocketIcon className="mr-2" />
+                  Broadcast Selected ({selectedRows?.length})
+                </Button>
+              </Broadcast>
+            </>
+          ) : null}
+        </div>
       </div>
       <DataTable
         ref={tableRef}

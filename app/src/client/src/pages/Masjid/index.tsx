@@ -54,15 +54,17 @@ export default function MasjidPage() {
 
   return (
     <div>
-      <div className="space-x-4">
+    <div className="flex flex-row justify-between items-center mb-4">
+      <h1 className="inline-block text-xl font-semibold">Masjid</h1>
+      <div className="space-x-4 space-y-2 -mt-2">
         <AddMasjidForm onSubmit={create}>
-          <Button variant="outline" className="mb-4">
+          <Button variant="outline" className="ml-4 mt-2">
             <PlusIcon className="mr-2" />
             Add
           </Button>
         </AddMasjidForm>
         <AddMasjidBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
+          <Button variant="outline">
             <PlusIcon className="mr-2" />
             Bulk Upload
           </Button>
@@ -79,7 +81,7 @@ export default function MasjidPage() {
             >
               <Button
                 variant="outline"
-                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+                className="text-red-600 hover:text-red-600 hover:bg-red-100"
               >
                 <TrashIcon className="mr-2" />
                 Delete Selected ({selectedRows?.length})
@@ -88,6 +90,7 @@ export default function MasjidPage() {
           </>
         ) : null}
       </div>
+    </div>
       <DataTable
         ref={tableRef}
         columns={columns}
