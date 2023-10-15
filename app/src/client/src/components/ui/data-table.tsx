@@ -5,6 +5,7 @@ import {
   TableMeta,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   Row,
 } from "@tanstack/react-table";
@@ -49,6 +50,7 @@ function DataTable1<TData, TValue>(
     data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     meta,
     onSortingChange: setSorting,
     state: {

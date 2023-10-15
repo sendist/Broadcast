@@ -70,10 +70,10 @@ export function useCRUD<T>({ initialGet = true, url, params }: useCRUDType) {
     return result;
   };
 
-  const get = () =>
+  const get = (orderBy: string = "id") =>
     request({
       url: `${BASE_URL}${url}${
-        params ? "?" + new URLSearchParams(params) : ""
+        params ? "?" + new URLSearchParams({ ...params, orderBy }) : `?orderBy=${orderBy}`
       }`,
       options: {
         method: "GET",
