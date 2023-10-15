@@ -81,7 +81,7 @@ export default function MasjidPage() {
             >
               <Button
                 variant="outline"
-                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+                className="text-red-600 hover:text-red-600 hover:bg-red-100"
               >
                 <TrashIcon className="mr-2" />
                 Delete Selected ({selectedRows?.length})

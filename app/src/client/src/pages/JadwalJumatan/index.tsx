@@ -127,7 +127,7 @@ export default function JadwalMasjidPage() {
               >
                 <Button
                   variant="outline"
-                  className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />
                   Delete Selected ({selectedRows?.length})
@@ -137,7 +137,7 @@ export default function JadwalMasjidPage() {
                 template={template || []}
                 idJadwal={selectedRows.map((row) => row.original.id)}
               >
-                <Button variant="outline" className="mb-4">
+                <Button variant="outline">
                   <RocketIcon className="mr-2" />
                   Broadcast Selected ({selectedRows?.length})
                 </Button>

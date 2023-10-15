@@ -39,9 +39,11 @@ export default function MessageLogs() {
   }
 
   return (
-    <>
-      <h1 className="inline-block text-xl font-semibold mb-4">Message Logs</h1>
-      <div>
+    <div>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold mt-2">
+          Message Logs
+        </h1>
         <div className="space-x-4">
           {selectedRows?.length ? (
             <>
@@ -55,7 +57,7 @@ export default function MessageLogs() {
               >
                 <Button
                   variant="outline"
-                  className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />
                   Delete Selected ({selectedRows?.length})
@@ -64,24 +66,24 @@ export default function MessageLogs() {
             </>
           ) : null}
         </div>
-        <DataTable
-          ref={tableRef}
-          columns={columns}
-          data={data}
-          isLoading={loading}
-          meta={{
-            removeData: (id: string) => {
-              remove(id);
-            },
-            resend: (id: string) => {
-              apiFetch({
-                url: `${BASE_URL}/message-logs/resend/${id}`,
-              });
-            },
-          }}
-          onSelectedRowsChange={setSelectedRows}
-        />
       </div>
-    </>
+      <DataTable
+        ref={tableRef}
+        columns={columns}
+        data={data}
+        isLoading={loading}
+        meta={{
+          removeData: (id: string) => {
+            remove(id);
+          },
+          resend: (id: string) => {
+            apiFetch({
+              url: `${BASE_URL}/message-logs/resend/${id}`,
+            });
+          },
+        }}
+        onSelectedRowsChange={setSelectedRows}
+      />
+    </div>
   );
 }
