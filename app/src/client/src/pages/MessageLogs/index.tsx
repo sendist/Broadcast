@@ -39,8 +39,10 @@ export default function MessageLogs() {
   }
 
   return (
-    <div>
-      <div className="space-x-4">
+    <>
+      <h1 className="inline-block text-xl font-semibold mb-4">Message Logs</h1>
+      <div>
+        <div className="space-x-4">
         {selectedRows?.length ? (
           <>
             <ConfirmDialog
@@ -62,23 +64,24 @@ export default function MessageLogs() {
           </>
         ) : null}
       </div>
-      <DataTable
+        <DataTable
         ref={tableRef}
-        columns={columns}
-        data={data}
-        isLoading={loading}
-        meta={{
-          removeData: (id: string) => {
-            remove(id);
-          },
-          resend: (id: string) => {
-            apiFetch({
-              url: `${BASE_URL}/message-logs/resend/${id}`,
-            });
-          },
-        }}
+          columns={columns}
+          data={data}
+          isLoading={loading}
+          meta={{
+            removeData: (id: string) => {
+              remove(id);
+            },
+            resend: (id: string) => {
+              apiFetch({
+                url: `${BASE_URL}/message-logs/resend/${id}`,
+              });
+            },
+          }}
         onSelectedRowsChange={setSelectedRows}
-      />
-    </div>
+        />
+      </div>
+    </>
   );
 }

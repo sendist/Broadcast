@@ -54,15 +54,17 @@ export default function MasjidPage() {
 
   return (
     <div>
+    <div className="flex flex-row justify-between items-center mb-4">
+      <h1 className="inline-block text-xl font-semibold">Masjid</h1>
       <div className="space-x-4">
         <AddMasjidForm onSubmit={create}>
-          <Button variant="outline" className="mb-4">
+          <Button variant="outline">
             <PlusIcon className="mr-2" />
             Add
           </Button>
         </AddMasjidForm>
         <AddMasjidBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
+          <Button variant="outline">
             <PlusIcon className="mr-2" />
             Bulk Upload
           </Button>
@@ -88,6 +90,7 @@ export default function MasjidPage() {
           </>
         ) : null}
       </div>
+    </div>
       <DataTable
         ref={tableRef}
         columns={columns}

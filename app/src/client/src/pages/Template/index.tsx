@@ -47,13 +47,15 @@ export default function TemplatePage() {
 
   return (
     <div>
-      <div className="space-x-4">
-        <AddTemplateForm onSubmit={create} types={types || []}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddTemplateForm>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold">Template</h1>
+        <div className="space-x-4">
+          <AddTemplateForm onSubmit={create} types={types || []}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddTemplateForm>
         {selectedRows?.length ? (
           <>
             <ConfirmDialog
@@ -74,6 +76,7 @@ export default function TemplatePage() {
             </ConfirmDialog>
           </>
         ) : null}
+        </div>
       </div>
       <DataTable
         ref={tableRef}

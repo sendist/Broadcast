@@ -54,19 +54,21 @@ export default function MubalighPage() {
 
   return (
     <div>
-      <div className="space-x-4">
-        <AddMubalighForm onSubmit={create}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddMubalighForm>
-        <AddMubalighBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Bulk Upload
-          </Button>
-        </AddMubalighBulk>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold">Mubaligh</h1>
+        <div className="space-x-4">
+          <AddMubalighForm onSubmit={create}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddMubalighForm>
+          <AddMubalighBulk onSubmit={uploadTemplate}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Bulk Upload
+            </Button>
+          </AddMubalighBulk>
         {selectedRows?.length ? (
           <>
             <ConfirmDialog
@@ -87,6 +89,7 @@ export default function MubalighPage() {
             </ConfirmDialog>
           </>
         ) : null}
+        </div>
       </div>
       <DataTable
         ref={tableRef}

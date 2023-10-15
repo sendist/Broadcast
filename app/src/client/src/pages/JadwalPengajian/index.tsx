@@ -95,23 +95,25 @@ export default function JadwalPengajianPage() {
 
   return (
     <div>
-      <div className="space-x-4">
-        <AddJadwalPengajianForm
-          onSubmit={create}
-          mubalighDropdown={mubalighDropdown || []}
-          masjidDropdown={masjidDropdown || []}
-        >
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddJadwalPengajianForm>
-        <AddJadwalPengajianBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Bulk Upload
-          </Button>
-        </AddJadwalPengajianBulk>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold">Pengajian</h1>
+        <div className="space-x-4">
+          <AddJadwalPengajianForm
+            onSubmit={create}
+            mubalighDropdown={mubalighDropdown || []}
+            masjidDropdown={masjidDropdown || []}
+          >
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddJadwalPengajianForm>
+          <AddJadwalPengajianBulk onSubmit={uploadTemplate}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Bulk Upload
+            </Button>
+          </AddJadwalPengajianBulk>
         {selectedRows?.length ? (
           <>
             <ConfirmDialog
@@ -141,6 +143,7 @@ export default function JadwalPengajianPage() {
             </Broadcast>
           </>
         ) : null}
+        </div>
       </div>
       <DataTable
         ref={tableRef}
