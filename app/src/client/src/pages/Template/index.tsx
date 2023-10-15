@@ -5,16 +5,26 @@ import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useApiFetch } from "@/hooks/fetch";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { BASE_URL } from "@/lib/constants";
 
 export default function TemplatePage() {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<Template>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Template>({
     url: "/template",
+    params: {
+      page: page.toString(),
+      limit: limit.toString(),
+    },
   });
+
+  useEffect(() => {
+    get();
+  }, [page, limit]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Template>>(null);
@@ -80,7 +90,16 @@ export default function TemplatePage() {
         columns={columns(types || [])}
         data={data}
         isLoading={loading}
+        page={page}
         meta={{
+          previousPage: () => {
+            if (page > 1) {
+              setPage(page - 1);
+            }
+          },
+          nextPage: () => {
+            setPage(page + 1);
+          },
           updateData: (id: string, key: string, value: unknown) => {
             update(id, {
               [key]: value,
