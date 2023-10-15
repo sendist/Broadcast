@@ -43,29 +43,29 @@ export default function MessageLogs() {
       <h1 className="inline-block text-xl font-semibold mb-4">Message Logs</h1>
       <div>
         <div className="space-x-4">
-        {selectedRows?.length ? (
-          <>
-            <ConfirmDialog
-              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Log?`}
-              description="Data yang sudah dihapus tidak dapat dikembalikan"
-              cancelText="Batal"
-              confirmText="Hapus"
-              onConfirm={deleteBatch}
-              dangerous
-            >
-              <Button
-                variant="outline"
-                className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Log?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
               >
-                <TrashIcon className="mr-2" />
-                Delete Selected ({selectedRows?.length})
-              </Button>
-            </ConfirmDialog>
-          </>
-        ) : null}
-      </div>
+                <Button
+                  variant="outline"
+                  className="mb-4 text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+            </>
+          ) : null}
+        </div>
         <DataTable
-        ref={tableRef}
+          ref={tableRef}
           columns={columns}
           data={data}
           isLoading={loading}
@@ -79,7 +79,7 @@ export default function MessageLogs() {
               });
             },
           }}
-        onSelectedRowsChange={setSelectedRows}
+          onSelectedRowsChange={setSelectedRows}
         />
       </div>
     </>
