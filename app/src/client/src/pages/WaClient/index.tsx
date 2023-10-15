@@ -15,7 +15,7 @@ export default function WaClient() {
     qr: "",
     state: "LOADING",
   });
-  const { lastJsonMessage, sendMessage } = useWebSocket<{
+  const { lastJsonMessage } = useWebSocket<{
     qr: string;
     /*
     LOADING
@@ -150,38 +150,47 @@ export default function WaClient() {
               </>
             )}
           </div>
-          <div className={`flex ${waClientInfo.state === "CONNECTED" ? "lg:flex-col" : "flex-col items-center"} lg:items-start justify-between lg:ml-8 h-full max-lg:w-full`}>
-              <div className="sm:ml-4 flex gap-x-2">
-                <span className="text-xl font-light">STATUS: </span>
-                <Badge
-                  className={
-                    { LOADING: "bg-orange-400", CONNECTED: "bg-green-400" }[
-                      waClientInfo.state || "DEFAULT"
-                    ] || "bg-red-400"
-                  }
+          <div
+            className={`flex ${
+              waClientInfo.state === "CONNECTED"
+                ? "lg:flex-col"
+                : "flex-col items-center"
+            } lg:items-start justify-between lg:ml-8 h-full max-lg:w-full`}
+          >
+            <div className="sm:ml-4 flex gap-x-2">
+              <span className="text-xl font-light">STATUS: </span>
+              <Badge
+                className={
+                  { LOADING: "bg-orange-400", CONNECTED: "bg-green-400" }[
+                    waClientInfo.state || "DEFAULT"
+                  ] || "bg-red-400"
+                }
+              >
+                {waClientInfo.state}
+              </Badge>
+            </div>
+            {waClientInfo.state === "CONNECTED" && (
+              <div className="self-end">
+                <Button
+                  onClick={() => {
+                    httpCall({ url: `${BASE_URL}/waclient/logout` });
+                  }}
+                  className="w-full bg-red-600"
                 >
-                  {waClientInfo.state}
-                </Badge>
+                  Logout
+                </Button>
               </div>
-              {waClientInfo.state === "CONNECTED" && (
-                <div className="self-end">
-                  <Button
-                    onClick={() => {
-                      httpCall({ url: `${BASE_URL}/waclient/logout` });
-                    }}
-                    className="w-full bg-red-600"
-                  >
-                    Logout
-                  </Button>
-                </div>
-              )}
+            )}
 
             {waClientInfo.state !== "CONNECTED" && (
               <div className="mb-4">
                 {waClientInfo.qr ? (
                   <div className="w-[128px] h-[128px] sm:w-[256px] sm:h-[256px] relative p-4 box-content bg-white">
                     <div className="absolute top-0 left-0 right-0 bottom-0 grid place-items-center p-2 sm:p-4">
-                      <QRCode value={waClientInfo.qr} className="w-full h-full" />
+                      <QRCode
+                        value={waClientInfo.qr}
+                        className="w-full h-full"
+                      />
                     </div>
                     <div className="absolute z-10 left-0 right-0 bottom-0 top-0 text-center grid place-items-center">
                       <div className="relative">
@@ -213,7 +222,7 @@ export default function WaClient() {
                         cy="12"
                         r="10"
                         stroke="currentColor"
-                        stroke-width="4"
+                        strokeWidth="4"
                       ></circle>
                       <path
                         className="opacity-75"

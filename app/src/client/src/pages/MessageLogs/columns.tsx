@@ -76,24 +76,21 @@ export const columns: ColumnDef<MessageLog>[] = [
   {
     accessorKey: "status",
     header: (header) => CellHeaderSortable(header, "Status"),
-    cell: ({ getValue, row }) => (
-      <p>
-        {getValue<string>() === "success" ? (
-          <div className="flex flex-row items-center gap-2 text-green-600 ">
-            <CheckCircledIcon />
-            Success
+    cell: ({ getValue, row }) =>
+      getValue<string>() === "success" ? (
+        <div className="flex flex-row items-center gap-2 text-green-600 ">
+          <CheckCircledIcon />
+          Success
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-row items-center gap-2 text-red-600">
+            <CrossCircledIcon />
+            Failed
           </div>
-        ) : (
-          <>
-            <div className="flex flex-row items-center gap-2 text-red-600">
-              <CrossCircledIcon />
-              Failed
-            </div>
-            {row.original.error_reason}
-          </>
-        )}
-      </p>
-    ),
+          {row.original.error_reason}
+        </>
+      ),
   },
   {
     accessorKey: "send_time",

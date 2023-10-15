@@ -100,18 +100,15 @@ export const columns: (
   {
     accessorKey: "broadcasted",
     header: (header) => CellHeaderSortable(header, "Status Broadcast"),
-    cell: ({ getValue }) => (
-      <p>
-        {getValue<boolean>() ? (
-          <div className="flex flex-row items-center gap-2 text-green-600 ">
-            <CheckCircledIcon />
-            Sudah Broadcast
-          </div>
-        ) : (
-          "Belum Broadcast"
-        )}
-      </p>
-    ),
+    cell: ({ getValue }) =>
+      getValue<boolean>() ? (
+        <div className="flex flex-row items-center gap-2 text-green-600 ">
+          <CheckCircledIcon />
+          Sudah Broadcast
+        </div>
+      ) : (
+        <p>Belum Broadcast</p>
+      ),
   },
   {
     id: "broadcast",
