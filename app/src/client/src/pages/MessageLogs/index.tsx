@@ -15,23 +15,26 @@ export default function MessageLogs() {
   const apiFetch = useApiFetch();
 
   return (
-    <div>
-      <div className="space-x-4"></div>
-      <DataTable
-        columns={columns}
-        data={data}
-        isLoading={loading}
-        meta={{
-          removeData: (id: string) => {
-            remove(id);
-          },
-          resend: (id: string) => {
-            apiFetch({
-              url: `${BASE_URL}/message-logs/resend/${id}`,
-            });
-          },
-        }}
-      />
-    </div>
+    <>
+      <h1 className="inline-block text-xl font-semibold mb-4">Message Logs</h1>
+      <div>
+        <div className="space-x-4"></div>
+        <DataTable
+          columns={columns}
+          data={data}
+          isLoading={loading}
+          meta={{
+            removeData: (id: string) => {
+              remove(id);
+            },
+            resend: (id: string) => {
+              apiFetch({
+                url: `${BASE_URL}/message-logs/resend/${id}`,
+              });
+            },
+          }}
+        />
+      </div>
+    </>
   );
 }

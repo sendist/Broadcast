@@ -73,23 +73,26 @@ export default function Masjid() {
 
   return (
     <div>
-      <div className="space-x-4">
-        <AddJadwalJumatanForm
-          onSubmit={create}
-          mubalighDropdown={mubalighDropdown || []}
-          masjidDropdown={masjidDropdown || []}
-        >
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddJadwalJumatanForm>
-        <AddJadwalJumatanBulk onSubmit={uploadTemplate}>
-          <Button variant="outline" className="mb-4">
-            <PlusIcon className="mr-2" />
-            Bulk Upload
-          </Button>
-        </AddJadwalJumatanBulk>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold">Jumatan</h1>
+        <div className="space-x-4">
+          <AddJadwalJumatanForm
+            onSubmit={create}
+            mubalighDropdown={mubalighDropdown || []}
+            masjidDropdown={masjidDropdown || []}
+          >
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddJadwalJumatanForm>
+          <AddJadwalJumatanBulk onSubmit={uploadTemplate}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Bulk Upload
+            </Button>
+          </AddJadwalJumatanBulk>
+        </div>
       </div>
       <DataTable
         columns={columns(
