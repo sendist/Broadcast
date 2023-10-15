@@ -46,8 +46,8 @@ const menus = [
         width="20"
         height="20"
         stroke="currentColor"
+        fill="currentColor"
       >
-        <title>layout, template, web design, design, web page</title>
         <g data-name="Layer 2">
           <path d="M27,2H5A3,3,0,0,0,2,5v5a3,3,0,0,0,3,3H27a3,3,0,0,0,3-3V5A3,3,0,0,0,27,2Zm1,8a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V5A1,1,0,0,1,5,4H27a1,1,0,0,1,1,1Z"></path>
           <path d="M13,16H5a3,3,0,0,0-3,3v8a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V19A3,3,0,0,0,13,16Zm1,11a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V19a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1Z"></path>
@@ -134,7 +134,7 @@ const menus = [
         height="20"
         aria-hidden="true"
         viewBox="0 0 16 16"
-        fill="black"
+        fill="currentColor"
         stroke="currentColor"
         strokeWidth="0.5"
         strokeLinecap="round"
@@ -158,6 +158,7 @@ const menus = [
         width="24"
         height="21.328046502319676"
         stroke="currentColor"
+        fill="currentColor"
         strokeWidth="2"
       >
         <svg
@@ -188,6 +189,8 @@ const menus = [
         xmlSpace="preserve"
         width="20"
         height="20"
+        stroke="currentColor"
+        fill="currentColor"
       >
         <path d="M77.5,25c-7.81-7.81-12.189-12.189-20-20h-40c-5.523,0-10,4.477-10,10v70c0,5.523,4.477,10,10,10h50   c5.523,0,10-4.477,10-10v-5H95V40H77.5V25z M55,13.107L69.393,27.5H57.5c-1.378,0-2.5-1.122-2.5-2.5V13.107z M70,85   c0,1.378-1.121,2.5-2.5,2.5h-50c-1.378,0-2.5-1.122-2.5-2.5V15c0-1.379,1.122-2.5,2.5-2.5h30V25c0,5.523,4.477,10,10,10H70v5H27.5   v40H70V85z M90,45v30H32.5V45H90z"></path>
         <path d="M60,70c4.136,0,7.5-3.364,7.5-7.5v-5c0-4.136-3.364-7.5-7.5-7.5s-7.5,3.364-7.5,7.5v5   C52.5,66.636,55.864,70,60,70z M57.5,57.5c0-1.378,1.122-2.5,2.5-2.5s2.5,1.122,2.5,2.5v5c0,1.378-1.122,2.5-2.5,2.5   s-2.5-1.122-2.5-2.5V57.5z"></path>
@@ -381,9 +384,7 @@ function App() {
               </li>
             ))}
           </ul>
-          <div className="px-4 mt-auto pb-4">
-            {logoutAdmin}
-          </div>
+          <div className="px-4 mt-auto pb-4">{logoutAdmin}</div>
         </div>
 
         {/* content */}
