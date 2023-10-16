@@ -131,7 +131,7 @@ const templateEnum: {
 }[] = [
   {
     value: "pengajian_bulanan",
-    label: "Pengajian Bulanan (unimplemented)",
+    label: "Pengajian Bulanan",
     replacements: ["bulan", "tanggal", "waktu", "nama_masjid", "nama_mubaligh"],
     repetition: true,
   },
