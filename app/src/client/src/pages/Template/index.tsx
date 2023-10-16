@@ -5,16 +5,28 @@ import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useApiFetch } from "@/hooks/fetch";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { BASE_URL } from "@/lib/constants";
 
+const limit = 20;
+
 export default function TemplatePage() {
+  const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<Template>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Template>({
     url: "/template",
+    params: {
+      page: page.toString(),
+      limit: limit.toString(),
+    },
   });
+
+  useEffect(() => {
+    get();
+    // eslint-disable-next-line
+  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Template>>(null);
@@ -56,26 +68,26 @@ export default function TemplatePage() {
               Add
             </Button>
           </AddTemplateForm>
-        {selectedRows?.length ? (
-          <>
-            <ConfirmDialog
-              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Template?`}
-              description="Data yang sudah dihapus tidak dapat dikembalikan"
-              cancelText="Batal"
-              confirmText="Hapus"
-              onConfirm={deleteBatch}
-              dangerous
-            >
-              <Button
-                variant="outline"
-                className="text-red-600 hover:text-red-600 hover:bg-red-100"
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Template?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
               >
-                <TrashIcon className="mr-2" />
-                Delete Selected ({selectedRows?.length})
-              </Button>
-            </ConfirmDialog>
-          </>
-        ) : null}
+                <Button
+                  variant="outline"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+            </>
+          ) : null}
         </div>
       </div>
       <DataTable
@@ -83,7 +95,17 @@ export default function TemplatePage() {
         columns={columns(types || [])}
         data={data}
         isLoading={loading}
+        page={page}
+        limit={limit}
         meta={{
+          previousPage: () => {
+            if (page > 1) {
+              setPage(page - 1);
+            }
+          },
+          nextPage: () => {
+            setPage(page + 1);
+          },
           updateData: (id: string, key: string, value: unknown) => {
             update(id, {
               [key]: value,

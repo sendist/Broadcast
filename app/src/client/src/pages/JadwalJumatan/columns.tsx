@@ -23,8 +23,8 @@ import Broadcast from "./broadcast";
 export type JadwalJumatan = {
   id: string;
   tanggal: Date;
-  id_masjid: number;
-  id_mubaligh: number;
+  id_masjid: string;
+  id_mubaligh: string;
 };
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {

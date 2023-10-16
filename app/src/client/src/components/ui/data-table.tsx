@@ -26,11 +26,21 @@ import {
 } from "react";
 import { Button } from "./button";
 
+interface CustomTableMeta<TData> extends TableMeta<TData> {
+  previousPage?: () => void;
+  nextPage?: () => void;
+  updateData?: (id: string, key: string, value: unknown) => void;
+  removeData?: (id: string) => void;
+  [key: string]: unknown;
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[] | undefined;
-  meta?: TableMeta<TData>;
+  meta?: CustomTableMeta<TData>;
   isLoading?: boolean;
+  page: number;
+  limit: number;
   onSelectedRowsChange?: (rows: Row<TData>[]) => void;
 }
 
@@ -40,6 +50,8 @@ function DataTable1<TData, TValue>(
     data,
     meta,
     isLoading,
+    page,
+    limit,
     onSelectedRowsChange,
   }: DataTableProps<TData, TValue>,
   ref: ForwardedRef<TableType<TData>>
@@ -134,16 +146,24 @@ function DataTable1<TData, TValue>(
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => {
+              if (meta && meta.previousPage) {
+                meta.previousPage();
+              }
+            }}
+            disabled={page === 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => {
+              if (meta && meta.nextPage) {
+                meta.nextPage();
+              }
+            }}
+            disabled={table.getRowModel().rows?.length < limit}
           >
             Next
           </Button>

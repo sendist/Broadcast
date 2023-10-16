@@ -15,7 +15,7 @@ const router = express.Router();
 
 export const authLogin = (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
-  prisma.user
+  return prisma.user
     .findUnique({
       where: {
         username,

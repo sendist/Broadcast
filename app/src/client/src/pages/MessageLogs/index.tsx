@@ -3,21 +3,32 @@ import { MessageLog, columns } from "./columns";
 import { useCRUD } from "@/hooks/backend";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
+const limit = 20;
+
 export default function MessageLogs() {
-  const [selectedRows, setSelectedRows] = useState<Row<Masjid>[]>([]);
+  const [page, setPage] = useState(1);
+  const [selectedRows, setSelectedRows] = useState<Row<MessageLog>[]>([]);
   const { data, loading, remove, get } = useCRUD<MessageLog>({
     url: "/message-logs",
     params: {
       orderBy: "send_time",
       orderType: "desc",
+      page: page.toString(),
+      limit: limit.toString(),
     },
   });
+
+  useEffect(() => {
+    get();
+    // eslint-disable-next-line
+  }, [page]);
+
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<MessageLog>>(null);
 
@@ -72,7 +83,17 @@ export default function MessageLogs() {
         columns={columns}
         data={data}
         isLoading={loading}
+        page={page}
+        limit={limit}
         meta={{
+          previousPage: () => {
+            if (page > 1) {
+              setPage(page - 1);
+            }
+          },
+          nextPage: () => {
+            setPage(page + 1);
+          },
           removeData: (id: string) => {
             remove(id);
           },

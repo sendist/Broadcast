@@ -2,6 +2,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import { Mubaligh } from "./columns";
 
 const mubalighFormSchema = z.object({
   nama_mubaligh: z.string().min(1, "Nama Mubaligh harus diisi"),
@@ -13,13 +14,15 @@ const mubalighFormSchema = z.object({
     ),
 });
 
+type Fields = z.infer<typeof mubalighFormSchema>;
+
 type Props = {
   children: React.ReactNode;
-  onSubmit: (data: { nama_mubaligh: string; no_hp: string }) => void;
+  onSubmit: (data: Omit<Mubaligh, "id">) => void;
 };
 
 export function AddMubalighForm({ children, onSubmit }: Props) {
-  const form = useForm<z.infer<typeof mubalighFormSchema>>({
+  const form = useForm<Fields>({
     resolver: zodResolver(mubalighFormSchema),
     defaultValues: {
       nama_mubaligh: "",
@@ -27,7 +30,7 @@ export function AddMubalighForm({ children, onSubmit }: Props) {
     },
   });
 
-  const renderFormInput: RenderFormInput<typeof form> = [
+  const renderFormInput: RenderFormInput<Fields> = [
     {
       name: "nama_mubaligh",
       label: "Nama Mubaligh",
@@ -38,7 +41,7 @@ export function AddMubalighForm({ children, onSubmit }: Props) {
       label: "No HP",
       placeholder: "No HP Mubaligh",
     },
-  ] as const;
+  ];
 
   return (
     <AddForm

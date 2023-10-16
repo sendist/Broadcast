@@ -2,6 +2,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import { Masjid } from "./columns";
 
 const masjidFormSchema = z.object({
   nama_masjid: z.string().min(1, "Nama Masjid harus diisi"),
@@ -14,17 +15,15 @@ const masjidFormSchema = z.object({
     ),
 });
 
+type Fields = z.infer<typeof masjidFormSchema>;
+
 type Props = {
   children: React.ReactNode;
-  onSubmit: (data: {
-    nama_masjid: string;
-    nama_ketua_dkm: string;
-    no_hp: string;
-  }) => void;
+  onSubmit: (data: Omit<Masjid, "id">) => void;
 };
 
 export function AddMasjidForm({ children, onSubmit }: Props) {
-  const form = useForm<z.infer<typeof masjidFormSchema>>({
+  const form = useForm<Fields>({
     resolver: zodResolver(masjidFormSchema),
     defaultValues: {
       nama_masjid: "",
@@ -33,7 +32,7 @@ export function AddMasjidForm({ children, onSubmit }: Props) {
     },
   });
 
-  const renderFormInput: RenderFormInput<typeof form> = [
+  const renderFormInput: RenderFormInput<Fields> = [
     {
       name: "nama_masjid",
       label: "Nama Masjid",
@@ -49,7 +48,7 @@ export function AddMasjidForm({ children, onSubmit }: Props) {
       label: "No HP",
       placeholder: "No HP",
     },
-  ] as const;
+  ];
 
   return (
     <AddForm

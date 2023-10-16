@@ -8,6 +8,45 @@ import { getExcelContent, renameObjectKey } from "../utils/xlsx.util";
 import path from "path";
 
 const router = express.Router();
+
+const getMasjid = (req: Request, res: Response, next: NextFunction) => {
+  // pagination (optional)
+  const { page, limit, orderBy, orderType } = req.query;
+
+  const { fields } = req.query;
+  const fieldsArr = fields ? fields.toString().split(",") : undefined;
+  return prisma.masjid
+    .findMany({
+      ...(fields && {
+        select: {
+          id: fieldsArr?.includes("id"),
+          nama_masjid: fieldsArr?.includes("nama_masjid"),
+          nama_ketua_dkm: fieldsArr?.includes("nama_ketua_dkm"),
+          no_hp: fieldsArr?.includes("no_hp"),
+        },
+      }),
+      ...(page && {
+        skip: (Number(page) - 1) * (Number(limit) || 10),
+      }),
+      ...(limit && {
+        take: Number(limit),
+      }),
+      ...(orderBy && {
+        orderBy: {
+          [orderBy.toString()]: orderType?.toString() || "asc",
+        },
+      }),
+    })
+    .then((masjids) => {
+      sendResponse({
+        res,
+        data: masjids,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
 router.get(
   "/",
   validate([
@@ -17,46 +56,30 @@ router.get(
     query("orderBy").optional().isString().notEmpty(),
     query("orderType").optional().isString().notEmpty(),
   ]),
-  (req: Request, res: Response, next: NextFunction) => {
-    // pagination (optional)
-    const { page, limit, orderBy, orderType } = req.query;
-
-    const { fields } = req.query;
-    const fieldsArr = fields ? fields.toString().split(",") : undefined;
-    prisma.masjid
-      .findMany({
-        ...(fields && {
-          select: {
-            id: fieldsArr?.includes("id"),
-            nama_masjid: fieldsArr?.includes("nama_masjid"),
-            nama_ketua_dkm: fieldsArr?.includes("nama_ketua_dkm"),
-            no_hp: fieldsArr?.includes("no_hp"),
-          },
-        }),
-        ...(page && {
-          skip: (Number(page) - 1) * (Number(limit) || 10),
-        }),
-        ...(limit && {
-          take: Number(limit),
-        }),
-        ...(orderBy && {
-          orderBy: {
-            [orderBy.toString()]: orderType?.toString() || "asc",
-          },
-        }),
-      })
-      .then((masjids) => {
-        sendResponse({
-          res,
-          data: masjids,
-        });
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  getMasjid
 );
 
+
+const postMasjid = (req: Request, res: Response, next: NextFunction) => {
+  const { nama_masjid, nama_ketua_dkm, no_hp } = req.body;
+  return prisma.masjid
+    .create({
+      data: {
+        nama_masjid,
+        nama_ketua_dkm,
+        no_hp,
+      },
+    })
+    .then((masjid) => {
+      sendResponse({
+        res,
+        data: masjid,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
 router.post(
   "/",
   validate([
@@ -64,26 +87,7 @@ router.post(
     body("nama_ketua_dkm").notEmpty(),
     body("no_hp").notEmpty(),
   ]),
-  (req: Request, res: Response, next: NextFunction) => {
-    const { nama_masjid, nama_ketua_dkm, no_hp } = req.body;
-    prisma.masjid
-      .create({
-        data: {
-          nama_masjid,
-          nama_ketua_dkm,
-          no_hp,
-        },
-      })
-      .then((masjid) => {
-        sendResponse({
-          res,
-          data: masjid,
-        });
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  postMasjid
 );
 
 router.get("/template", (req: Request, res: Response) => {

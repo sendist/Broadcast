@@ -8,7 +8,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 
 type Props = {
-  value;
+  value?: Date;
   onChange: (date: Date) => void;
   placeholder?: string;
   align?: "start" | "end" | "center";

@@ -6,11 +6,11 @@ import {
   Path,
   useForm,
 } from "react-hook-form";
-import { useState } from "react";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 import InputDropdown from "@/components/custom/inputDropdown";
 import InputCalendar from "@/components/custom/inputCalendar";
 import { resetDateTimeToMidnight } from "@/lib/utils";
+import { JadwalJumatan } from "./columns";
 
 const jadwalJumatanFormSchema = z.object({
   tanggal: z.date({
@@ -19,6 +19,8 @@ const jadwalJumatanFormSchema = z.object({
   id_masjid: z.string().min(1, "Masjid harus diisi"),
   id_mubaligh: z.string().min(1, "Mubaligh harus diisi"),
 });
+
+type Fields = z.infer<typeof jadwalJumatanFormSchema>;
 
 export function AddJadwalJumatanForm({
   masjidDropdown,
@@ -29,19 +31,13 @@ export function AddJadwalJumatanForm({
   masjidDropdown: { label: string; value: string }[];
   mubalighDropdown: { label: string; value: string }[];
   children: React.ReactNode;
-  onSubmit: (data: {
-    tanggal: Date;
-    id_masjid: number;
-    id_mubaligh: number;
-  }) => void;
+  onSubmit: (data: Omit<JadwalJumatan, "id">) => void;
 }) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const form = useForm<z.infer<typeof jadwalJumatanFormSchema>>({
+  const form = useForm<Fields>({
     resolver: zodResolver(jadwalJumatanFormSchema),
   });
 
-  const renderFormInput: RenderFormInput<typeof form> = [
+  const renderFormInput: RenderFormInput<Fields> = [
     {
       name: "tanggal",
       label: "Tanggal Jumatan",
@@ -106,8 +102,6 @@ export function AddJadwalJumatanForm({
     <AddForm
       title="Tambah Data Jadwal Jumatan"
       subtitle="Input data jadwal jumatan yang akan ditambahkan"
-      dialogOpen={dialogOpen}
-      setDialogOpen={setDialogOpen}
       onSubmit={onSubmit}
       form={form}
       renderFormInput={renderFormInput}
