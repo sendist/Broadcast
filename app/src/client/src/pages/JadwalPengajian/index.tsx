@@ -11,6 +11,7 @@ import { Row, Table as TableType } from "@tanstack/react-table";
 import { useRef, useState } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import Broadcast from "./broadcast";
+import BroadcastBulanan from "./broadcastBulanan";
 
 const limit = 20;
 
@@ -53,6 +54,17 @@ export default function JadwalPengajianPage() {
     params: {
       fields: "id,content,nama_template",
       type: "pengajian_reminder",
+    },
+  });
+  const { data: templateBulanan } = useCRUD<{
+    id: string;
+    content: string;
+    nama_template: string;
+  }>({
+    url: "/template",
+    params: {
+      fields: "id,content,nama_template",
+      type: "pengajian_bulanan",
     },
   });
 
@@ -121,35 +133,43 @@ export default function JadwalPengajianPage() {
               Bulk Upload
             </Button>
           </AddJadwalPengajianBulk>
+            <BroadcastBulanan
+            template={templateBulanan || []}
+          >
+            <Button variant="outline">
+              <RocketIcon className="mr-2" />
+              Broadcast Bulanan
+            </Button>
+          </BroadcastBulanan>
           {selectedRows?.length ? (
-            <>
-              <ConfirmDialog
-                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Jadwal Pengajian?`}
-                description="Data yang sudah dihapus tidak dapat dikembalikan"
-                cancelText="Batal"
-                confirmText="Hapus"
-                onConfirm={deleteBatch}
-                dangerous
-              >
-                <Button
-                  variant="outline"
-                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+              <>
+                <ConfirmDialog
+                  title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Jadwal Pengajian?`}
+                  description="Data yang sudah dihapus tidak dapat dikembalikan"
+                  cancelText="Batal"
+                  confirmText="Hapus"
+                  onConfirm={deleteBatch}
+                  dangerous
                 >
-                  <TrashIcon className="mr-2" />
-                  Delete Selected ({selectedRows?.length})
-                </Button>
-              </ConfirmDialog>
-              <Broadcast
-                template={template || []}
-                idJadwal={selectedRows.map((row) => row.original.id)}
-              >
-                <Button variant="outline">
-                  <RocketIcon className="mr-2" />
-                  Broadcast Selected ({selectedRows?.length})
-                </Button>
-              </Broadcast>
-            </>
-          ) : null}
+                  <Button
+                    variant="outline"
+                    className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                  >
+                    <TrashIcon className="mr-2" />
+                    Delete Selected ({selectedRows?.length})
+                  </Button>
+                </ConfirmDialog>
+                <Broadcast
+                  template={template || []}
+                  idJadwal={selectedRows.map((row) => row.original.id)}
+                >
+                  <Button variant="outline">
+                    <RocketIcon className="mr-2" />
+                    Broadcast Selected ({selectedRows?.length})
+                  </Button>
+                </Broadcast>
+              </>
+            ) : null}
         </div>
       </div>
       <DataTable

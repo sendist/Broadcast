@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"nodemon index.ts\" \"cd src/client && npm run dev",
     "build-frontend": "cd src/client && npm run build",
-    "build": "tsc && npm run build-frontend && copyfiles -u 1 \"src/client/dist/**/*\" \"dist\"",
+    "build": "prisma generate && tsc && npm run build-frontend && copyfiles -u 1 \"src/client/dist/**/*\" \"dist\"",
     "serve": "cross-env NODE_ENV=production node dist/index.js",
     "build-serve": "prisma generate && npm run build && npm run serve",
     "test": "cross-env NODE_ENV=test jest --testTimeout=5000"
