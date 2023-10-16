@@ -47,5 +47,6 @@ COPY package*.json .
 RUN npm i
 COPY . .
 RUN cd src/client && npm i
+RUN npm run build
 EXPOSE 3000
-CMD ["npm", "run", "build-serve"]
+CMD ["npm", "run", "serve"]

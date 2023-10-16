@@ -62,7 +62,6 @@ router.use("/auth", authRoute);
 
 // all routes below this line will require authentication
 router.use(authentication);
-app.use(authentication);
 
 router.use("/template", templateRoute);
 

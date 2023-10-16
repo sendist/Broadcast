@@ -1,7 +1,7 @@
 import { BASE_URL } from "@/lib/constants";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { useApiFetch } from "./fetch";
-import { isStringJson } from "@/lib/utils";
+import { isDev, isStringJson } from "@/lib/utils";
 
 interface State<T> {
   data?: T[];
@@ -150,9 +150,13 @@ export function useWebSocket<T>(url: string, getTokenURL: string) {
       if (res?.data) {
         stopWebSocket();
         const ws = new WebSocket(
-          `${location.protocol === "https:" ? "wss://" : "ws://"}${
-            location.hostname
-          }:3000${BASE_URL}${url}?token=${res.data.token}`
+          isDev()
+            ? `${location.protocol === "https:" ? "wss://" : "ws://"}${
+                location.hostname
+              }:3000${BASE_URL}${url}?token=${res.data.token}`
+            : `${location.protocol === "https:" ? "wss://" : "ws://"}${
+                location.host
+              }${BASE_URL}${url}?token=${res.data.token}`
         );
         websocket = ws;
         ws.onmessage = (e) => {
