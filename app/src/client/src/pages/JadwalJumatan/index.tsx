@@ -9,7 +9,7 @@ import { AddJadwalJumatanBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import ConfirmDialog from "../../components/custom/confirmDialog";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Broadcast from "./broadcast";
 
 const limit = 20;
@@ -26,11 +26,6 @@ export default function JadwalMasjidPage() {
       },
     }
   );
-
-  useEffect(() => {
-    get();
-    // eslint-disable-next-line
-  }, [page]);
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;

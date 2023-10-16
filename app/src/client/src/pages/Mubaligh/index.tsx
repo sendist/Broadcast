@@ -7,7 +7,7 @@ import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { AddMubalighBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 
@@ -23,11 +23,6 @@ export default function MubalighPage() {
       limit: limit.toString(),
     },
   });
-
-  useEffect(() => {
-    get();
-    // eslint-disable-next-line
-  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Mubaligh>>(null);

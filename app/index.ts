@@ -62,7 +62,6 @@ router.use("/auth", authRoute);
 
 // all routes below this line will require authentication
 router.use(authentication);
-app.use(authentication);
 
 router.use("/template", templateRoute);
 
@@ -83,6 +82,7 @@ router.get("/protected", (req: Request, res: Response) => {
 });
 
 if (process.env.NODE_ENV === "production") {
+  console.log("serving static file for prodution use");
   app.use(express.static(path.join(__dirname, "client", "dist")));
   app.get("/*", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, "client", "dist", "index.html"));

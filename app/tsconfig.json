@@ -13,9 +13,6 @@
     // "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src/**/*.ts",
-    "index.ts",
-  ],
+  "include": ["src/**/*.ts", "index.ts"],
   "exclude": ["node_modules", "src/client/**/*"]
 }

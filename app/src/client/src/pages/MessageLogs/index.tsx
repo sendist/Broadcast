@@ -3,7 +3,7 @@ import { MessageLog, columns } from "./columns";
 import { useCRUD } from "@/hooks/backend";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { TrashIcon } from "@radix-ui/react-icons";
@@ -23,11 +23,6 @@ export default function MessageLogs() {
       limit: limit.toString(),
     },
   });
-
-  useEffect(() => {
-    get();
-    // eslint-disable-next-line
-  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<MessageLog>>(null);

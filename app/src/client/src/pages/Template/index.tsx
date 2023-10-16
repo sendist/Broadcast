@@ -5,7 +5,7 @@ import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useApiFetch } from "@/hooks/fetch";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { BASE_URL } from "@/lib/constants";
@@ -22,11 +22,6 @@ export default function TemplatePage() {
       limit: limit.toString(),
     },
   });
-
-  useEffect(() => {
-    get();
-    // eslint-disable-next-line
-  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Template>>(null);

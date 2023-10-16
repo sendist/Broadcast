@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
 export default function SplashScreen({ children }: Props) {

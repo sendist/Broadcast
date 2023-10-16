@@ -8,7 +8,7 @@ import { AddJadwalPengajianBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { Row, Table as TableType } from "@tanstack/react-table";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import Broadcast from "./broadcast";
 
@@ -25,11 +25,6 @@ export default function JadwalPengajianPage() {
         limit: limit.toString(),
       },
     });
-
-  useEffect(() => {
-    get();
-    // eslint-disable-next-line
-  }, [page]);
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;
