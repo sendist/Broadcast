@@ -26,6 +26,11 @@ client.on("change_state", (state) => {
   data.state = state;
 });
 
+client.on("qr", (qr)=>{
+  console.log("QR", qr);
+  data.qr = qr;
+});
+
 client.initialize().then(() => {
   client.getState().then((state) => {
     console.log("STATE", state);
