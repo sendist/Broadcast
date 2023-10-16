@@ -32,14 +32,14 @@ export function templateReplacerBulanan(
   replacements: [string, string][][]
 ) {
   let result = template;
-  if (/\[\[.*\]\]/.test(template)) {
-    const [_, brackets, insideBrackets] = template.match(/(\[\[([^\]]*)\]\])/)!;
+  if (/\[\[.*\]\]/s.test(template)) {
+    const [_, brackets, insideBrackets] = template.match(/(\[\[([\s\S]*?)\]\])/)!;
     let insideContent = "";
     for (const replacement of replacements) {
       const temp = templateReplacer(insideBrackets, replacement);
       insideContent += temp;
     }
-    result = template.replace(brackets, insideContent);
+    result = template.replaceAll(brackets, insideContent);
   }
   const result2 = templateReplacer(result, replacements[0]);
   return result2;
