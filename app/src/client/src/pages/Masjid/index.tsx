@@ -11,9 +11,10 @@ import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 
+const limit = 20;
+
 export default function MasjidPage() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<Masjid>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Masjid>({
     url: "/masjid",
@@ -25,7 +26,8 @@ export default function MasjidPage() {
 
   useEffect(() => {
     get();
-  }, [page, limit]);
+    // eslint-disable-next-line
+  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Masjid>>(null);
@@ -64,49 +66,50 @@ export default function MasjidPage() {
 
   return (
     <div>
-    <div className="flex flex-row justify-between items-center mb-4">
-      <h1 className="inline-block text-xl font-semibold">Masjid</h1>
-      <div className="space-x-4 space-y-2 -mt-2">
-        <AddMasjidForm onSubmit={create}>
-          <Button variant="outline" className="ml-4 mt-2">
-            <PlusIcon className="mr-2" />
-            Add
-          </Button>
-        </AddMasjidForm>
-        <AddMasjidBulk onSubmit={uploadTemplate}>
-          <Button variant="outline">
-            <PlusIcon className="mr-2" />
-            Bulk Upload
-          </Button>
-        </AddMasjidBulk>
-        {selectedRows?.length ? (
-          <>
-            <ConfirmDialog
-              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Masjid?`}
-              description="Data yang sudah dihapus tidak dapat dikembalikan"
-              cancelText="Batal"
-              confirmText="Hapus"
-              onConfirm={deleteBatch}
-              dangerous
-            >
-              <Button
-                variant="outline"
-                className="text-red-600 hover:text-red-600 hover:bg-red-100"
+      <div className="flex flex-row justify-between items-center mb-4">
+        <h1 className="inline-block text-xl font-semibold">Masjid</h1>
+        <div className="space-x-4 space-y-2 -mt-2">
+          <AddMasjidForm onSubmit={create}>
+            <Button variant="outline" className="ml-4 mt-2">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddMasjidForm>
+          <AddMasjidBulk onSubmit={uploadTemplate}>
+            <Button variant="outline">
+              <PlusIcon className="mr-2" />
+              Bulk Upload
+            </Button>
+          </AddMasjidBulk>
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Masjid?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
               >
-                <TrashIcon className="mr-2" />
-                Delete Selected ({selectedRows?.length})
-              </Button>
-            </ConfirmDialog>
-          </>
-        ) : null}
+                <Button
+                  variant="outline"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+            </>
+          ) : null}
+        </div>
       </div>
-    </div>
       <DataTable
         ref={tableRef}
         columns={columns}
         data={data}
         isLoading={loading}
         page={page}
+        limit={limit}
         meta={{
           previousPage: () => {
             if (page > 1) {

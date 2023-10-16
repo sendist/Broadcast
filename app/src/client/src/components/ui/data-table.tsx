@@ -31,14 +31,16 @@ interface CustomTableMeta<TData> extends TableMeta<TData> {
   nextPage?: () => void;
   updateData?: (id: string, key: string, value: unknown) => void;
   removeData?: (id: string) => void;
+  [key: string]: unknown;
 }
 
-interface DataTableProps<TData, TValue, TMeta> {
+interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[] | undefined;
-  meta?: TMeta;
+  meta?: CustomTableMeta<TData>;
   isLoading?: boolean;
   page: number;
+  limit: number;
   onSelectedRowsChange?: (rows: Row<TData>[]) => void;
 }
 
@@ -49,8 +51,9 @@ function DataTable1<TData, TValue>(
     meta,
     isLoading,
     page,
+    limit,
     onSelectedRowsChange,
-  }: DataTableProps<TData, TValue, CustomTableMeta<TData>>,
+  }: DataTableProps<TData, TValue>,
   ref: ForwardedRef<TableType<TData>>
 ) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -160,7 +163,7 @@ function DataTable1<TData, TValue>(
                 meta.nextPage();
               }
             }}
-            disabled={table.getRowModel().rows?.length < 10}
+            disabled={table.getRowModel().rows?.length < limit}
           >
             Next
           </Button>
@@ -170,8 +173,8 @@ function DataTable1<TData, TValue>(
   );
 }
 
-export const DataTable = forwardRef(DataTable1) as <TData, TValue, TMeta>(
-  props: DataTableProps<TData, TValue, TMeta> & {
+export const DataTable = forwardRef(DataTable1) as <TData, TValue>(
+  props: DataTableProps<TData, TValue> & {
     ref?: ForwardedRef<TableType<TData>>;
   }
 ) => ReturnType<typeof DataTable1>;

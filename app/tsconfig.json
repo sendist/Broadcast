@@ -16,8 +16,6 @@
   "include": [
     "src/**/*.ts",
     "index.ts",
-    "src/client/src/hooks/backend.tsx",
-    "src/client/src/lib/utils.tsx"
   ],
   "exclude": ["node_modules", "src/client/**/*"]
 }

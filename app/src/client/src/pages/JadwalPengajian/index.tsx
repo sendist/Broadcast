@@ -12,9 +12,10 @@ import { useEffect, useRef, useState } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import Broadcast from "./broadcast";
 
+const limit = 20;
+
 export default function JadwalPengajianPage() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<JadwalPengajian>[]>([]);
   const { data, loading, update, remove, create, get } =
     useCRUD<JadwalPengajian>({
@@ -27,7 +28,8 @@ export default function JadwalPengajianPage() {
 
   useEffect(() => {
     get();
-  }, [page, limit]);
+    // eslint-disable-next-line
+  }, [page]);
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;
@@ -124,35 +126,35 @@ export default function JadwalPengajianPage() {
               Bulk Upload
             </Button>
           </AddJadwalPengajianBulk>
-        {selectedRows?.length ? (
-          <>
-            <ConfirmDialog
-              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Jadwal Pengajian?`}
-              description="Data yang sudah dihapus tidak dapat dikembalikan"
-              cancelText="Batal"
-              confirmText="Hapus"
-              onConfirm={deleteBatch}
-              dangerous
-            >
-              <Button
-                variant="outline"
-                className="text-red-600 hover:text-red-600 hover:bg-red-100"
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Jadwal Pengajian?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
               >
-                <TrashIcon className="mr-2" />
-                Delete Selected ({selectedRows?.length})
-              </Button>
-            </ConfirmDialog>
-            <Broadcast
-              template={template || []}
-              idJadwal={selectedRows.map((row) => row.original.id)}
-            >
-              <Button variant="outline">
-                <RocketIcon className="mr-2" />
-                Broadcast Selected ({selectedRows?.length})
-              </Button>
-            </Broadcast>
-          </>
-        ) : null}
+                <Button
+                  variant="outline"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+              <Broadcast
+                template={template || []}
+                idJadwal={selectedRows.map((row) => row.original.id)}
+              >
+                <Button variant="outline">
+                  <RocketIcon className="mr-2" />
+                  Broadcast Selected ({selectedRows?.length})
+                </Button>
+              </Broadcast>
+            </>
+          ) : null}
         </div>
       </div>
       <DataTable
@@ -165,6 +167,7 @@ export default function JadwalPengajianPage() {
         data={data}
         isLoading={loading}
         page={page}
+        limit={limit}
         meta={{
           previousPage: () => {
             if (page > 1) {

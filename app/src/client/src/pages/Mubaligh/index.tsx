@@ -11,9 +11,10 @@ import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 
+const limit = 20;
+
 export default function MubalighPage() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<Mubaligh>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Mubaligh>({
     url: "/mubaligh",
@@ -25,7 +26,8 @@ export default function MubalighPage() {
 
   useEffect(() => {
     get();
-  }, [page, limit]);
+    // eslint-disable-next-line
+  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Mubaligh>>(null);
@@ -79,26 +81,26 @@ export default function MubalighPage() {
               Bulk Upload
             </Button>
           </AddMubalighBulk>
-        {selectedRows?.length ? (
-          <>
-            <ConfirmDialog
-              title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Mubaligh?`}
-              description="Data yang sudah dihapus tidak dapat dikembalikan"
-              cancelText="Batal"
-              confirmText="Hapus"
-              onConfirm={deleteBatch}
-              dangerous
-            >
-              <Button
-                variant="outline"
-                className="text-red-600 hover:text-red-600 hover:bg-red-100"
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Mubaligh?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
               >
-                <TrashIcon className="mr-2" />
-                Delete Selected ({selectedRows?.length})
-              </Button>
-            </ConfirmDialog>
-          </>
-        ) : null}
+                <Button
+                  variant="outline"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+            </>
+          ) : null}
         </div>
       </div>
       <DataTable
@@ -107,6 +109,7 @@ export default function MubalighPage() {
         data={data}
         isLoading={loading}
         page={page}
+        limit={limit}
         meta={{
           previousPage: () => {
             if (page > 1) {

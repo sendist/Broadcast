@@ -9,10 +9,11 @@ import { Row, Table as TableType } from "@tanstack/react-table";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
+const limit = 20;
+
 export default function MessageLogs() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [selectedRows, setSelectedRows] = useState<Row<Masjid>[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Row<MessageLog>[]>([]);
   const { data, loading, remove, get } = useCRUD<MessageLog>({
     url: "/message-logs",
     params: {
@@ -25,7 +26,8 @@ export default function MessageLogs() {
 
   useEffect(() => {
     get();
-  }, [page, limit]);
+    // eslint-disable-next-line
+  }, [page]);
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<MessageLog>>(null);
@@ -82,6 +84,7 @@ export default function MessageLogs() {
         data={data}
         isLoading={loading}
         page={page}
+        limit={limit}
         meta={{
           previousPage: () => {
             if (page > 1) {

@@ -8,7 +8,6 @@ import {
 } from "react-hook-form";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 import InputDropdown from "@/components/custom/inputDropdown";
-
 export function AddTemplateForm({
   types,
   children,
@@ -28,14 +27,10 @@ export function AddTemplateForm({
   }) => void;
 }) {
   const templateFormSchema = z.object({
-    nama_template: z.string().nonempty({
-      message: "Nama Template harus diisi",
-    }),
-    content: z.string().nonempty({
-      message: "Content harus diisi",
-    }),
-    type: z.nativeEnum(
-      types.map((type) => type.value),
+    nama_template: z.string().min(1, "Nama Template harus diisi"),
+    content: z.string().min(1, "Content harus diisi"),
+    type: z.enum(
+      types.map((type) => type.value) as unknown as [string, ...string[]],
       {
         errorMap: () => {
           return { message: "Pilih Tipe Pesan" };
@@ -44,7 +39,9 @@ export function AddTemplateForm({
     ),
   });
 
-  const form = useForm<z.infer<typeof templateFormSchema>>({
+  type Fields = z.infer<typeof templateFormSchema>;
+
+  const form = useForm<Fields>({
     resolver: zodResolver(templateFormSchema),
     defaultValues: {
       nama_template: "",
@@ -53,7 +50,7 @@ export function AddTemplateForm({
     },
   });
 
-  const renderFormInput: RenderFormInput = [
+  const renderFormInput: RenderFormInput<Fields> = [
     {
       name: "nama_template",
       label: "Nama Template",

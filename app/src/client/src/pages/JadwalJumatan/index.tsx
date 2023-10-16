@@ -12,9 +12,10 @@ import ConfirmDialog from "../../components/custom/confirmDialog";
 import { useEffect, useRef, useState } from "react";
 import Broadcast from "./broadcast";
 
+const limit = 20;
+
 export default function JadwalMasjidPage() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Row<JadwalJumatan>[]>([]);
   const { data, loading, update, remove, create, get } = useCRUD<JadwalJumatan>(
     {
@@ -28,7 +29,8 @@ export default function JadwalMasjidPage() {
 
   useEffect(() => {
     get();
-  }, [page, limit]);
+    // eslint-disable-next-line
+  }, [page]);
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;
@@ -136,7 +138,7 @@ export default function JadwalMasjidPage() {
                 dangerous
               >
                 <Button
-                  variant="outline" 
+                  variant="outline"
                   className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />
@@ -166,6 +168,7 @@ export default function JadwalMasjidPage() {
         data={data}
         isLoading={loading}
         page={page}
+        limit={limit}
         meta={{
           previousPage: () => {
             if (page > 1) {

@@ -24,8 +24,8 @@ export type JadwalPengajian = {
   id: string;
   tanggal: Date;
   waktu: string;
-  id_masjid: number;
-  id_mubaligh: number;
+  id_masjid: string;
+  id_mubaligh: string;
 };
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
