@@ -60,6 +60,7 @@ export function AddTemplateForm({
       name: "content",
       label: "Content Pesan",
       placeholder: "Content Pesan",
+      textarea: true,
     },
     {
       name: "type",

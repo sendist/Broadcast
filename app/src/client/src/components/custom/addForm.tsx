@@ -23,11 +23,13 @@ import {
 } from "../ui/form";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 export type RenderFormInput<T extends FieldValues> = {
   name: string;
   label: string;
   placeholder?: string;
+  textarea?: boolean;
   customInput?: (props: { field: ControllerRenderProps<T> }) => JSX.Element;
 }[];
 
@@ -77,7 +79,9 @@ export default function AddForm<T extends FieldValues>({
                   <FormItem className="flex flex-col">
                     <FormLabel>{item.label}</FormLabel>
                     <FormControl>
-                      {item.customInput ? (
+                      {item.textarea ? (
+                        <Textarea placeholder={item.placeholder} {...field} />
+                      ) : item.customInput ? (
                         <item.customInput field={field} />
                       ) : (
                         <Input placeholder={item.placeholder} {...field} />
