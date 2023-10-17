@@ -3,11 +3,12 @@ import { MessageLog, columns } from "./columns";
 import { useCRUD } from "@/hooks/backend";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
+import useFirstRender from "@/hooks/firstRender";
 
 const limit = 20;
 
@@ -26,6 +27,7 @@ export default function MessageLogs() {
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<MessageLog>>(null);
+  const isFirstRender = useFirstRender();
 
   function deleteBatch() {
     apiFetch({
@@ -43,6 +45,12 @@ export default function MessageLogs() {
       });
     });
   }
+
+  useEffect(() => {
+    if (!isFirstRender) {
+      get();
+    }
+  }, [page]);
 
   return (
     <div>

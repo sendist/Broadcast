@@ -206,7 +206,9 @@ function App() {
   const navigate = useNavigate();
   const { width } = useWindowSize();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [selectedMenu, setSelectedMenu] = useState(menus[0].name);
+  const [selectedMenu, setSelectedMenu] = useState(
+    menus.find((menu) => menu.path === location.pathname)?.name ?? menus[0].name
+  );
   const logoutAdmin = (
     <div className="mt-auto flex">
       <Popover>

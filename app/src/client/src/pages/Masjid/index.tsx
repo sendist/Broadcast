@@ -7,9 +7,10 @@ import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { AddMasjidBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
+import useFirstRender from "@/hooks/firstRender";
 
 const limit = 20;
 
@@ -26,6 +27,7 @@ export default function MasjidPage() {
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Masjid>>(null);
+  const isFirstRender = useFirstRender();
 
   function uploadTemplate(file: File) {
     apiFetch({
@@ -58,6 +60,12 @@ export default function MasjidPage() {
       });
     });
   }
+
+  useEffect(() => {
+    if (!isFirstRender) {
+      get();
+    }
+  }, [page]);
 
   return (
     <div>

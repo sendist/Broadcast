@@ -5,10 +5,11 @@ import { AddTemplateForm } from "./add";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useApiFetch } from "@/hooks/fetch";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, Table as TableType } from "@tanstack/react-table";
 import { BASE_URL } from "@/lib/constants";
+import useFirstRender from "@/hooks/firstRender";
 
 const limit = 20;
 
@@ -25,6 +26,7 @@ export default function TemplatePage() {
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<Template>>(null);
+  const isFirstRender = useFirstRender();
 
   const { data: types } = useCRUD<{
     value: string;
@@ -51,6 +53,12 @@ export default function TemplatePage() {
       });
     });
   }
+
+  useEffect(() => {
+    if (!isFirstRender) {
+      get();
+    }
+  }, [page]);
 
   return (
     <div>

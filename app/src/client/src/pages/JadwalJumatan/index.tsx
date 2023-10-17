@@ -9,8 +9,9 @@ import { AddJadwalJumatanBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import ConfirmDialog from "../../components/custom/confirmDialog";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Broadcast from "./broadcast";
+import useFirstRender from "@/hooks/firstRender";
 
 const limit = 20;
 
@@ -68,6 +69,7 @@ export default function JadwalMasjidPage() {
 
   const apiFetch = useApiFetch();
   const tableRef = useRef<TableType<JadwalJumatan>>(null);
+  const isFirstRender = useFirstRender();
 
   function uploadTemplate(file: File) {
     apiFetch({
@@ -100,6 +102,12 @@ export default function JadwalMasjidPage() {
       });
     });
   }
+
+  useEffect(() => {
+    if (!isFirstRender) {
+      get();
+    }
+  }, [page]);
 
   return (
     <div>
