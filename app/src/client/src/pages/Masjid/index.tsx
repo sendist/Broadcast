@@ -9,7 +9,7 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
-import { Row, Table as TableType } from "@tanstack/react-table";
+import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
 import useFirstRender from "@/hooks/firstRender";
 
 const limit = 20;
@@ -17,11 +17,16 @@ const limit = 20;
 export default function MasjidPage() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<Masjid>[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Masjid>({
     url: "/masjid",
     params: {
       page: page.toString(),
       limit: limit.toString(),
+      ...(sorting[0] && {
+        orderBy: sorting[0].id,
+        orderType: sorting[0].desc ? "desc" : "asc",
+      }),
     },
   });
 
@@ -65,7 +70,8 @@ export default function MasjidPage() {
     if (!isFirstRender) {
       get();
     }
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sorting]);
 
   return (
     <div>
@@ -131,6 +137,7 @@ export default function MasjidPage() {
             remove(id);
           },
         }}
+        onSortingChange={setSorting}
         onSelectedRowsChange={setSelectedRows}
       />
     </div>

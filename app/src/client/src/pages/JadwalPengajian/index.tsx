@@ -7,7 +7,7 @@ import { PlusIcon, RocketIcon, TrashIcon } from "@radix-ui/react-icons";
 import { AddJadwalPengajianBulk } from "./bulk";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
-import { Row, Table as TableType } from "@tanstack/react-table";
+import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import Broadcast from "./broadcast";
@@ -19,12 +19,17 @@ const limit = 20;
 export default function JadwalPengajianPage() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<JadwalPengajian>[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const { data, loading, update, remove, create, get } =
     useCRUD<JadwalPengajian>({
       url: "/jadwal-pengajian",
       params: {
         page: page.toString(),
         limit: limit.toString(),
+        ...(sorting[0] && {
+          orderBy: sorting[0].id,
+          orderType: sorting[0].desc ? "desc" : "asc",
+        }),
       },
     });
 
@@ -118,7 +123,8 @@ export default function JadwalPengajianPage() {
     if (!isFirstRender) {
       get();
     }
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sorting]);
 
   return (
     <div>
@@ -207,6 +213,7 @@ export default function JadwalPengajianPage() {
             remove(id);
           },
         }}
+        onSortingChange={setSorting}
         onSelectedRowsChange={setSelectedRows}
       />
     </div>

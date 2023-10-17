@@ -47,7 +47,7 @@ export const columns: ColumnDef<Masjid>[] = [
   },
   {
     accessorKey: "id",
-    header: "ID",
+    header: (header) => CellHeaderSortable(header, "ID"),
     enableSorting: true,
   },
   {

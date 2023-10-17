@@ -7,7 +7,7 @@ import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useApiFetch } from "@/hooks/fetch";
 import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
-import { Row, Table as TableType } from "@tanstack/react-table";
+import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
 import { BASE_URL } from "@/lib/constants";
 import useFirstRender from "@/hooks/firstRender";
 
@@ -16,11 +16,16 @@ const limit = 20;
 export default function TemplatePage() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<Template>[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const { data, loading, update, remove, create, get } = useCRUD<Template>({
     url: "/template",
     params: {
       page: page.toString(),
       limit: limit.toString(),
+      ...(sorting[0] && {
+        orderBy: sorting[0].id,
+        orderType: sorting[0].desc ? "desc" : "asc",
+      }),
     },
   });
 
@@ -58,7 +63,8 @@ export default function TemplatePage() {
     if (!isFirstRender) {
       get();
     }
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sorting]);
 
   return (
     <div>
@@ -118,6 +124,7 @@ export default function TemplatePage() {
             remove(id);
           },
         }}
+        onSortingChange={setSorting}
         onSelectedRowsChange={setSelectedRows}
       />
     </div>

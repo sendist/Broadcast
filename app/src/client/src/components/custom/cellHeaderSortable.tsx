@@ -1,4 +1,4 @@
-import { CaretSortIcon } from "@radix-ui/react-icons";
+import { CaretSortIcon, CaretUpIcon, CaretDownIcon } from "@radix-ui/react-icons";
 import { Button } from "../ui/button";
 import { HeaderContext } from "@tanstack/react-table";
 
@@ -9,10 +9,16 @@ export default function CellHeaderSortable<T>(
   return (
     <Button
       variant="ghost"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      onClick={column.getToggleSortingHandler()}
     >
       {name}
-      <CaretSortIcon className="ml-2 h-4 w-4" />
+      {column.getIsSorted() === "asc" ? (
+        <CaretUpIcon className="ml-2 h-4 w-4" />
+      ) : column.getIsSorted() === "desc" ? (
+        <CaretDownIcon className="ml-2 h-4 w-4" />
+      ) : (
+        <CaretSortIcon className="ml-2 h-4 w-4" />
+      )}
     </Button>
   );
 }
