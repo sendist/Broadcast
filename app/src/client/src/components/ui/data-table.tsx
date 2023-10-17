@@ -8,6 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
   Row,
+  Updater,
 } from "@tanstack/react-table";
 
 import {
@@ -43,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   page: number;
   limit: number;
   onSelectedRowsChange?: (rows: Row<TData>[]) => void;
+  onSortingChange?: (sorting: Updater<SortingState>) => void;
 }
 
 function DataTable1<TData, TValue>(
@@ -54,15 +56,13 @@ function DataTable1<TData, TValue>(
     page,
     limit,
     onSelectedRowsChange,
+    onSortingChange,
   }: DataTableProps<TData, TValue>,
   ref: ForwardedRef<TableType<TData>>
 ) {
-  
   const sortingFromMeta = meta?.sorting;
   const [sorting, setSorting] = useState<SortingState>(
-    sortingFromMeta && Array.isArray(sortingFromMeta)
-      ? sortingFromMeta
-      :  []
+    sortingFromMeta && Array.isArray(sortingFromMeta) ? sortingFromMeta : []
   );
 
   const table = useReactTable({
@@ -71,8 +71,9 @@ function DataTable1<TData, TValue>(
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     meta,
-    onSortingChange: (newSorting) => {
-      setSorting(newSorting);
+    onSortingChange: (updater) => {
+      setSorting(updater);
+      onSortingChange && onSortingChange(updater);
     },
     state: {
       sorting,

@@ -49,6 +49,9 @@ router.get(
         ...(limit && {
           take: Number(limit),
         }),
+        orderBy: {
+          id: "desc",
+        },
         ...(orderBy && {
           orderBy: {
             [orderBy.toString()]: orderType?.toString() || "asc",

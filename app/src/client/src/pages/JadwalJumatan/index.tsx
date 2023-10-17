@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/ui/data-table";
-import { Table as TableType, Row } from "@tanstack/react-table";
+import { Table as TableType, Row, SortingState } from "@tanstack/react-table";
 import { JadwalJumatan, columns } from "./columns";
 import { useCRUD } from "@/hooks/backend";
 import { AddJadwalJumatanForm } from "./add";
@@ -18,12 +18,17 @@ const limit = 20;
 export default function JadwalMasjidPage() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<JadwalJumatan>[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const { data, loading, update, remove, create, get } = useCRUD<JadwalJumatan>(
     {
       url: "/jadwal-jumatan",
       params: {
         page: page.toString(),
         limit: limit.toString(),
+        ...(sorting[0] && {
+          orderBy: sorting[0].id,
+          orderType: sorting[0].desc ? "desc" : "asc",
+        }),
       },
     }
   );
@@ -107,7 +112,8 @@ export default function JadwalMasjidPage() {
     if (!isFirstRender) {
       get();
     }
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sorting]);
 
   return (
     <div>
@@ -190,6 +196,7 @@ export default function JadwalMasjidPage() {
             remove(id);
           },
         }}
+        onSortingChange={setSorting}
         onSelectedRowsChange={setSelectedRows}
       />
     </div>

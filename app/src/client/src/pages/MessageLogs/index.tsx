@@ -5,7 +5,7 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
-import { Row, Table as TableType } from "@tanstack/react-table";
+import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import useFirstRender from "@/hooks/firstRender";
@@ -15,13 +15,16 @@ const limit = 20;
 export default function MessageLogs() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<MessageLog>[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const { data, loading, remove, get } = useCRUD<MessageLog>({
     url: "/message-logs",
     params: {
-      orderBy: "send_time",
-      orderType: "desc",
       page: page.toString(),
       limit: limit.toString(),
+      ...(sorting[0] && {
+        orderBy: sorting[0].id,
+        orderType: sorting[0].desc ? "desc" : "asc",
+      }),
     },
   });
 
@@ -50,7 +53,8 @@ export default function MessageLogs() {
     if (!isFirstRender) {
       get();
     }
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sorting]);
 
   return (
     <div>
@@ -106,6 +110,7 @@ export default function MessageLogs() {
             });
           },
         }}
+        onSortingChange={setSorting}
         onSelectedRowsChange={setSelectedRows}
       />
     </div>

@@ -31,6 +31,9 @@ const getMasjid = (req: Request, res: Response, next: NextFunction) => {
       ...(limit && {
         take: Number(limit),
       }),
+      orderBy: {
+        id: "desc",
+      },
       ...(orderBy && {
         orderBy: {
           [orderBy.toString()]: orderType?.toString() || "asc",
@@ -46,7 +49,7 @@ const getMasjid = (req: Request, res: Response, next: NextFunction) => {
     .catch((err) => {
       next(err);
     });
-}
+};
 router.get(
   "/",
   validate([
@@ -58,7 +61,6 @@ router.get(
   ]),
   getMasjid
 );
-
 
 const postMasjid = (req: Request, res: Response, next: NextFunction) => {
   const { nama_masjid, nama_ketua_dkm, no_hp } = req.body;
@@ -79,7 +81,7 @@ const postMasjid = (req: Request, res: Response, next: NextFunction) => {
     .catch((err) => {
       next(err);
     });
-}
+};
 router.post(
   "/",
   validate([

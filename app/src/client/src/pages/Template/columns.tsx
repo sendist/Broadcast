@@ -56,7 +56,7 @@ export const columns: (
   },
   {
     accessorKey: "id",
-    header: "ID",
+    header: (header) => CellHeaderSortable(header, "ID"),
     enableSorting: true,
   },
   {

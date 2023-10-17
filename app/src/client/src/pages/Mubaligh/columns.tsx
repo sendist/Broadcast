@@ -46,7 +46,7 @@ export const columns: ColumnDef<Mubaligh>[] = [
   },
   {
     accessorKey: "id",
-    header: "ID",
+    header: (header) => CellHeaderSortable(header, "ID"),
     enableSorting: true,
   },
   {
