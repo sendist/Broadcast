@@ -5,6 +5,7 @@ import {
   TableMeta,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   Row,
 } from "@tanstack/react-table";
@@ -56,13 +57,23 @@ function DataTable1<TData, TValue>(
   }: DataTableProps<TData, TValue>,
   ref: ForwardedRef<TableType<TData>>
 ) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  
+  const sortingFromMeta = meta?.sorting;
+  const [sorting, setSorting] = useState<SortingState>(
+    sortingFromMeta && Array.isArray(sortingFromMeta)
+      ? sortingFromMeta
+      :  []
+  );
+
   const table = useReactTable({
     data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     meta,
-    onSortingChange: setSorting,
+    onSortingChange: (newSorting) => {
+      setSorting(newSorting);
+    },
     state: {
       sorting,
     },
