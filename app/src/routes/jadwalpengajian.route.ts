@@ -6,15 +6,11 @@ import validate from "../middlewares/validation.middleware";
 import { body, param, query } from "express-validator";
 import { getExcelContent, getFilledTemplate } from "../utils/xlsx.util";
 import { addToQueue } from "../utils/waweb.util";
-import {
-  formatDate,
-  templateReplacer,
-  templateReplacerBulanan,
-} from "../utils/etc.util";
+import { formatDate, templateReplacerBulanan } from "../utils/etc.util";
 import {
   pengajianMessages,
   transformPhoneMessageToSingle,
-} from "../utils/broadcast";
+} from "../utils/broadcast.util";
 
 const router = express.Router();
 router.get(
@@ -235,12 +231,28 @@ router.get(
 
 router.get(
   "/broadcast-bulanan-preview",
-  validate([query("template").isNumeric().notEmpty()]),
+  validate([
+    query("template").isNumeric().notEmpty(),
+    query("month")
+      .matches(/^(1[0-1]|0?[0-9])$/)
+      .notEmpty(),
+  ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { template } = req.query;
+    const { template, month } = req.query;
+    const year =
+      Number(month) >= new Date().getMonth()
+        ? new Date().getFullYear()
+        : new Date().getFullYear() + 1;
     Promise.all([
       prisma.pengajian.findMany({
+        where: {
+          tanggal: {
+            gt: new Date(new Date().getFullYear(), Number(month), 1),
+            lte: new Date(new Date().getFullYear(), Number(month) + 1, 1),
+          },
+        },
         select: {
+          id: true,
           tanggal: true,
           waktu: true,
           masjid: {
@@ -268,16 +280,15 @@ router.get(
           content: true,
         },
       }),
-    ])
-      .then(([pengajians, template]) => {
-        if (!pengajians.length || !template) {
-          return sendResponse({
-            res,
-            error: "Jadwal pengajian atau template tidak ditemukan",
-          });
-        }
-        let messagesByMasjid: Record<string, [string, string][][]> = {};
-        let messagesByMubaligh: Record<string, [string, string][][]> = {};
+    ]).then(([pengajians, template]) => {
+      if (!pengajians.length || !template) {
+        return sendResponse({
+          res,
+          error: "Jadwal pengajian atau template tidak ditemukan",
+        });
+      }
+      let messageForMasjid: Record<string, [string, string][][]> = {};
+      let messageForMubaligh: Record<string, [string, string][][]> = {};
 
         const previews: string[] = [];
         for (const pengajian of pengajians) {
@@ -288,54 +299,58 @@ router.get(
             ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh.toString()],
           ];
 
-          if (messagesByMasjid[pengajian.masjid.id.toString()]) {
-            messagesByMasjid[pengajian.masjid.id.toString()].push(replacements);
-          } else {
-            messagesByMasjid[pengajian.masjid.id.toString()] = [replacements];
-          }
-
-          if (messagesByMubaligh[pengajian.mubaligh.id.toString()]) {
-            messagesByMubaligh[pengajian.mubaligh.id.toString()].push(
-              replacements
-            );
-          } else {
-            messagesByMubaligh[pengajian.mubaligh.id.toString()] = [
-              replacements,
-            ];
-          }
+        if (messageForMasjid[pengajian.masjid.id.toString()]) {
+          messageForMasjid[pengajian.masjid.id.toString()].push(replacements);
+        } else {
+          messageForMasjid[pengajian.masjid.id.toString()] = [replacements];
         }
 
-        for (const id in messagesByMubaligh) {
-          previews.push(
-            templateReplacerBulanan(template.content, messagesByMubaligh[id])
-          );
-        }
+        messageForMubaligh[pengajian.id.toString()] = [replacements];
+      }
 
-        for (const id in messagesByMasjid) {
-          previews.push(
-            templateReplacerBulanan(template.content, messagesByMasjid[id])
-          );
-        }
-        sendResponse({
-          res,
-          data: previews,
-        });
-      })
-      .catch((err) => {
-        next(err);
+      for (const id in messageForMubaligh) {
+        previews.push(
+          templateReplacerBulanan(template.content, messageForMubaligh[id])
+        );
+      }
+
+      for (const id in messageForMasjid) {
+        previews.push(
+          templateReplacerBulanan(template.content, messageForMasjid[id])
+        );
+      }
+      sendResponse({
+        res,
+        data: previews,
       });
+    });
   }
 );
 
 router.get(
   "/broadcast-bulanan",
-  validate([query("template").isNumeric().notEmpty()]),
+  validate([
+    query("template").isNumeric().notEmpty(),
+    query("month")
+      .matches(/^(1[0-1]|0?[0-9])$/)
+      .notEmpty(),
+  ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { template } = req.query;
-
+    const { template, month } = req.query;
+    const year =
+      Number(month) >= new Date().getMonth()
+        ? new Date().getFullYear()
+        : new Date().getFullYear() + 1;
     Promise.all([
       prisma.pengajian.findMany({
+        where: {
+          tanggal: {
+            gt: new Date(new Date().getFullYear(), Number(month), 1),
+            lte: new Date(new Date().getFullYear(), Number(month) + 1, 1),
+          },
+        },
         select: {
+          id: true,
           tanggal: true,
           waktu: true,
           masjid: {
@@ -377,8 +392,8 @@ router.get(
           messages: [string, string][][];
         }
 
-        let messagesByMasjid: Record<string, Info> = {};
-        let messagesByMubaligh: Record<string, Info> = {};
+        let messageForMasjid: Record<string, Info> = {};
+        let messageForMubaligh: Record<string, Info> = {};
 
         for (const pengajian of pengajians) {
           const replacements: [string, string][] = [
@@ -398,50 +413,44 @@ router.get(
             messages: [replacements],
           };
 
-          if (messagesByMasjid[pengajian.masjid.id.toString()]) {
-            messagesByMasjid[pengajian.masjid.id.toString()].messages.push(
+          if (messageForMasjid[pengajian.masjid.id.toString()]) {
+            messageForMasjid[pengajian.masjid.id.toString()].messages.push(
               replacements
             );
           } else {
-            messagesByMasjid[pengajian.masjid.id.toString()] = {
+            messageForMasjid[pengajian.masjid.id.toString()] = {
               no_hp: pengajian.masjid.no_hp,
               messages: [replacements],
             };
           }
 
-          if (messagesByMubaligh[pengajian.mubaligh.id.toString()]) {
-            messagesByMubaligh[pengajian.mubaligh.id.toString()].messages.push(
-              replacements
-            );
-          } else {
-            messagesByMubaligh[pengajian.mubaligh.id.toString()] = {
-              no_hp: pengajian.mubaligh.no_hp,
-              messages: [replacements],
-            };
-          }
+          messageForMubaligh[pengajian.id.toString()] = {
+            no_hp: pengajian.mubaligh.no_hp,
+            messages: [replacements],
+          };
         }
 
-        for (const id in messagesByMubaligh) {
+        for (const id in messageForMubaligh) {
           const message = templateReplacerBulanan(
             template.content,
-            messagesByMubaligh[id].messages
+            messageForMubaligh[id].messages
           );
           addToQueue([
             {
-              phone: messagesByMubaligh[id].no_hp,
+              phone: messageForMubaligh[id].no_hp,
               message: message,
             },
           ]);
         }
 
-        for (const id in messagesByMasjid) {
+        for (const id in messageForMasjid) {
           const message = templateReplacerBulanan(
             template.content,
-            messagesByMasjid[id].messages
+            messageForMasjid[id].messages
           );
           addToQueue([
             {
-              phone: messagesByMasjid[id].no_hp,
+              phone: messageForMasjid[id].no_hp,
               message: message,
             },
           ]);
