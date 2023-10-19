@@ -18,6 +18,13 @@ type Props = {
     label: string;
     value: string;
   }[];
+  selectMonth?: {
+    label: string;
+    value: string;
+  }[];
+  isBulanan?: boolean;
+  month?: string;
+  setMonth?: (month: string) => void;
   idTemplate: string;
   setIdTemplate: (id: string) => void;
   previewTexts: string[];
@@ -27,6 +34,10 @@ type Props = {
 export function BroadcastPopover({
   children,
   select,
+  selectMonth,
+  month,
+  setMonth,
+  isBulanan,
   idTemplate,
   setIdTemplate,
   previewTexts,
@@ -40,12 +51,22 @@ export function BroadcastPopover({
           <DialogTitle>Broadcast</DialogTitle>
           <DialogDescription>Kirimkan pesan secara langsung</DialogDescription>
         </DialogHeader>
-        <InputDropdown
-          select={select}
-          value={idTemplate}
-          onChange={setIdTemplate}
-          placeholder="Pilih Template..."
-        />
+        <div className="flex justify-between">
+          <InputDropdown
+            select={select}
+            value={idTemplate}
+            onChange={setIdTemplate}
+            placeholder="Pilih Template..."
+          />
+          {isBulanan && (
+            <InputDropdown
+              select={selectMonth}
+              value={month}
+              onChange={setMonth}
+              placeholder="Pilih Template..."
+            />
+          )}
+        </div>
         <div className="min-h-[200px] max-h-[400px]">
           <ScrollArea className="p-2 max-h-[400px]">
             {previewTexts.length
