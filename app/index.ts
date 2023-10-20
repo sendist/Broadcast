@@ -17,6 +17,7 @@ import messageLogsRoute from "./src/routes/messagelogs.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
 import prismaErrorHandler from "./src/middlewares/prismaErrorHandler.middleware";
+import { initCron } from "./src/utils/cron.util";
 dotenv.config();
 
 const app = express();
@@ -42,6 +43,9 @@ if (process.env.NODE_ENV !== "production") {
     next();
   });
 }
+
+// initialize cron jobs
+initCron();
 
 //serve static assets if in production
 

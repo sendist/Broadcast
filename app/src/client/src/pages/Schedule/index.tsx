@@ -41,6 +41,9 @@ type Schedule = {
 };
 
 export default function SchedulePage() {
+  const [noTemplateSelected, setNoTemplateSelected] = useState<
+    (keyof Schedule)[]
+  >([]);
   const { data, update } = useCRUD<Schedule>({
     url: "/schedule",
   }) as unknown as Omit<ReturnType<typeof useCRUD<Schedule>>, "data"> & {
@@ -155,7 +158,13 @@ export default function SchedulePage() {
   }
 
   function save(id: keyof Schedule) {
-    console.log(schedule[id]);
+    //check if template is selected for the first time using schedule
+    if (!schedule[id].id_template) {
+      setNoTemplateSelected((prev) => [...prev, id]);
+      return;
+    }
+    setNoTemplateSelected((prev) => prev.filter((item) => item !== id));
+
     setUnsavedChanges((prev) => ({
       ...prev,
       [id]: {
@@ -318,6 +327,11 @@ export default function SchedulePage() {
                     )}
                   </Button>
                 </div>
+                {noTemplateSelected.includes("pengajian_bulanan") && (
+                  <p className="text-red-600">
+                    Mohon pilih template sebelum menyimpan
+                  </p>
+                )}
               </>
             )}
           </CardContent>
@@ -432,6 +446,11 @@ export default function SchedulePage() {
                     )}
                   </Button>
                 </div>
+                {noTemplateSelected.includes("pengajian_reminder") && (
+                  <p className="text-red-600">
+                    Mohon pilih template sebelum menyimpan
+                  </p>
+                )}
               </>
             )}
           </CardContent>
@@ -546,6 +565,11 @@ export default function SchedulePage() {
                     )}
                   </Button>
                 </div>
+                {noTemplateSelected.includes("jumatan_reminder") && (
+                  <p className="text-red-600">
+                    Mohon pilih template sebelum menyimpan
+                  </p>
+                )}
               </>
             )}
           </CardContent>

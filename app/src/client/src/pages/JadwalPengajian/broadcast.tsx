@@ -1,4 +1,7 @@
-import { BroadcastPopover } from "@/components/custom/broadcastPopover";
+import {
+  BroadcastPopover,
+  PreviewTextType,
+} from "@/components/custom/broadcastPopover";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { useState } from "react";
@@ -15,11 +18,11 @@ type Props = {
 
 export default function Broadcast({ idJadwal, children, template }: Props) {
   const [idTemplate, setIdTemplate] = useState<string>("");
-  const [templatePreview, setTemplatePreview] = useState<string[]>([]);
+  const [templatePreview, setTemplatePreview] = useState<PreviewTextType[]>([]);
   const apiFetch = useApiFetch();
   function changeIdTemplate(id: string) {
     setIdTemplate(id);
-    apiFetch<string[]>({
+    apiFetch<PreviewTextType[]>({
       url: `${BASE_URL}/jadwal-pengajian/broadcast-preview?${new URLSearchParams(
         {
           id: idJadwal.join(","),

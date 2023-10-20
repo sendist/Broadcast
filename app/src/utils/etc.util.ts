@@ -33,7 +33,8 @@ export function templateReplacerBulanan(
 ) {
   let result = template;
   if (/\[\[.*\]\]/s.test(template)) {
-    const [_, brackets, insideBrackets] = template.match(/(\[\[([\s\S]*?)\]\])/)!;
+    const [_, brackets, insideBrackets] =
+      template.match(/(\[\[([\s\S]*?)\]\])/)!;
     let insideContent = "";
     for (const replacement of replacements) {
       const temp = templateReplacer(insideBrackets, replacement);
@@ -54,3 +55,36 @@ export function templateReplacer(
   }
   return template;
 }
+
+export function resetDateTimeToMidnight(date: Date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+}
+
+export const UTCToLocalTime = (date: Date) => {
+  const dateCopy = new Date(date);
+  return new Date(
+    dateCopy.setHours(dateCopy.getHours() + dateCopy.getTimezoneOffset() / 60)
+  );
+};
+
+export const calculateNextJadwalBulanan = (
+  h: number,
+  hour: string,
+  minute: string
+) => {
+  let currentMonth = new Date().getMonth();
+  let nextSchedule = new Date();
+
+  do {
+    nextSchedule = new Date(new Date().setMonth(currentMonth));
+    nextSchedule.setDate(1 - h);
+    nextSchedule.setHours(parseInt(hour));
+    nextSchedule.setMinutes(parseInt(minute));
+    nextSchedule.setSeconds(0);
+    nextSchedule.setMilliseconds(0);
+
+    currentMonth++;
+  } while (nextSchedule < new Date());
+
+  return nextSchedule;
+};
