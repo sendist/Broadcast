@@ -239,16 +239,13 @@ router.get(
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { template, month } = req.query;
-    const year =
-      Number(month) >= new Date().getMonth()
-        ? new Date().getFullYear()
-        : new Date().getFullYear() + 1;
+    const year = Number(month) >= new Date().getMonth() ? new Date().getFullYear() : new Date().getFullYear() + 1;
     Promise.all([
       prisma.pengajian.findMany({
         where: {
           tanggal: {
-            gt: new Date(new Date().getFullYear(), Number(month), 1),
-            lte: new Date(new Date().getFullYear(), Number(month) + 1, 1),
+            gt: new Date(year, Number(month), 1),
+            lte: new Date(year, Number(month) + 1, 1),
           },
         },
         select: {
@@ -337,16 +334,13 @@ router.get(
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { template, month } = req.query;
-    const year =
-      Number(month) >= new Date().getMonth()
-        ? new Date().getFullYear()
-        : new Date().getFullYear() + 1;
+    const year = Number(month) >= new Date().getMonth() ? new Date().getFullYear() : new Date().getFullYear() + 1;
     Promise.all([
       prisma.pengajian.findMany({
         where: {
           tanggal: {
-            gt: new Date(new Date().getFullYear(), Number(month), 1),
-            lte: new Date(new Date().getFullYear(), Number(month) + 1, 1),
+            gt: new Date(year, Number(month), 1),
+            lte: new Date(year, Number(month) + 1, 1),
           },
         },
         select: {
