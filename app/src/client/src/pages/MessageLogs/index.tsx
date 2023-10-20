@@ -59,9 +59,7 @@ export default function MessageLogs() {
   return (
     <div>
       <div className="flex flex-row justify-between items-center mb-4">
-        <h1 className="inline-block text-xl font-semibold mt-2">
-          Message Logs
-        </h1>
+        <h1 className="inline-block text-xl font-semibold">Message Logs</h1>
         <div className="space-x-4">
           {selectedRows?.length ? (
             <>

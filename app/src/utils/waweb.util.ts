@@ -26,7 +26,7 @@ client.on("change_state", (state) => {
   data.state = state;
 });
 
-client.on("qr", (qr)=>{
+client.on("qr", (qr) => {
   console.log("QR", qr);
   data.qr = qr;
 });
@@ -163,6 +163,8 @@ export function addToQueue(
     | { phone: string; message: string }[]
 ) {
   if (Array.isArray(data)) {
+    if (data.length === 0) return;
+
     queue.push(...data);
   } else {
     const { phone, message } = data;

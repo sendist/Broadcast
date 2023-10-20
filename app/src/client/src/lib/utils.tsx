@@ -1,7 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export const isDev = () => !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+export const isDev = () =>
+  !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -144,4 +145,18 @@ export function formatDateTime(date: Date | string) {
     timeStyle: "short",
     hour12: true,
   }).format(date);
+}
+
+export function compareObjectShallow<T extends { [key: string]: unknown }>(
+  obj1: T,
+  obj2: T
+): boolean {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  return keys1.every((key) => obj1[key] === obj2[key]);
 }

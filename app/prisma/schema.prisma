@@ -38,10 +38,11 @@ model pengajian {
 }
 
 model template {
-  id            BigInt     @id @default(autoincrement())
-  nama_template String     @unique
-  content       String
-  type          template_t
+  id                 BigInt               @id @default(autoincrement())
+  nama_template      String               @unique
+  content            String
+  type               template_t
+  broadcast_schedule broadcast_schedule[]
 }
 
 model user {
@@ -76,6 +77,16 @@ model jumatan {
   broadcasted Boolean  @default(false)
   masjid      masjid   @relation(fields: [id_masjid], references: [id], onDelete: Cascade, onUpdate: NoAction)
   mubaligh    mubaligh @relation(fields: [id_mubaligh], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model broadcast_schedule {
+  id              template_t @id
+  active          Boolean    @default(false)
+  force_broadcast Boolean    @default(false)
+  h               Int        @default(0)
+  jam             DateTime   @default(dbgenerated("'00:00:00+07'::time with time zone")) @db.Timetz(6)
+  id_template     BigInt?
+  template        template?  @relation(fields: [id_template], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum template_t {

@@ -3,19 +3,13 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, checkExact, checkSchema, param, query } from "express-validator";
-import {
-  getFilledTemplate,
-  getExcelContent,
-  renameObjectKey,
-} from "../utils/xlsx.util";
-import path from "path";
+import { body, param, query } from "express-validator";
+import { getFilledTemplate, getExcelContent } from "../utils/xlsx.util";
 import { addToQueue } from "../utils/waweb.util";
 import {
-  formatDate,
-  formatDateTime,
-  templateReplacer,
-} from "../utils/etc.util";
+  jumatanMessages,
+  transformPhoneMessageToSingle,
+} from "../utils/broadcast";
 
 const router = express.Router();
 router.get(
@@ -169,59 +163,19 @@ router.get(
     const { id, template } = req.query;
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
-    Promise.all([
-      prisma.jumatan.findMany({
-        where: {
-          id: {
-            in: idArr,
-          },
-        },
-        select: {
-          tanggal: true,
-          masjid: {
-            select: {
-              no_hp: true,
-              nama_ketua_dkm: true,
-              nama_masjid: true,
-            },
-          },
-          mubaligh: {
-            select: {
-              no_hp: true,
-              nama_mubaligh: true,
-            },
-          },
-        },
-      }),
-      prisma.template.findUnique({
-        where: {
-          id: BigInt(template as string),
-        },
-        select: {
-          content: true,
-        },
-      }),
-    ]).then(([jumatans, template]) => {
-      if (!jumatans.length || !template) {
-        return sendResponse({
+    return jumatanMessages({
+      templateId: BigInt(template as string),
+      jumatanId: idArr,
+    })
+      .then((messages) => {
+        sendResponse({
           res,
-          error: "Jadwal jumatan atau template tidak ditemukan",
+          data: messages.map((message) => message.message),
         });
-      }
-      const previews: string[] = [];
-      for (const jumatan of jumatans) {
-        const message = templateReplacer(template.content, [
-          ["tanggal", formatDate(jumatan.tanggal)],
-          ["nama_masjid", jumatan.masjid.nama_masjid],
-          ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
-        ]);
-        previews.push(message);
-      }
-      sendResponse({
-        res,
-        data: previews,
+      })
+      .catch((err) => {
+        next(err);
       });
-    });
   }
 );
 
@@ -237,63 +191,14 @@ router.get(
     const { id, template } = req.query;
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
-    Promise.all([
-      prisma.jumatan.findMany({
-        where: {
-          id: {
-            in: idArr,
-          },
-        },
-        select: {
-          tanggal: true,
-          masjid: {
-            select: {
-              no_hp: true,
-              nama_ketua_dkm: true,
-              nama_masjid: true,
-            },
-          },
-          mubaligh: {
-            select: {
-              no_hp: true,
-              nama_mubaligh: true,
-            },
-          },
-        },
-      }),
-      prisma.template.findUnique({
-        where: {
-          id: BigInt(template as string),
-        },
-        select: {
-          content: true,
-        },
-      }),
-    ])
-      .then(([jumatans, template]) => {
-        if (!jumatans.length || !template) {
-          return sendResponse({
-            res,
-            error: "Jadwal jumatan atau template tidak ditemukan",
-          });
-        }
-        for (const jumatan of jumatans) {
-          const message = templateReplacer(template.content, [
-            ["tanggal", formatDate(jumatan.tanggal)],
-            ["nama_masjid", jumatan.masjid.nama_masjid],
-            ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
-          ]);
-          addToQueue([
-            {
-              phone: jumatan.masjid.no_hp,
-              message: message,
-            },
-            {
-              phone: jumatan.mubaligh.no_hp,
-              message: message,
-            },
-          ]);
-        }
+    return jumatanMessages({
+      templateId: BigInt(template as string),
+      jumatanId: idArr,
+    })
+      .then((messages) => {
+        addToQueue(transformPhoneMessageToSingle(messages));
+      })
+      .then(() => {
         prisma.jumatan
           .updateMany({
             where: {

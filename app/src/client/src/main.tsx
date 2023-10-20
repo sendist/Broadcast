@@ -15,6 +15,7 @@ import JadwalPengajian from "./pages/JadwalPengajian/index.tsx";
 import JadwalJumatan from "./pages/JadwalJumatan/index.tsx";
 import SplashScreen from "./pages/SplashScreen/index.tsx";
 import MessageLogs from "./pages/MessageLogs/index.tsx";
+import SchedulePage from "./pages/Schedule/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: "jadwal-jumatan",
         element: <JadwalJumatan />,
+      },
+      {
+        path: "schedule",
+        element: <SchedulePage />,
       },
       {
         path: "message-logs",

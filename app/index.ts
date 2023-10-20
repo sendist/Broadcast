@@ -12,6 +12,7 @@ import masjidRoute from "./src/routes/masjid.route";
 import jadwalPengajianRoute from "./src/routes/jadwalpengajian.route";
 import jadwalJumatanRoute from "./src/routes/jadwaljumatan.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
+import scheduleRoute from "./src/routes/schedule.route";
 import messageLogsRoute from "./src/routes/messagelogs.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
@@ -74,6 +75,8 @@ router.use("/mubaligh", mubalighRoute);
 router.use("/jadwal-pengajian", jadwalPengajianRoute);
 
 router.use("/jadwal-jumatan", jadwalJumatanRoute);
+
+router.use("/schedule", scheduleRoute);
 
 router.use("/message-logs", messageLogsRoute);
 

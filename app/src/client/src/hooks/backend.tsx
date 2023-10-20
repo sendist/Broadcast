@@ -67,7 +67,9 @@ export function useCRUD<T>({ initialGet = true, url, params }: useCRUDType) {
       shouldDispatch &&
         dispatch({ type: "fetched", payload: result.data as T[] });
     }
-    return result;
+    return result as
+      | { data: T | T[]; error: null }
+      | { error: string; data: null };
   };
 
   const get = () =>
