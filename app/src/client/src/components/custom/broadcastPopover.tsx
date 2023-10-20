@@ -12,32 +12,32 @@ import { Button } from "../ui/button";
 import { whatsappFormatting } from "@/lib/utils";
 import { ScrollArea } from "../ui/scroll-area";
 
+export type PreviewTextType = { message: string; recipients: string[] };
+
 type Props = {
   children: React.ReactNode;
   select: {
     label: string;
     value: string;
   }[];
-  selectMonth?: {
-    label: string;
-    value: string;
-  }[];
-  isBulanan?: boolean;
-  month?: string;
-  setMonth?: (month: string) => void;
+  bulanan?: {
+    selectMonth: {
+      label: string;
+      value: string;
+    }[];
+    month: string;
+    setMonth: (month: string) => void;
+  };
   idTemplate: string;
   setIdTemplate: (id: string) => void;
-  previewTexts: string[];
+  previewTexts: PreviewTextType[];
   onSend: () => void;
 };
 
 export function BroadcastPopover({
   children,
   select,
-  selectMonth,
-  month,
-  setMonth,
-  isBulanan,
+  bulanan,
   idTemplate,
   setIdTemplate,
   previewTexts,
@@ -58,41 +58,49 @@ export function BroadcastPopover({
             onChange={setIdTemplate}
             placeholder="Pilih Template..."
           />
-          {isBulanan && (
+          {bulanan && (
             <InputDropdown
-              select={selectMonth}
-              value={month}
-              onChange={setMonth}
-              placeholder="Pilih Template..."
+              select={bulanan.selectMonth}
+              value={bulanan.month}
+              onChange={bulanan.setMonth}
+              placeholder="Pilih Bulan..."
             />
           )}
         </div>
         <div className="min-h-[200px] max-h-[400px]">
           <ScrollArea className="p-2 max-h-[400px]">
             {previewTexts.length
-              ? previewTexts.map((previewText) => (
-                  <div className="flex justify-end">
-                    <div className="single-message rounded-tl-lg rounded-bl-lg text-[#111b21] rounded-br-lg user mb-4 px-4 py-2 bg-[#d9fdd3] text-sm">
-                      {whatsappFormatting(previewText)}
+              ? previewTexts.map((previewText, i) => (
+                  <div
+                    className="flex items-end flex-col gap-1"
+                    key={previewText.message + i}
+                  >
+                    <p className="text-sm">
+                      {previewText.recipients.join(", ")}
+                    </p>
+                    <div className="flex justify-end">
+                      <div className="single-message rounded-tl-lg rounded-bl-lg text-[#111b21] rounded-br-lg user mb-4 px-4 py-2 bg-[#d9fdd3] text-sm">
+                        {whatsappFormatting(previewText.message)}
+                      </div>
+                      <span>
+                        <svg
+                          className="user-svg"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 8 13"
+                          width="8"
+                          height="13"
+                        >
+                          <path
+                            opacity=".13"
+                            d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"
+                          ></path>
+                          <path
+                            fill="#d9fdd3"
+                            d="M5.188 0H0v11.193l6.467-8.625C7.526 1.156 6.958 0 5.188 0z"
+                          ></path>
+                        </svg>
+                      </span>
                     </div>
-                    <span>
-                      <svg
-                        className="user-svg"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 8 13"
-                        width="8"
-                        height="13"
-                      >
-                        <path
-                          opacity=".13"
-                          d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"
-                        ></path>
-                        <path
-                          fill="#d9fdd3"
-                          d="M5.188 0H0v11.193l6.467-8.625C7.526 1.156 6.958 0 5.188 0z"
-                        ></path>
-                      </svg>
-                    </span>
                   </div>
                 ))
               : null}

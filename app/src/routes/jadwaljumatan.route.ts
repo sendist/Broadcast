@@ -9,7 +9,7 @@ import { addToQueue } from "../utils/waweb.util";
 import {
   jumatanMessages,
   transformPhoneMessageToSingle,
-} from "../utils/broadcast";
+} from "../utils/broadcast.util";
 
 const router = express.Router();
 router.get(
@@ -170,7 +170,10 @@ router.get(
       .then((messages) => {
         sendResponse({
           res,
-          data: messages.map((message) => message.message),
+          data: messages.map((message) => ({
+            message: message.message,
+            recipients: message.recipients,
+          })),
         });
       })
       .catch((err) => {
@@ -194,31 +197,10 @@ router.get(
     return jumatanMessages({
       templateId: BigInt(template as string),
       jumatanId: idArr,
+      changeStatusToBroadcasted: true,
     })
       .then((messages) => {
         addToQueue(transformPhoneMessageToSingle(messages));
-      })
-      .then(() => {
-        prisma.jumatan
-          .updateMany({
-            where: {
-              id: {
-                in: idArr,
-              },
-            },
-            data: {
-              broadcasted: true,
-            },
-          })
-          .then(() => {
-            sendResponse({
-              res,
-              data: "Success",
-            });
-          })
-          .catch((err) => {
-            next(err);
-          });
       })
       .catch((err) => {
         next(err);

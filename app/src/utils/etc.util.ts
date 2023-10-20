@@ -60,6 +60,13 @@ export function resetDateTimeToMidnight(date: Date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
 }
 
+export const UTCToLocalTime = (date: Date) => {
+  const dateCopy = new Date(date);
+  return new Date(
+    dateCopy.setHours(dateCopy.getHours() + dateCopy.getTimezoneOffset() / 60)
+  );
+};
+
 export const calculateNextJadwalBulanan = (
   h: number,
   hour: string,

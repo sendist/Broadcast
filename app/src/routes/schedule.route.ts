@@ -5,6 +5,8 @@ import sendResponse from "../utils/response.util";
 import { $Enums } from "@prisma/client";
 import validate from "../middlewares/validation.middleware";
 import { body, param } from "express-validator";
+import { startSchedule } from "../utils/cron.util";
+import { UTCToLocalTime } from "../utils/etc.util";
 
 const router = express.Router();
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
@@ -82,6 +84,14 @@ router.patch(
         },
       })
       .then((schedule) => {
+        startSchedule({
+          type: id as $Enums.template_t,
+          active: schedule.active,
+          force_broadcast: schedule.force_broadcast,
+          h: schedule.h,
+          jam: UTCToLocalTime(schedule.jam),
+          id_template: schedule.id_template!,
+        });
         sendResponse({
           res,
           data: {

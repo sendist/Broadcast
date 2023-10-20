@@ -1,4 +1,7 @@
-import { BroadcastPopover } from "@/components/custom/broadcastPopover";
+import {
+  BroadcastPopover,
+  PreviewTextType,
+} from "@/components/custom/broadcastPopover";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { useState } from "react";
@@ -14,7 +17,7 @@ type Props = {
 
 export default function BroadcastBulanan({ children, template }: Props) {
   const [idTemplate, setIdTemplate] = useState<string>("");
-  const [templatePreview, setTemplatePreview] = useState<string[]>([]);
+  const [templatePreview, setTemplatePreview] = useState<PreviewTextType[]>([]);
   const [month, setMonth] = useState<string>(new Date().getMonth().toString());
   const apiFetch = useApiFetch();
   const months = [
@@ -34,7 +37,7 @@ export default function BroadcastBulanan({ children, template }: Props) {
 
   function changeMonth(month: string) {
     setMonth(month);
-    apiFetch<string[]>({
+    apiFetch<PreviewTextType[]>({
       url: `${BASE_URL}/jadwal-pengajian/broadcast-bulanan-preview?${new URLSearchParams(
         {
           template: idTemplate,
@@ -48,7 +51,7 @@ export default function BroadcastBulanan({ children, template }: Props) {
 
   function changeIdTemplate(id: string) {
     setIdTemplate(id);
-    apiFetch<string[]>({
+    apiFetch<PreviewTextType[]>({
       url: `${BASE_URL}/jadwal-pengajian/broadcast-bulanan-preview?${new URLSearchParams(
         {
           template: id,
@@ -65,13 +68,14 @@ export default function BroadcastBulanan({ children, template }: Props) {
         label: item.nama_template,
         value: item.id,
       }))}
-      selectMonth={months.map((item) => ({
-        label: item.name,
-        value: item.id.toString(),
-      }))}
-      month={month}
-      setMonth={changeMonth}
-      isBulanan={true}
+      bulanan={{
+        selectMonth: months.map((item) => ({
+          label: item.name,
+          value: item.id.toString(),
+        })),
+        month: month,
+        setMonth: changeMonth,
+      }}
       idTemplate={idTemplate}
       setIdTemplate={changeIdTemplate}
       previewTexts={templatePreview}
