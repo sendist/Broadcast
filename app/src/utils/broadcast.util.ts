@@ -95,7 +95,10 @@ export const pengajianMessages = ({
           },
         })
         .then(() => {
-          console.log("changed to broadcasted");
+          console.log(
+            "changed to broadcasted",
+            pengajians.map((pengajian) => pengajian.id)
+          );
         })
         .catch((err) => {
           console.log(err);
@@ -335,7 +338,10 @@ export const jumatanMessages = ({
           },
         })
         .then(() => {
-          console.log("changed to broadcasted");
+          console.log(
+            "changed to broadcasted",
+            jumatans.map((jumatan) => jumatan.id)
+          );
         })
         .catch((err) => {
           console.log(err);

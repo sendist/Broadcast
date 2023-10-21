@@ -141,9 +141,13 @@ const sendReminder = (type: $Enums.template_t) => {
         templateId: id_template,
         month: month,
         year: new Date(new Date().setMonth(month)).getFullYear(),
-      }).then((messages) => {
-        addToQueue(transformPhoneMessageToSingle(messages));
-      });
+      })
+        .then((messages) => {
+          addToQueue(transformPhoneMessageToSingle(messages));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       break;
 
     case "pengajian_reminder":
@@ -156,22 +160,6 @@ const sendReminder = (type: $Enums.template_t) => {
         .then((messages) => {
           if (messages.length > 0) {
             addToQueue(transformPhoneMessageToSingle(messages));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      prisma.pengajian
-        .findMany({
-          where: {
-            tanggal: {
-              equals: new Date(new Date().setDate(new Date().getDate() + h)),
-            },
-            ...(!force_broadcast && { broadcasted: false }),
-          },
-        })
-        .then((pengajians) => {
-          if (pengajians.length > 0) {
           }
         })
         .catch((err) => {
@@ -190,28 +178,6 @@ const sendReminder = (type: $Enums.template_t) => {
           if (messages.length > 0) {
             addToQueue(transformPhoneMessageToSingle(messages));
           }
-        })
-        .then(() => {
-          prisma.jumatan
-            .updateMany({
-              where: {
-                tanggal: {
-                  equals: new Date(
-                    new Date().setDate(new Date().getDate() + h)
-                  ),
-                },
-                ...(!force_broadcast && { broadcasted: false }),
-              },
-              data: {
-                broadcasted: true,
-              },
-            })
-            .then(() => {
-              console.log("broadcasted");
-            })
-            .catch((err) => {
-              console.log(err);
-            });
         })
         .catch((err) => {
           console.log(err);

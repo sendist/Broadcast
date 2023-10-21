@@ -40,7 +40,6 @@ export default function WaClient() {
     if (lastJsonMessage !== null) {
       setWaClientInfo(lastJsonMessage);
     }
-    console.log(lastJsonMessage);
   }, [lastJsonMessage]);
 
   const httpCall = useApiFetch();

@@ -27,7 +27,6 @@ client.on("change_state", (state) => {
 });
 
 client.on("qr", (qr) => {
-  console.log("QR", qr);
   data.qr = qr;
 });
 
@@ -49,7 +48,6 @@ export function sendMessage(phone: string, message: string): void {
         ? client
             .isRegisteredUser(convertedPhone)
             .then((isRegistered) => {
-              console.log("IS REGISTERED", isRegistered);
               isRegistered
                 ? client
                     .sendMessage(convertedPhone, message)

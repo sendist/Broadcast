@@ -47,8 +47,6 @@ if (process.env.NODE_ENV !== "production") {
 // initialize cron jobs
 initCron();
 
-//serve static assets if in production
-
 // prefix all other routes with /api
 const router = express.Router();
 app.use("/api", router);
@@ -88,6 +86,7 @@ router.get("/protected", (req: Request, res: Response) => {
   res.send("You are authenticated");
 });
 
+//serve static assets if in production
 if (process.env.NODE_ENV === "production") {
   console.log("serving static file for prodution use");
   app.use(express.static(path.join(__dirname, "client", "dist")));
