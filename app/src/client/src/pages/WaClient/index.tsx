@@ -6,6 +6,7 @@ import { useWebSocket } from "@/hooks/backend";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 export default function WaClient() {
   const [waClientInfo, setWaClientInfo] = useState<{
@@ -55,7 +56,7 @@ export default function WaClient() {
           Hubungkan WhatsApp Client untuk melakukan broadcast
         </p>
       </div>
-      <div className="border-2 xl:mx-24 lg:mx-8 m-4 lg:mt-24 py-6 sm:py-12 px-2 sm:px-8 rounded-md">
+      <Card className="xl:mx-24 lg:mx-8 m-4 lg:mt-24 py-6 sm:py-12 px-2 sm:px-8 rounded-md">
         <div className="flex flex-col items-center gap-y-10 lg:flex-row lg:justify-between px-4 h-full">
           <div>
             {waClientInfo.state !== "CONNECTED" ? (
@@ -199,14 +200,7 @@ export default function WaClient() {
                     </div>
                     <div className="absolute z-10 left-0 right-0 bottom-0 top-0 text-center grid place-items-center">
                       <div className="relative">
-                        <img
-                          src="\broadcast-logo.svg"
-                          className="w-8 h-8 sm:w-16 sm:h-16 absolute"
-                        />
-                        <img
-                          src="\background-logo.svg"
-                          className="w-8 h-8 sm:w-16 sm:h-16"
-                        />
+                        <div className="w-8 h-8 sm:w-16 sm:h-16 bg-[url('broadcast-logo.svg')] bg-contain bg-no-repeat bg-center" />
                       </div>
                     </div>
                   </div>
@@ -241,7 +235,7 @@ export default function WaClient() {
             )}
           </div>
         </div>
-      </div>
+      </Card>
     </>
   );
 }

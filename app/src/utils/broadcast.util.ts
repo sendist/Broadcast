@@ -118,10 +118,12 @@ export const pengajianMessages = ({
       ]);
       messages.push({
         phone: [...new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp])],
-        recipients: [...new Set([
-          pengajian.masjid.nama_ketua_dkm,
-          pengajian.mubaligh.nama_mubaligh,
-        ])],
+        recipients: [
+          ...new Set([
+            pengajian.masjid.nama_ketua_dkm,
+            pengajian.mubaligh.nama_mubaligh,
+          ]),
+        ],
         message: message,
       });
     }
@@ -353,10 +355,12 @@ export const jumatanMessages = ({
       ]);
       messages.push({
         phone: [...new Set([jumatan.masjid.no_hp, jumatan.mubaligh.no_hp])],
-        recipients: [...new Set([
-          jumatan.masjid.nama_ketua_dkm,
-          jumatan.mubaligh.nama_mubaligh,
-        ])],
+        recipients: [
+          ...new Set([
+            jumatan.masjid.nama_ketua_dkm,
+            jumatan.mubaligh.nama_mubaligh,
+          ]),
+        ],
         message: message,
       });
     }

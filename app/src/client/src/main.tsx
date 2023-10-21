@@ -16,6 +16,7 @@ import JadwalJumatan from "./pages/JadwalJumatan/index.tsx";
 import SplashScreen from "./pages/SplashScreen/index.tsx";
 import MessageLogs from "./pages/MessageLogs/index.tsx";
 import SchedulePage from "./pages/Schedule/index.tsx";
+import Home from "./pages/Home/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
     ),
     errorElement: <NotFound />,
     children: [
+      {
+        path: "",
+        element: <Home />,
+      },
       {
         path: "template",
         element: <Template />,
