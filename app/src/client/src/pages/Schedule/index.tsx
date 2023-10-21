@@ -137,6 +137,10 @@ export default function SchedulePage() {
     key: keyof (typeof schedule)[T],
     value: (typeof schedule)[T][keyof (typeof schedule)[T]]
   ) {
+    if (key === "id_template" && !value) {
+      setNoTemplateSelected((prev) => prev.filter((item) => item !== type));
+    }
+
     setUnsavedChanges((prev) => ({
       ...prev,
       [type]: {
@@ -233,8 +237,13 @@ export default function SchedulePage() {
 
   return (
     <div>
-      <div className="flex flex-row justify-between items-center mb-4">
-        <h1 className="inline-block text-xl font-semibold">Schedule</h1>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4  items-start gap-4 sm:gap-0">
+        <div>
+          <h1 className="inline-block text-xl font-semibold">Schedule</h1>
+          <p className="text-sm text-muted-foreground">
+            Atur Scheduling untuk broadcast otomatis
+          </p>
+        </div>
       </div>
       <div className="flex flex-col gap-4">
         <Card>

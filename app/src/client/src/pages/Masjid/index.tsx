@@ -75,8 +75,11 @@ export default function MasjidPage() {
 
   return (
     <div>
-      <div className="flex flex-row justify-between items-center mb-4">
-        <h1 className="inline-block text-xl font-semibold">Masjid</h1>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4  items-start gap-4 sm:gap-0">
+        <div>
+          <h1 className="inline-block text-xl font-semibold">Masjid</h1>
+          <p className="text-sm text-muted-foreground">Atur Daftar Masjid</p>
+        </div>
         <div className="space-x-4 space-y-2 -mt-2">
           <AddMasjidForm onSubmit={create}>
             <Button variant="outline" className="ml-4 mt-2">

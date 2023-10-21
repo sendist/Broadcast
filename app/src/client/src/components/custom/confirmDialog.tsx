@@ -40,7 +40,7 @@ export default function ConfirmDialog({
             <AlertDialogDescription>{description}</AlertDialogDescription>
           )}
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex-col">
           {dangerous ? (
             <>
               <AlertDialogAction asChild onClick={onConfirm}>

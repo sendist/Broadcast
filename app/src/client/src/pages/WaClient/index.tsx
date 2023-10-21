@@ -49,7 +49,12 @@ export default function WaClient() {
 
   return (
     <>
-      <h1 className="inline-block text-xl font-semibold">WA Client</h1>
+      <div>
+        <h1 className="inline-block text-xl font-semibold">WA Client</h1>
+        <p className="text-sm text-muted-foreground">
+          Hubungkan WhatsApp Client untuk melakukan broadcast
+        </p>
+      </div>
       <div className="border-2 xl:mx-24 lg:mx-8 m-4 lg:mt-24 py-6 sm:py-12 px-2 sm:px-8 rounded-md">
         <div className="flex flex-col items-center gap-y-10 lg:flex-row lg:justify-between px-4 h-full">
           <div>

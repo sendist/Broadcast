@@ -10,7 +10,7 @@ import {
 import { addToQueue } from "./waweb.util";
 import { UTCToLocalTime, calculateNextJadwalBulanan } from "./etc.util";
 
-const jobs = new Map<
+const scheduleJobs = new Map<
   $Enums.template_t,
   {
     options: {
@@ -21,6 +21,24 @@ const jobs = new Map<
     job: CronJob;
   }
 >();
+
+//auto delete message log every day if the message is more than 30 days old
+const autoDeleteMessageLog = new CronJob("0 0 * * *", () => {
+  prisma.message_logs
+    .deleteMany({
+      where: {
+        send_time: {
+          lt: new Date(new Date().setDate(new Date().getDate() - 30)),
+        },
+      },
+    })
+    .then(() => {
+      console.log("deleted message log");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 export const startSchedule = ({
   type,
@@ -55,66 +73,55 @@ export const startSchedule = ({
     calculateNextJadwalBulanan(h, hour, minute)
   );
 
-  let job = jobs.get(type);
-  console.log("AAAA", calculateNextJadwalBulanan(h, hour, minute));
+  let job = scheduleJobs.get(type);
   const time =
     type === "pengajian_bulanan"
       ? calculateNextJadwalBulanan(h, hour, minute)
       : `${minute} ${hour} * * *`;
 
-  if (!job) {
-    jobs.set(type, {
-      options: {
-        force_broadcast,
-        h,
-      },
-      job: new CronJob(
-        time,
-        () => {
-          sendReminder(type);
-
-          if (type === "pengajian_bulanan") {
-            startSchedule({
-              type,
-              active,
-              force_broadcast,
-              h,
-              jam,
-              id_template,
-            });
-          }
-        },
-        null,
-        false,
-        "utc"
-      ),
-    });
-    job = jobs.get(type);
+  // if job exists then stop it
+  if (job?.job) {
+    job.job.stop();
   }
-
-  job!.job.stop();
-
-  // replace the options
-  job!.options = {
-    force_broadcast,
-    h,
-    id_template,
-  };
 
   // if not active then let the job stop
   if (!active) {
     return;
   }
 
+  // replace the job
+  scheduleJobs.set(type, {
+    options: {
+      force_broadcast,
+      h,
+      id_template,
+    },
+    job: new CronJob(time, () => {
+      sendReminder(type);
+
+      if (type === "pengajian_bulanan") {
+        startSchedule({
+          type,
+          active,
+          force_broadcast,
+          h,
+          jam,
+          id_template,
+        });
+      }
+    }),
+  });
+
+  job = scheduleJobs.get(type);
+
   // replace the cron time
-  job!.job.setTime(new CronTime(time));
   job!.job.start();
   console.log("next date", job!.job.nextDate().diffNow().toHuman());
 };
 
 const sendReminder = (type: $Enums.template_t) => {
   console.log("Sending reminder for", type);
-  const { h, force_broadcast, id_template } = jobs.get(type)?.options!;
+  const { h, force_broadcast, id_template } = scheduleJobs.get(type)?.options!;
 
   if (!id_template) {
     console.log("Canceling reminder because id_template is undefined");
@@ -229,4 +236,10 @@ export const initCron = () => {
       });
     });
   });
+
+  autoDeleteMessageLog.start();
+  console.log(
+    "next delete message log",
+    autoDeleteMessageLog.nextDate().diffNow().toHuman()
+  );
 };
