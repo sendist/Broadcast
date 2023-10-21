@@ -48,6 +48,15 @@ export function whatsappFormatting(
       regex: /(?:```)(?:(?!\s))((?:(?!\n|```).)+)(?:```)/g,
       replacement: "<code>$1</code>",
     },
+    ...(extendedFormatting?.repetition
+      ? [
+          {
+            regex: /(\[\[)(.*)(\]\])/s,
+            replacement:
+              "<span class='text-blue-600'>$1</span>$2<span class='text-blue-600'>$3</span>",
+          },
+        ]
+      : []),
     {
       regex: /(?:\*)(?:(?!\s))((?:(?!\*|\n).)+)(?:\*)/g,
       replacement: "<b>$1</b>",
