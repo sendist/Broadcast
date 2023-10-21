@@ -200,7 +200,7 @@ export default function WaClient() {
                     </div>
                     <div className="absolute z-10 left-0 right-0 bottom-0 top-0 text-center grid place-items-center">
                       <div className="relative">
-                        <div className="w-8 h-8 sm:w-16 sm:h-16 bg-[url('broadcast-logo.svg')] bg-contain bg-no-repeat bg-center" />
+                        <div className="w-8 h-8 sm:w-16 sm:h-16 bg-[url('/broadcast-logo.svg')] bg-contain bg-no-repeat bg-center" />
                       </div>
                     </div>
                   </div>
