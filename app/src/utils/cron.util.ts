@@ -8,7 +8,7 @@ import {
   transformPhoneMessageToSingle,
 } from "./broadcast.util";
 import { addToQueue } from "./waweb.util";
-import { UTCToLocalTime, calculateNextJadwalBulanan } from "./etc.util";
+import { calculateNextJadwalBulanan } from "./etc.util";
 
 const scheduleJobs = new Map<
   $Enums.template_t,
@@ -16,7 +16,8 @@ const scheduleJobs = new Map<
     options: {
       force_broadcast: boolean;
       h: number;
-      id_template?: bigint;
+      id_template_dkm?: bigint;
+      id_template_mubaligh?: bigint;
     };
     job: CronJob;
   }
@@ -46,14 +47,16 @@ export const startSchedule = ({
   force_broadcast,
   h,
   jam,
-  id_template,
+  id_template_dkm,
+  id_template_mubaligh,
 }: {
   type: $Enums.template_t;
   active: boolean;
   force_broadcast: boolean;
   h: number;
   jam: Date | string;
-  id_template?: bigint;
+  id_template_dkm?: bigint;
+  id_template_mubaligh?: bigint;
 }) => {
   //get hour and minute from jam
   const [hour, minute] = (jam instanceof Date ? jam.toTimeString() : jam).split(
@@ -69,7 +72,8 @@ export const startSchedule = ({
     h,
     hour,
     minute,
-    id_template,
+    id_template_dkm,
+    id_template_mubaligh,
     calculateNextJadwalBulanan(h, hour, minute)
   );
 
@@ -94,7 +98,8 @@ export const startSchedule = ({
     options: {
       force_broadcast,
       h,
-      id_template,
+      id_template_dkm,
+      id_template_mubaligh,
     },
     job: new CronJob(time, () => {
       sendReminder(type);
@@ -106,7 +111,8 @@ export const startSchedule = ({
           force_broadcast,
           h,
           jam,
-          id_template,
+          id_template_dkm,
+          id_template_mubaligh,
         });
       }
     }),
@@ -121,12 +127,8 @@ export const startSchedule = ({
 
 const sendReminder = (type: $Enums.template_t) => {
   console.log("Sending reminder for", type);
-  const { h, force_broadcast, id_template } = scheduleJobs.get(type)?.options!;
-
-  if (!id_template) {
-    console.log("Canceling reminder because id_template is undefined");
-    return;
-  }
+  const { h, force_broadcast, id_template_dkm, id_template_mubaligh } =
+    scheduleJobs.get(type)?.options!;
 
   switch (type) {
     case "pengajian_bulanan":
@@ -138,7 +140,8 @@ const sendReminder = (type: $Enums.template_t) => {
       }
 
       pengajianBulananMessages({
-        templateId: id_template,
+        templateIdDKM: id_template_dkm,
+        templateIdMubaligh: id_template_mubaligh,
         month: month,
         year: new Date(new Date().setMonth(month)).getFullYear(),
       })
@@ -152,7 +155,8 @@ const sendReminder = (type: $Enums.template_t) => {
 
     case "pengajian_reminder":
       pengajianMessages({
-        templateId: id_template,
+        templateIdDKM: id_template_dkm,
+        templateIdMubaligh: id_template_mubaligh,
         exactDate: new Date(new Date().setDate(new Date().getDate() + h)),
         includeBroadcasted: force_broadcast,
         changeStatusToBroadcasted: true,
@@ -169,7 +173,8 @@ const sendReminder = (type: $Enums.template_t) => {
 
     case "jumatan_reminder":
       jumatanMessages({
-        templateId: id_template,
+        templateIdDKM: id_template_dkm,
+        templateIdMubaligh: id_template_mubaligh,
         exactDate: new Date(new Date().setDate(new Date().getDate() + h)),
         includeBroadcasted: force_broadcast,
         changeStatusToBroadcasted: true,
@@ -196,9 +201,11 @@ export const initCron = () => {
         active: broadcastSchedule.active,
         force_broadcast: broadcastSchedule.force_broadcast,
         h: broadcastSchedule.h,
-        jam: UTCToLocalTime(broadcastSchedule.jam),
+        jam: broadcastSchedule.jam,
         type: broadcastSchedule.id,
-        id_template: broadcastSchedule.id_template || undefined,
+        id_template_dkm: broadcastSchedule.id_template_dkm ?? undefined,
+        id_template_mubaligh:
+          broadcastSchedule.id_template_mubaligh ?? undefined,
       });
     });
   });

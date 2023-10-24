@@ -13,6 +13,9 @@
     // "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
+  "typeAcquisition": {
+    "include": ["jest"]
+  },
   "include": ["src/**/*.ts", "index.ts"],
   "exclude": ["node_modules", "src/client/**/*"]
 }

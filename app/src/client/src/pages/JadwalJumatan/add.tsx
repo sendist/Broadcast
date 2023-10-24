@@ -78,8 +78,8 @@ export function AddJadwalJumatanForm({
     },
     {
       name: "id_mubaligh",
-      label: "Kode Mubaligh",
-      placeholder: "Kode Mubaligh",
+      label: "Mubaligh",
+      placeholder: "Mubaligh",
       customInput: <T extends FieldValues>({
         field,
       }: {

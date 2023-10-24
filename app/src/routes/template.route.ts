@@ -135,19 +135,32 @@ const templateEnum: {
   {
     value: "pengajian_bulanan",
     label: "Pengajian Bulanan",
-    replacements: ["bulan", "tanggal", "waktu", "nama_masjid", "nama_mubaligh"],
+    replacements: [
+      "bulan",
+      "tanggal",
+      "waktu",
+      "nama_masjid",
+      "nama_mubaligh",
+      "nama_ketua_dkm",
+    ],
     repetition: true,
   },
   {
     value: "pengajian_reminder",
     label: "Pengajian Reminder",
-    replacements: ["tanggal", "waktu", "nama_masjid", "nama_mubaligh"],
+    replacements: [
+      "tanggal",
+      "waktu",
+      "nama_masjid",
+      "nama_mubaligh",
+      "nama_ketua_dkm",
+    ],
     repetition: false,
   },
   {
     value: "jumatan_reminder",
     label: "Jumatan Reminder",
-    replacements: ["tanggal", "nama_masjid", "nama_mubaligh"],
+    replacements: ["tanggal", "nama_masjid", "nama_mubaligh", "nama_ketua_dkm"],
     repetition: false,
   },
 ];

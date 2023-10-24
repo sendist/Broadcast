@@ -6,7 +6,6 @@ import { $Enums } from "@prisma/client";
 import validate from "../middlewares/validation.middleware";
 import { body, param } from "express-validator";
 import { startSchedule } from "../utils/cron.util";
-import { UTCToLocalTime } from "../utils/etc.util";
 
 const router = express.Router();
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
@@ -55,11 +54,19 @@ router.patch(
     body("jam")
       .optional()
       .matches(/^([01]\d|2[0-3]):([0-5]\d)$/),
-    body("id_template").optional().isNumeric().notEmpty(),
+    body("id_template_dkm").optional().isNumeric().notEmpty(),
+    body("id_template_mubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { active, force_broadcast, h, jam, id_template } = req.body;
+    const {
+      active,
+      force_broadcast,
+      h,
+      jam,
+      id_template_dkm,
+      id_template_mubaligh,
+    } = req.body;
     prisma.broadcast_schedule
       .update({
         where: {
@@ -78,8 +85,11 @@ router.patch(
           ...(jam !== undefined && {
             jam: new Date(`1970-01-01T${jam}:00.000Z`),
           }),
-          ...(id_template !== undefined && {
-            id_template: BigInt(id_template),
+          ...(id_template_dkm !== undefined && {
+            id_template_dkm: BigInt(id_template_dkm),
+          }),
+          ...(id_template_mubaligh !== undefined && {
+            id_template_mubaligh: BigInt(id_template_mubaligh),
           }),
         },
       })
@@ -89,8 +99,9 @@ router.patch(
           active: schedule.active,
           force_broadcast: schedule.force_broadcast,
           h: schedule.h,
-          jam: UTCToLocalTime(schedule.jam),
-          id_template: schedule.id_template!,
+          jam: schedule.jam,
+          id_template_dkm: schedule.id_template_dkm ?? undefined,
+          id_template_mubaligh: schedule.id_template_mubaligh ?? undefined,
         });
         sendResponse({
           res,

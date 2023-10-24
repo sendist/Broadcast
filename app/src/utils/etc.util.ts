@@ -60,28 +60,22 @@ export function resetDateTimeToMidnight(date: Date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
 }
 
-export const UTCToLocalTime = (date: Date) => {
-  const dateCopy = new Date(date);
-  return new Date(
-    dateCopy.setHours(dateCopy.getHours() + dateCopy.getTimezoneOffset() / 60)
-  );
-};
-
 export const calculateNextJadwalBulanan = (
   h: number,
   hour: string,
   minute: string
 ) => {
   let currentMonth = new Date().getMonth();
+
   let nextSchedule = new Date();
+  nextSchedule.setHours(parseInt(hour));
+  nextSchedule.setMinutes(parseInt(minute));
+  nextSchedule.setSeconds(0);
+  nextSchedule.setMilliseconds(0);
 
   do {
-    nextSchedule = new Date(new Date().setMonth(currentMonth));
+    nextSchedule = new Date(nextSchedule.setMonth(currentMonth));
     nextSchedule.setDate(1 - h);
-    nextSchedule.setHours(parseInt(hour));
-    nextSchedule.setMinutes(parseInt(minute));
-    nextSchedule.setSeconds(0);
-    nextSchedule.setMilliseconds(0);
 
     currentMonth++;
   } while (nextSchedule < new Date());

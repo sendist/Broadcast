@@ -161,13 +161,19 @@ router.get(
     query("id")
       .matches(/^[0-9]+(,[0-9]+)*$/)
       .notEmpty(),
-    query("template").isNumeric().notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { id, template } = req.query;
+    const { id, templateDKM, templateMubaligh } = req.query;
     const idArr = (id as string).split(",").map((id) => BigInt(id));
     pengajianMessages({
-      templateId: BigInt(template as string),
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
       pengajianId: idArr,
     })
       .then((messages) => {
@@ -191,14 +197,16 @@ router.get(
     query("id")
       .matches(/^[0-9]+(,[0-9]+)*$/)
       .notEmpty(),
-    query("template").isNumeric().notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { id, template } = req.query;
+    const { id, templateDKM, templateMubaligh } = req.query;
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
     return pengajianMessages({
-      templateId: BigInt(template as string),
+      templateIdDKM: BigInt(templateDKM as string),
+      templateIdMubaligh: BigInt(templateMubaligh as string),
       pengajianId: idArr,
       changeStatusToBroadcasted: true,
     })
@@ -214,19 +222,25 @@ router.get(
 router.get(
   "/broadcast-bulanan-preview",
   validate([
-    query("template").isNumeric().notEmpty(),
     query("month")
       .matches(/^(1[0-1]|0?[0-9])$/)
       .notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { template, month } = req.query;
+    const { month, templateDKM, templateMubaligh } = req.query;
     const year =
       Number(month) >= new Date().getMonth()
         ? new Date().getFullYear()
         : new Date().getFullYear() + 1;
     pengajianBulananMessages({
-      templateId: BigInt(template as string),
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
       month: Number(month),
       year: year,
     })
@@ -248,19 +262,25 @@ router.get(
 router.get(
   "/broadcast-bulanan",
   validate([
-    query("template").isNumeric().notEmpty(),
     query("month")
       .matches(/^(1[0-1]|0?[0-9])$/)
       .notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { template, month } = req.query;
+    const { month, templateDKM, templateMubaligh } = req.query;
     const year =
       Number(month) >= new Date().getMonth()
         ? new Date().getFullYear()
         : new Date().getFullYear() + 1;
     pengajianBulananMessages({
-      templateId: BigInt(template as string),
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
       month: Number(month),
       year: year,
     })

@@ -38,11 +38,12 @@ model pengajian {
 }
 
 model template {
-  id                 BigInt               @id @default(autoincrement())
-  nama_template      String               @unique
-  content            String
-  type               template_t
-  broadcast_schedule broadcast_schedule[]
+  id                                                                   BigInt               @id @default(autoincrement())
+  nama_template                                                        String               @unique
+  content                                                              String
+  type                                                                 template_t
+  broadcast_schedule_broadcast_schedule_id_template_dkmTotemplate      broadcast_schedule[] @relation("broadcast_schedule_id_template_dkmTotemplate")
+  broadcast_schedule_broadcast_schedule_id_template_mubalighTotemplate broadcast_schedule[] @relation("broadcast_schedule_id_template_mubalighTotemplate")
 }
 
 model user {
@@ -71,7 +72,7 @@ model message_logs {
 
 model jumatan {
   id          BigInt   @id @default(autoincrement())
-  tanggal     DateTime @db.Timestamptz(6)
+  tanggal     DateTime @db.Date
   id_masjid   BigInt
   id_mubaligh BigInt
   broadcasted Boolean  @default(false)
@@ -80,13 +81,15 @@ model jumatan {
 }
 
 model broadcast_schedule {
-  id              template_t @id
-  active          Boolean    @default(false)
-  force_broadcast Boolean    @default(false)
-  h               Int        @default(0)
-  jam             DateTime   @default(dbgenerated("'00:00:00+07'::time with time zone")) @db.Timetz(6)
-  id_template     BigInt?
-  template        template?  @relation(fields: [id_template], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                                                         template_t @id
+  active                                                     Boolean    @default(false)
+  force_broadcast                                            Boolean    @default(false)
+  h                                                          Int        @default(0)
+  jam                                                        DateTime   @default(dbgenerated("'00:00:00+07'::time with time zone")) @db.Timetz(6)
+  id_template_dkm                                            BigInt?
+  id_template_mubaligh                                       BigInt?
+  template_broadcast_schedule_id_template_dkmTotemplate      template?  @relation("broadcast_schedule_id_template_dkmTotemplate", fields: [id_template_dkm], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  template_broadcast_schedule_id_template_mubalighTotemplate template?  @relation("broadcast_schedule_id_template_mubalighTotemplate", fields: [id_template_mubaligh], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum template_t {

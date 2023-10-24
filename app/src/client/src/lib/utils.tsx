@@ -45,7 +45,7 @@ export function whatsappFormatting(
 ): JSX.Element {
   const regexList = [
     {
-      regex: /(?:```)(?:(?!\s))((?:(?!\n|```).)+)(?:```)/g,
+      regex: /(?<=\s|^)(?:```)(?:(?!\s))((?:(?!\n|```).)+)(?:```)(?=\s|$)/g,
       replacement: "<code>$1</code>",
     },
     ...(extendedFormatting?.repetition
@@ -58,7 +58,7 @@ export function whatsappFormatting(
         ]
       : []),
     {
-      regex: /(?:\*)(?:(?!\s))((?:(?!\*|\n).)+)(?:\*)/g,
+      regex: /(?<=\s|^)(?:\*)(?:(?!\s))((?:(?!\*|\n).)+)(?:\*)(?=\s|$)/g,
       replacement: "<b>$1</b>",
     },
     {
@@ -71,11 +71,11 @@ export function whatsappFormatting(
       replacement: "<span class='text-primary'>{{$1}}</span>",
     },
     {
-      regex: /(?:_)(?:(?!\s))((?:(?!\n|_).)+)(?:_)/g,
+      regex: /(?<=\s|^)(?:_)(?:(?!\s))((?:(?!\n|_).)+)(?:_)(?=\s|$)/g,
       replacement: "<i>$1</i>",
     },
     {
-      regex: /(?:~)(?:(?!\s))((?:(?!\n|~).)+)(?:~)/g,
+      regex: /(?<=\s|^)(?:~)(?:(?!\s))((?:(?!\n|~).)+)(?:~)(?=\s|$)/g,
       replacement: "<s>$1</s>",
     },
   ];
@@ -168,4 +168,16 @@ export function compareObjectShallow<T extends { [key: string]: unknown }>(
   }
 
   return keys1.every((key) => obj1[key] === obj2[key]);
+}
+
+export function LocalTimeUTCConverter(time: string, reverse: boolean = false) {
+  const date = new Date();
+  const [hour, minute] = time.split(":");
+  if (reverse) {
+    date.setUTCHours(+hour, +minute);
+    return date.toTimeString().split(":").slice(0, 2).join(":");
+  } else {
+    date.setHours(+hour, +minute);
+    return date.toISOString().split("T")[1].split(":").slice(0, 2).join(":");
+  }
 }

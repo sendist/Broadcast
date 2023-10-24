@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useCRUD } from "@/hooks/backend";
-import { compareObjectShallow } from "@/lib/utils";
+import { LocalTimeUTCConverter, compareObjectShallow } from "@/lib/utils";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 
@@ -22,21 +22,24 @@ type Schedule = {
     active: boolean;
     h: number;
     jam: string;
-    id_template: string;
+    id_template_dkm: string;
+    id_template_mubaligh: string;
   };
   pengajian_reminder: {
     active: boolean;
     force_broadcast: boolean;
     h: number;
     jam: string;
-    id_template: string;
+    id_template_dkm: string;
+    id_template_mubaligh: string;
   };
   jumatan_reminder: {
     active: boolean;
     force_broadcast: boolean;
     h: number;
     jam: string;
-    id_template: string;
+    id_template_dkm: string;
+    id_template_mubaligh: string;
   };
 };
 
@@ -71,21 +74,24 @@ export default function SchedulePage() {
       active: false,
       h: 0,
       jam: "00:00",
-      id_template: "",
+      id_template_dkm: "",
+      id_template_mubaligh: "",
     },
     pengajian_reminder: {
       active: false,
       force_broadcast: false,
       h: 0,
       jam: "00:00",
-      id_template: "",
+      id_template_dkm: "",
+      id_template_mubaligh: "",
     },
     jumatan_reminder: {
       active: false,
       force_broadcast: false,
       h: 0,
       jam: "00:00",
-      id_template: "",
+      id_template_dkm: "",
+      id_template_mubaligh: "",
     },
   });
   const [unsavedChanges, setUnsavedChanges] = useState<
@@ -105,7 +111,8 @@ export default function SchedulePage() {
         active: false,
         h: 0,
         jam: "00:00",
-        id_template: "",
+        id_template_dkm: "",
+        id_template_mubaligh: "",
       },
     },
     pengajian_reminder: {
@@ -116,7 +123,8 @@ export default function SchedulePage() {
         force_broadcast: false,
         h: 0,
         jam: "00:00",
-        id_template: "",
+        id_template_dkm: "",
+        id_template_mubaligh: "",
       },
     },
     jumatan_reminder: {
@@ -127,7 +135,8 @@ export default function SchedulePage() {
         force_broadcast: false,
         h: 0,
         jam: "00:00",
-        id_template: "",
+        id_template_dkm: "",
+        id_template_mubaligh: "",
       },
     },
   });
@@ -163,7 +172,7 @@ export default function SchedulePage() {
 
   function save(id: keyof Schedule) {
     //check if template is selected for the first time using schedule
-    if (!schedule[id].id_template) {
+    if (!schedule[id].id_template_dkm || !schedule[id].id_template_mubaligh) {
       setNoTemplateSelected((prev) => [...prev, id]);
       return;
     }
@@ -285,17 +294,25 @@ export default function SchedulePage() {
               <Input
                 type="time"
                 className="w-fit inline-block"
-                value={schedule.pengajian_bulanan.jam}
-                onChange={(e) =>
-                  changeSchedule("pengajian_bulanan", "jam", e.target.value)
-                }
+                value={LocalTimeUTCConverter(
+                  schedule.pengajian_bulanan.jam,
+                  true
+                )}
+                onChange={(e) => {
+                  changeSchedule(
+                    "pengajian_bulanan",
+                    "jam",
+                    LocalTimeUTCConverter(e.target.value)
+                  );
+                }}
               />{" "}
-              dengan template{" "}
+              dengan template DKM{" "}
               <InputDropdown
+                placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
                     (item) =>
-                      item.value === schedule.pengajian_bulanan.id_template
+                      item.value === schedule.pengajian_bulanan.id_template_dkm
                   )?.value || ""
                 }
                 select={
@@ -306,7 +323,30 @@ export default function SchedulePage() {
                 onChange={(value) => {
                   changeSchedule(
                     "pengajian_bulanan",
-                    "id_template",
+                    "id_template_dkm",
+                    value as string
+                  );
+                }}
+              />{" "}
+              dan template Mubaligh{" "}
+              <InputDropdown
+                placeholder="Pilih Template..."
+                value={
+                  templateDropdown?.find(
+                    (item) =>
+                      item.value ===
+                      schedule.pengajian_bulanan.id_template_mubaligh
+                  )?.value || ""
+                }
+                select={
+                  templateDropdown?.filter(
+                    (item) => item.type === "pengajian_bulanan"
+                  ) || []
+                }
+                onChange={(value) => {
+                  changeSchedule(
+                    "pengajian_bulanan",
+                    "id_template_mubaligh",
                     value as string
                   );
                 }}
@@ -404,17 +444,25 @@ export default function SchedulePage() {
               <Input
                 type="time"
                 className="w-fit inline-block"
-                value={schedule.pengajian_reminder.jam}
+                value={LocalTimeUTCConverter(
+                  schedule.pengajian_reminder.jam,
+                  true
+                )}
                 onChange={(e) => {
-                  changeSchedule("pengajian_reminder", "jam", e.target.value);
+                  changeSchedule(
+                    "pengajian_reminder",
+                    "jam",
+                    LocalTimeUTCConverter(e.target.value)
+                  );
                 }}
               />{" "}
-              dengan template{" "}
+              dengan template DKM{" "}
               <InputDropdown
+                placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
                     (item) =>
-                      item.value === schedule.pengajian_reminder.id_template
+                      item.value === schedule.pengajian_reminder.id_template_dkm
                   )?.value || ""
                 }
                 select={
@@ -425,7 +473,30 @@ export default function SchedulePage() {
                 onChange={(value) => {
                   changeSchedule(
                     "pengajian_reminder",
-                    "id_template",
+                    "id_template_dkm",
+                    value as string
+                  );
+                }}
+              />{" "}
+              dan template Mubaligh{" "}
+              <InputDropdown
+                placeholder="Pilih Template..."
+                value={
+                  templateDropdown?.find(
+                    (item) =>
+                      item.value ===
+                      schedule.pengajian_reminder.id_template_mubaligh
+                  )?.value || ""
+                }
+                select={
+                  templateDropdown?.filter(
+                    (item) => item.type === "pengajian_reminder"
+                  ) || []
+                }
+                onChange={(value) => {
+                  changeSchedule(
+                    "pengajian_reminder",
+                    "id_template_mubaligh",
                     value as string
                   );
                 }}
@@ -523,17 +594,25 @@ export default function SchedulePage() {
               <Input
                 type="time"
                 className="w-fit inline-block"
-                value={schedule.jumatan_reminder.jam}
+                value={LocalTimeUTCConverter(
+                  schedule.jumatan_reminder.jam,
+                  true
+                )}
                 onChange={(e) => {
-                  changeSchedule("jumatan_reminder", "jam", e.target.value);
+                  changeSchedule(
+                    "jumatan_reminder",
+                    "jam",
+                    LocalTimeUTCConverter(e.target.value)
+                  );
                 }}
               />{" "}
-              dengan template{" "}
+              dengan template DKM{" "}
               <InputDropdown
+                placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
                     (item) =>
-                      item.value === schedule.jumatan_reminder.id_template
+                      item.value === schedule.jumatan_reminder.id_template_dkm
                   )?.value || ""
                 }
                 select={
@@ -544,7 +623,30 @@ export default function SchedulePage() {
                 onChange={(value) => {
                   changeSchedule(
                     "jumatan_reminder",
-                    "id_template",
+                    "id_template_dkm",
+                    value as string
+                  );
+                }}
+              />{" "}
+              dan template Mubaligh{" "}
+              <InputDropdown
+                placeholder="Pilih Template..."
+                value={
+                  templateDropdown?.find(
+                    (item) =>
+                      item.value ===
+                      schedule.jumatan_reminder.id_template_mubaligh
+                  )?.value || ""
+                }
+                select={
+                  templateDropdown?.filter(
+                    (item) => item.type === "jumatan_reminder"
+                  ) || []
+                }
+                onChange={(value) => {
+                  changeSchedule(
+                    "jumatan_reminder",
+                    "id_template_mubaligh",
                     value as string
                   );
                 }}

@@ -157,14 +157,16 @@ router.get(
     query("id")
       .matches(/^[0-9]+(,[0-9]+)*$/)
       .notEmpty(),
-    query("template").isNumeric().notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { id, template } = req.query;
+    const { id, templateDKM, templateMubaligh } = req.query;
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
     return jumatanMessages({
-      templateId: BigInt(template as string),
+      templateIdDKM: BigInt(templateDKM as string),
+      templateIdMubaligh: BigInt(templateMubaligh as string),
       jumatanId: idArr,
     })
       .then((messages) => {
@@ -188,14 +190,16 @@ router.get(
     query("id")
       .matches(/^[0-9]+(,[0-9]+)*$/)
       .notEmpty(),
-    query("template").isNumeric().notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { id, template } = req.query;
+    const { id, templateDKM, templateMubaligh } = req.query;
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
     return jumatanMessages({
-      templateId: BigInt(template as string),
+      templateIdDKM: BigInt(templateDKM as string),
+      templateIdMubaligh: BigInt(templateMubaligh as string),
       jumatanId: idArr,
       changeStatusToBroadcasted: true,
     })

@@ -7,21 +7,24 @@ import {
 import prisma from "./prisma.util";
 
 export const pengajianMessages = ({
-  templateId,
+  templateIdDKM,
+  templateIdMubaligh,
   pengajianId,
   exactDate,
   includeBroadcasted = true,
   changeStatusToBroadcasted = false,
 }:
   | {
-      templateId: bigint;
+      templateIdDKM?: bigint;
+      templateIdMubaligh?: bigint;
       pengajianId: bigint[];
       exactDate?: undefined;
       includeBroadcasted?: boolean;
       changeStatusToBroadcasted?: boolean;
     }
   | {
-      templateId: bigint;
+      templateIdDKM?: bigint;
+      templateIdMubaligh?: bigint;
       pengajianId?: undefined;
       exactDate: Date;
       includeBroadcasted?: boolean;
@@ -65,16 +68,26 @@ export const pengajianMessages = ({
         },
       },
     }),
-    prisma.template.findUnique({
-      where: {
-        id: templateId,
-      },
-      select: {
-        content: true,
-      },
-    }),
-  ]).then(([pengajians, template]) => {
-    if (!template) {
+    templateIdDKM !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdDKM,
+        },
+        select: {
+          content: true,
+        },
+      }),
+    templateIdMubaligh !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdMubaligh,
+        },
+        select: {
+          content: true,
+        },
+      }),
+  ]).then(([pengajians, templateDKM, templateMubaligh]) => {
+    if (templateDKM === null || templateMubaligh === null) {
       throw new Error("Template tidak ditemukan");
     }
     if (!pengajians.length) {
@@ -113,32 +126,50 @@ export const pengajianMessages = ({
     }[] = [];
 
     for (const pengajian of pengajians) {
-      const message = templateReplacer(template.content, [
-        ["tanggal", formatDate(pengajian.tanggal)],
-        ["waktu", pengajian.waktu.toString()],
-        ["nama_masjid", pengajian.masjid.nama_masjid.toString()],
-        ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh.toString()],
-      ]);
-      messages.push({
-        phone: [...new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp])],
-        recipients: [
-          ...new Set([
-            pengajian.masjid.nama_ketua_dkm,
-            pengajian.mubaligh.nama_mubaligh,
-          ]),
-        ],
-        message: message,
-      });
+      if (templateDKM) {
+        const message = templateReplacer(templateDKM.content, [
+          ["tanggal", formatDate(pengajian.tanggal)],
+          ["waktu", pengajian.waktu],
+          ["nama_masjid", pengajian.masjid.nama_masjid],
+          ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
+        ]);
+        messages.push({
+          phone: [
+            ...new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp]),
+          ],
+          recipients: [pengajian.masjid.nama_ketua_dkm],
+          message: message,
+        });
+      }
+      if (templateMubaligh) {
+        const message = templateReplacer(templateMubaligh.content, [
+          ["tanggal", formatDate(pengajian.tanggal)],
+          ["waktu", pengajian.waktu],
+          ["nama_masjid", pengajian.masjid.nama_masjid],
+          ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
+        ]);
+        messages.push({
+          phone: [
+            ...new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp]),
+          ],
+          recipients: [pengajian.mubaligh.nama_mubaligh],
+          message: message,
+        });
+      }
     }
     return messages;
   });
 
 export const pengajianBulananMessages = ({
-  templateId,
+  templateIdDKM,
+  templateIdMubaligh,
   month,
   year,
 }: {
-  templateId: bigint;
+  templateIdDKM?: bigint;
+  templateIdMubaligh?: bigint;
   month: number; // 0-11
   year: number;
   changeStatusToBroadcasted?: boolean;
@@ -175,16 +206,26 @@ export const pengajianBulananMessages = ({
         tanggal: "asc",
       },
     }),
-    prisma.template.findUnique({
-      where: {
-        id: templateId,
-      },
-      select: {
-        content: true,
-      },
-    }),
-  ]).then(([pengajians, template]) => {
-    if (!template) {
+    templateIdDKM !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdDKM,
+        },
+        select: {
+          content: true,
+        },
+      }),
+    templateIdMubaligh !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdMubaligh,
+        },
+        select: {
+          content: true,
+        },
+      }),
+  ]).then(([pengajians, templateDKM, templateMubaligh]) => {
+    if (templateDKM === null || templateMubaligh === null) {
       throw new Error("Template tidak ditemukan");
     }
     if (!pengajians.length) {
@@ -199,73 +240,93 @@ export const pengajianBulananMessages = ({
       message: string;
     }[] = [];
 
-    let phoneAndReplacements: Record<
+    let masjidGroups: Record<
       string,
-      {
-        phone: Set<string>;
-        recipients: Set<string>;
-        replacements: [string, string][][];
-      }
-    > = {}; // masjidId: {phone: Set<phone>, replacements: replacements[]}
+      { pengajians: (typeof pengajians)[number][]; mubalighs: Set<bigint> }
+    > = {};
 
     for (const pengajian of pengajians) {
       const replacements: [string, string][] = [
         ["tanggal", formatDate(pengajian.tanggal)],
-        ["waktu", pengajian.waktu.toString()],
-        ["nama_masjid", pengajian.masjid.nama_masjid.toString()],
-        ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh.toString()],
+        ["waktu", pengajian.waktu],
+        ["nama_masjid", pengajian.masjid.nama_masjid],
+        ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+        ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
       ];
 
-      if (phoneAndReplacements[pengajian.masjid.id.toString()]) {
-        phoneAndReplacements[pengajian.masjid.id.toString()].replacements.push(
-          replacements
-        );
-        phoneAndReplacements[pengajian.masjid.id.toString()].recipients.add(
-          pengajian.mubaligh.nama_mubaligh
-        );
-        phoneAndReplacements[pengajian.masjid.id.toString()].phone.add(
-          pengajian.mubaligh.no_hp
+      if (masjidGroups[pengajian.masjid.id.toString()]) {
+        masjidGroups[pengajian.masjid.id.toString()].pengajians.push(pengajian);
+        masjidGroups[pengajian.masjid.id.toString()].mubalighs.add(
+          pengajian.mubaligh.id
         );
       } else {
-        phoneAndReplacements[pengajian.masjid.id.toString()] = {
-          phone: new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp]),
-          recipients: new Set([
-            pengajian.masjid.nama_ketua_dkm,
-            pengajian.mubaligh.nama_mubaligh,
-          ]),
-          replacements: [replacements],
+        masjidGroups[pengajian.masjid.id.toString()] = {
+          pengajians: [pengajian],
+          mubalighs: new Set([pengajian.mubaligh.id]),
         };
       }
     }
-    for (const id in phoneAndReplacements) {
-      messages.push({
-        phone: [...phoneAndReplacements[id].phone],
-        recipients: [...phoneAndReplacements[id].recipients],
-        message: templateReplacerBulanan(
-          template.content,
-          phoneAndReplacements[id].replacements
-        ),
-      });
+    for (const [id, { pengajians, mubalighs }] of Object.entries(
+      masjidGroups
+    )) {
+      if (templateDKM) {
+        const replacements = pengajians.map((pengajian) => [
+          ["tanggal", formatDate(pengajian.tanggal)],
+          ["waktu", pengajian.waktu],
+          ["nama_masjid", pengajian.masjid.nama_masjid],
+          ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
+        ]) as [string, string][][];
+        messages.push({
+          phone: [pengajians[0].masjid.no_hp],
+          recipients: [pengajians[0].masjid.nama_ketua_dkm],
+          message: templateReplacerBulanan(templateDKM.content, replacements),
+        });
+      }
+      if (templateMubaligh) {
+        [...mubalighs].forEach((mubaligh) => {
+          const replacements = pengajians
+            .filter((pengajian) => pengajian.mubaligh.id === mubaligh)
+            .map((pengajian) => [
+              ["tanggal", formatDate(pengajian.tanggal)],
+              ["waktu", pengajian.waktu],
+              ["nama_masjid", pengajian.masjid.nama_masjid],
+              ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+              ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
+            ]) as [string, string][][];
+          messages.push({
+            phone: [pengajians[0].mubaligh.no_hp],
+            recipients: [pengajians[0].mubaligh.nama_mubaligh],
+            message: templateReplacerBulanan(
+              templateMubaligh.content,
+              replacements
+            ),
+          });
+        });
+      }
     }
     return messages;
   });
 
 export const jumatanMessages = ({
-  templateId,
+  templateIdDKM,
+  templateIdMubaligh,
   jumatanId,
   exactDate,
   includeBroadcasted = true,
   changeStatusToBroadcasted = false,
 }:
   | {
-      templateId: bigint;
+      templateIdDKM?: bigint;
+      templateIdMubaligh?: bigint;
       jumatanId: bigint[];
       exactDate?: undefined;
       includeBroadcasted?: boolean;
       changeStatusToBroadcasted?: boolean;
     }
   | {
-      templateId: bigint;
+      templateIdDKM?: bigint;
+      templateIdMubaligh?: bigint;
       jumatanId?: undefined;
       exactDate: Date;
       includeBroadcasted?: boolean;
@@ -281,7 +342,7 @@ export const jumatanMessages = ({
               },
             }
           : {}),
-        ...(exactDate
+        ...(exactDate !== undefined
           ? {
               tanggal: {
                 equals: resetDateTimeToMidnight(exactDate),
@@ -308,20 +369,30 @@ export const jumatanMessages = ({
         },
       },
     }),
-    prisma.template.findUnique({
-      where: {
-        id: templateId,
-      },
-      select: {
-        content: true,
-      },
-    }),
-  ]).then(([jumatans, template]) => {
-    if (!template) {
+    templateIdDKM !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdDKM,
+        },
+        select: {
+          content: true,
+        },
+      }),
+    templateIdMubaligh !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdMubaligh,
+        },
+        select: {
+          content: true,
+        },
+      }),
+  ]).then(([jumatans, templateDKM, templateMubaligh]) => {
+    if (templateDKM === null || templateMubaligh === null) {
       throw new Error("Template tidak ditemukan");
     }
     if (!jumatans.length) {
-      throw new Error("Jadwal pengajian tidak ditemukan");
+      throw new Error("Jadwal jumatan tidak ditemukan");
     }
 
     // change status to broadcasted
@@ -354,21 +425,32 @@ export const jumatanMessages = ({
       message: string;
     }[] = [];
     for (const jumatan of jumatans) {
-      const message = templateReplacer(template.content, [
-        ["tanggal", formatDate(jumatan.tanggal)],
-        ["nama_masjid", jumatan.masjid.nama_masjid],
-        ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
-      ]);
-      messages.push({
-        phone: [...new Set([jumatan.masjid.no_hp, jumatan.mubaligh.no_hp])],
-        recipients: [
-          ...new Set([
-            jumatan.masjid.nama_ketua_dkm,
-            jumatan.mubaligh.nama_mubaligh,
-          ]),
-        ],
-        message: message,
-      });
+      if (templateDKM) {
+        const message = templateReplacer(templateDKM.content, [
+          ["tanggal", formatDate(jumatan.tanggal)],
+          ["nama_masjid", jumatan.masjid.nama_masjid],
+          ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", jumatan.masjid.nama_ketua_dkm],
+        ]);
+        messages.push({
+          phone: [...new Set([jumatan.masjid.no_hp, jumatan.mubaligh.no_hp])],
+          recipients: [jumatan.masjid.nama_ketua_dkm],
+          message: message,
+        });
+      }
+      if (templateMubaligh) {
+        const message = templateReplacer(templateMubaligh.content, [
+          ["tanggal", formatDate(jumatan.tanggal)],
+          ["nama_masjid", jumatan.masjid.nama_masjid],
+          ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", jumatan.masjid.nama_ketua_dkm],
+        ]);
+        messages.push({
+          phone: [...new Set([jumatan.masjid.no_hp, jumatan.mubaligh.no_hp])],
+          recipients: [jumatan.mubaligh.nama_mubaligh],
+          message: message,
+        });
+      }
     }
     return messages;
   });

@@ -11,8 +11,27 @@ import InputDropdown from "./inputDropdown";
 import { Button } from "../ui/button";
 import { whatsappFormatting } from "@/lib/utils";
 import { ScrollArea } from "../ui/scroll-area";
+import { Checkbox } from "../ui/checkbox";
+import { Separator } from "../ui/separator";
+import { Label } from "../ui/label";
+import { useState } from "react";
 
 export type PreviewTextType = { message: string; recipients: string[] };
+
+const months = [
+  { value: "0", label: "Januari" },
+  { value: "1", label: "Februari" },
+  { value: "2", label: "Maret" },
+  { value: "3", label: "April" },
+  { value: "4", label: "Mei" },
+  { value: "5", label: "Juni" },
+  { value: "6", label: "Juli" },
+  { value: "7", label: "Agustus" },
+  { value: "8", label: "September" },
+  { value: "9", label: "Oktober" },
+  { value: "10", label: "November" },
+  { value: "11", label: "Desember" },
+] as const;
 
 type Props = {
   children: React.ReactNode;
@@ -20,29 +39,92 @@ type Props = {
     label: string;
     value: string;
   }[];
-  bulanan?: {
-    selectMonth: {
-      label: string;
-      value: string;
-    }[];
-    month: string;
-    setMonth: (month: string) => void;
-  };
-  idTemplate: string;
-  setIdTemplate: (id: string) => void;
+  bulanan?: boolean;
+  refreshPreview: ({
+    idTemplateDKM,
+    idTemplateMubaligh,
+  }: {
+    idTemplateDKM?: string;
+    idTemplateMubaligh?: string;
+  }) => void;
   previewTexts: PreviewTextType[];
-  onSend: () => void;
+  onSend: ({
+    idTemplateDKM,
+    idTemplateMubaligh,
+  }: {
+    idTemplateDKM?: string;
+    idTemplateMubaligh?: string;
+  }) => void;
 };
 
 export function BroadcastPopover({
   children,
   select,
   bulanan,
-  idTemplate,
-  setIdTemplate,
+  refreshPreview,
   previewTexts,
   onSend,
 }: Props) {
+  const [idTemplateDKM, setIdTemplateDKM] = useState<string>("");
+  const [idTemplateMubaligh, setIdTemplateMubaligh] = useState<string>("");
+  const [DKMActive, setDKMActive] = useState<boolean>(true);
+  const [MubalighActive, setMubalighActive] = useState<boolean>(true);
+  const [month, setMonth] = useState<string>(new Date().getMonth().toString());
+
+  const updateTemplates = ({
+    idTemplateDKM: newIdTemplateDKM,
+    idTemplateMubaligh: newIdTemplateMubaligh,
+    DKMActive: newDKMActive,
+    MubalighActive: newMubalighActive,
+  }: {
+    idTemplateDKM?: string;
+    idTemplateMubaligh?: string;
+    DKMActive?: boolean;
+    MubalighActive?: boolean;
+  }) => {
+    if (newIdTemplateDKM !== undefined) {
+      setIdTemplateDKM(newIdTemplateDKM);
+      refreshPreview({
+        idTemplateDKM: DKMActive ? newIdTemplateDKM : undefined,
+        idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
+        ...(bulanan && { month: month }),
+      });
+    }
+    if (newIdTemplateMubaligh !== undefined) {
+      setIdTemplateMubaligh(newIdTemplateMubaligh);
+      refreshPreview({
+        idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+        idTemplateMubaligh: MubalighActive ? newIdTemplateMubaligh : undefined,
+        ...(bulanan && { month: month }),
+      });
+    }
+    if (newDKMActive !== undefined) {
+      setDKMActive(newDKMActive);
+      refreshPreview({
+        idTemplateDKM: newDKMActive ? idTemplateDKM : undefined,
+        idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
+        ...(bulanan && { month: month }),
+      });
+    }
+    if (newMubalighActive !== undefined) {
+      setMubalighActive(newMubalighActive);
+      refreshPreview({
+        idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+        idTemplateMubaligh: newMubalighActive ? idTemplateMubaligh : undefined,
+        ...(bulanan && { month: month }),
+      });
+    }
+  };
+
+  function changeMonth(newMonth: string) {
+    setMonth(newMonth);
+    refreshPreview({
+      idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+      idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
+      ...(bulanan && { month: newMonth }),
+    });
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -51,22 +133,62 @@ export function BroadcastPopover({
           <DialogTitle>Broadcast</DialogTitle>
           <DialogDescription>Kirimkan pesan secara langsung</DialogDescription>
         </DialogHeader>
-        <div className="flex justify-between">
-          <InputDropdown
-            select={select}
-            value={idTemplate}
-            onChange={setIdTemplate}
-            placeholder="Pilih Template..."
-          />
+        <div className="flex flex-col items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:w-full">
+            <div className="flex flex-col gap-1">
+              <span className="flex flex-row gap-1 items-center">
+                <Checkbox
+                  checked={DKMActive}
+                  onCheckedChange={(checked) =>
+                    updateTemplates({
+                      DKMActive: !!checked,
+                    })
+                  }
+                />
+                <Label>Ketua DKM</Label>
+              </span>
+              <InputDropdown
+                select={select}
+                value={idTemplateDKM}
+                onChange={(id) =>
+                  updateTemplates({
+                    idTemplateDKM: id,
+                  })
+                }
+                placeholder="Pilih Template..."
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="flex flex-row gap-1 items-center">
+                <Checkbox
+                  checked={MubalighActive}
+                  onCheckedChange={(checked) =>
+                    updateTemplates({ MubalighActive: !!checked })
+                  }
+                />
+                <Label>Mubaligh</Label>
+              </span>
+              <InputDropdown
+                select={select}
+                value={idTemplateMubaligh}
+                onChange={(id) => updateTemplates({ idTemplateMubaligh: id })}
+                placeholder="Pilih Template..."
+              />
+            </div>
+          </div>
           {bulanan && (
-            <InputDropdown
-              select={bulanan.selectMonth}
-              value={bulanan.month}
-              onChange={bulanan.setMonth}
-              placeholder="Pilih Bulan..."
-            />
+            <div className="flex flex-col mt-4 gap-1">
+              <Label>Bulan</Label>
+              <InputDropdown
+                select={months}
+                value={month}
+                onChange={changeMonth}
+                placeholder="Pilih Bulan..."
+              />
+            </div>
           )}
         </div>
+        <Separator />
         <div className="min-h-[200px] max-h-[400px]">
           <ScrollArea className="p-2 max-h-[400px]">
             {previewTexts.length
@@ -107,7 +229,23 @@ export function BroadcastPopover({
           </ScrollArea>
         </div>
         <DialogClose asChild>
-          <Button disabled={!idTemplate} onClick={onSend}>
+          <Button
+            disabled={
+              !(
+                (DKMActive && idTemplateDKM) ||
+                (MubalighActive && idTemplateMubaligh)
+              )
+            }
+            onClick={() => {
+              onSend({
+                idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+                idTemplateMubaligh: MubalighActive
+                  ? idTemplateMubaligh
+                  : undefined,
+                ...(bulanan && { month: month }),
+              });
+            }}
+          >
             Kirim
           </Button>
         </DialogClose>

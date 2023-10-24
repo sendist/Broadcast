@@ -17,15 +17,22 @@ type Props = {
 };
 
 export default function Broadcast({ idJadwal, children, template }: Props) {
-  const [idTemplate, setIdTemplate] = useState<string>("");
-  const [templatePreview, setTemplatePreview] = useState<PreviewTextType[]>([]);
   const apiFetch = useApiFetch();
-  function changeIdTemplate(id: string) {
-    setIdTemplate(id);
+  const [templatePreview, setTemplatePreview] = useState<PreviewTextType[]>([]);
+
+  function refreshPreview(templates: {
+    idTemplateDKM?: string;
+    idTemplateMubaligh?: string;
+  }) {
     apiFetch<PreviewTextType[]>({
       url: `${BASE_URL}/jadwal-jumatan/broadcast-preview?${new URLSearchParams({
         id: idJadwal.join(","),
-        template: id,
+        ...(templates.idTemplateDKM && {
+          templateDKM: templates.idTemplateDKM,
+        }),
+        ...(templates.idTemplateMubaligh && {
+          templateMubaligh: templates.idTemplateMubaligh,
+        }),
       }).toString()}`,
     }).then((res) => {
       setTemplatePreview(res?.data || []);
@@ -37,17 +44,21 @@ export default function Broadcast({ idJadwal, children, template }: Props) {
         label: item.nama_template,
         value: item.id,
       }))}
-      idTemplate={idTemplate}
-      setIdTemplate={changeIdTemplate}
+      refreshPreview={refreshPreview}
       previewTexts={templatePreview}
-      onSend={() =>
+      onSend={(templates) =>
         apiFetch({
           url:
             BASE_URL +
             "/jadwal-jumatan/broadcast?" +
             new URLSearchParams({
               id: idJadwal.join(","),
-              template: idTemplate,
+              ...(templates.idTemplateDKM && {
+                templateDKM: templates.idTemplateDKM,
+              }),
+              ...(templates.idTemplateMubaligh && {
+                templateMubaligh: templates.idTemplateMubaligh,
+              }),
             }).toString(),
         })
       }

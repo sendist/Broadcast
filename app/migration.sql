@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS "pengajian" (
 
 CREATE TABLE IF NOT EXISTS "jumatan" (
     id BIGSERIAL PRIMARY KEY,
-    tanggal TIMESTAMPTZ NOT NULL,
+    tanggal DATE NOT NULL,
     id_masjid BIGINT NOT NULL,
     id_mubaligh BIGINT NOT NULL,
     broadcasted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -117,8 +117,10 @@ CREATE TABLE IF NOT EXISTS "broadcast_schedule" (
     force_broadcast BOOLEAN NOT NULL DEFAULT FALSE,
     h INT NOT NULL DEFAULT 0,
     jam timetz NOT NULL DEFAULT '00:00:00',
-    id_template BIGINT,
-    FOREIGN KEY (id_template) REFERENCES template(id) ON DELETE NO ACTION
+    id_template_dkm BIGINT,
+    id_template_mubaligh BIGINT,
+    FOREIGN KEY (id_template_dkm) REFERENCES template(id) ON DELETE NO ACTION,
+    FOREIGN KEY (id_template_mubaligh) REFERENCES template(id) ON DELETE NO ACTION
 );
 
 INSERT INTO "broadcast_schedule" (id, active, force_broadcast, h, jam) VALUES

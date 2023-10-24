@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Props = {
   value: string;
-  select: { label: string; value: string }[];
+  select: readonly { label: string; value: string }[];
   onChange: (value: string) => void;
   placeholder?: string;
   align?: "start" | "end" | "center";
