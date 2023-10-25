@@ -162,19 +162,19 @@ export default function JadwalPengajianPage() {
             mubalighDropdown={mubalighDropdown || []}
             masjidDropdown={masjidDropdown || []}
           >
-            <Button variant="outline" className="ml-4 mt-2">
+            <Button variant="white" className="ml-4 mt-2">
               <PlusIcon className="mr-2" />
               Add
             </Button>
           </AddJadwalPengajianForm>
           <AddJadwalPengajianBulk onSubmit={uploadTemplate}>
-            <Button variant="outline">
+            <Button variant="white">
               <PlusIcon className="mr-2" />
               Bulk Upload
             </Button>
           </AddJadwalPengajianBulk>
           <BroadcastBulanan template={templateBulanan || []}>
-            <Button variant="outline">
+            <Button variant="white">
               <RocketIcon className="mr-2" />
               Broadcast Bulanan
             </Button>
@@ -190,7 +190,7 @@ export default function JadwalPengajianPage() {
                 dangerous
               >
                 <Button
-                  variant="outline"
+                  variant="white"
                   className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />
@@ -201,7 +201,7 @@ export default function JadwalPengajianPage() {
                 template={template || []}
                 idJadwal={selectedRows.map((row) => row.original.id)}
               >
-                <Button variant="outline">
+                <Button variant="white">
                   <RocketIcon className="mr-2" />
                   Broadcast Selected ({selectedRows?.length})
                 </Button>

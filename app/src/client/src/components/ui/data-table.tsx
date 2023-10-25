@@ -156,7 +156,7 @@ function DataTable1<TData, TValue>(
         </div>
         <div className="space-x-2">
           <Button
-            variant="outline"
+            variant="white"
             size="sm"
             onClick={() => {
               if (meta && meta.previousPage) {
@@ -168,7 +168,7 @@ function DataTable1<TData, TValue>(
             Previous
           </Button>
           <Button
-            variant="outline"
+            variant="white"
             size="sm"
             onClick={() => {
               if (meta && meta.nextPage) {

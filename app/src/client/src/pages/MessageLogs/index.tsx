@@ -77,7 +77,7 @@ export default function MessageLogs() {
                 dangerous
               >
                 <Button
-                  variant="outline"
+                  variant="white"
                   className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />

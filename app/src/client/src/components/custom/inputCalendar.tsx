@@ -27,7 +27,7 @@ export default function InputCalendar({
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"outline"}
+          variant="white"
           className={cn(
             "w-[240px] pl-3 text-left font-normal",
             !value && "text-muted-foreground"

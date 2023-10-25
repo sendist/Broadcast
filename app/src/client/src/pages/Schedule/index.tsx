@@ -362,7 +362,7 @@ export default function SchedulePage() {
                 <Separator />
                 <div className="space-x-4">
                   <Button
-                    variant="outline"
+                    variant="white"
                     disabled={unsavedChanges.pengajian_bulanan.saving}
                     onClick={() => discard("pengajian_bulanan")}
                   >
@@ -517,7 +517,7 @@ export default function SchedulePage() {
                 <Separator />
                 <div className="space-x-4">
                   <Button
-                    variant="outline"
+                    variant="white"
                     disabled={unsavedChanges.pengajian_reminder.saving}
                     onClick={() => discard("pengajian_reminder")}
                   >
@@ -672,7 +672,7 @@ export default function SchedulePage() {
                 <Separator />
                 <div className="space-x-4">
                   <Button
-                    variant="outline"
+                    variant="white"
                     disabled={unsavedChanges.jumatan_reminder.saving}
                     onClick={() => discard("jumatan_reminder")}
                   >

@@ -82,13 +82,13 @@ export default function MasjidPage() {
         </div>
         <div className="space-x-4 space-y-2 -mt-2">
           <AddMasjidForm onSubmit={create}>
-            <Button variant="outline" className="ml-4 mt-2">
+            <Button variant="white" className="ml-4 mt-2">
               <PlusIcon className="mr-2" />
               Add
             </Button>
           </AddMasjidForm>
           <AddMasjidBulk onSubmit={uploadTemplate}>
-            <Button variant="outline">
+            <Button variant="white">
               <PlusIcon className="mr-2" />
               Bulk Upload
             </Button>
@@ -104,7 +104,7 @@ export default function MasjidPage() {
                 dangerous
               >
                 <Button
-                  variant="outline"
+                  variant="white"
                   className="text-red-600 hover:text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="mr-2" />

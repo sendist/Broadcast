@@ -37,7 +37,7 @@ export default function InputDropdown({
       <PopoverTrigger asChild>
         <Button
           disabled={disabled}
-          variant="outline"
+          variant="white"
           role="combobox"
           aria-expanded={open}
           className="w-[200px] justify-between disabled:cursor-not-allowed"
