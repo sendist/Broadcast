@@ -5,35 +5,37 @@ services:
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 5222d520fa145634b71e89e1273a49617e557b7283d86fd97ece7634435502ff
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: postgres
       PGDATABASE: postgres
-      PGPASSWORD: 5222d520fa145634b71e89e1273a49617e557b7283d86fd97ece7634435502ff
-      POSTGRES_PORT: 54321
-      PGPORT: 54321
+      PGPASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_PORT: ${DATABASE_PORT}
+      PGPORT: ${DATABASE_PORT}
     ports:
-      - "54321:54321"
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
+      - ./migration.sql:/docker-entrypoint-initdb.d/migration.sql
       - broadcast:/var/lib/postgresql/data
     restart: unless-stopped
 
   backend:
     build:
-        context: ./app
+      context: ./app
     ports:
-        - "3000:3000"
+      - "${APP_PORT}:3000"
     depends_on:
       - db
     restart: unless-stopped
 
+# comment out if you don't want to use nginx
   nginx:
-    restart: unless-stopped
     build:
-        context: ./nginx
+      context: ./nginx
     ports:
-        - "80:80"
+      - "80:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
   broadcast:

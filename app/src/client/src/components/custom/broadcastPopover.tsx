@@ -84,45 +84,58 @@ export function BroadcastPopover({
   }) => {
     if (newIdTemplateDKM !== undefined) {
       setIdTemplateDKM(newIdTemplateDKM);
-      refreshPreview({
-        idTemplateDKM: DKMActive ? newIdTemplateDKM : undefined,
-        idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
-        ...(bulanan && { month: month }),
-      });
+      ((DKMActive && newIdTemplateDKM) ||
+        (MubalighActive && idTemplateMubaligh)) &&
+        refreshPreview({
+          idTemplateDKM: DKMActive ? newIdTemplateDKM : undefined,
+          idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
+          ...(bulanan && { month: month }),
+        });
     }
     if (newIdTemplateMubaligh !== undefined) {
       setIdTemplateMubaligh(newIdTemplateMubaligh);
-      refreshPreview({
-        idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
-        idTemplateMubaligh: MubalighActive ? newIdTemplateMubaligh : undefined,
-        ...(bulanan && { month: month }),
-      });
+      ((DKMActive && idTemplateDKM) ||
+        (MubalighActive && newIdTemplateMubaligh)) &&
+        refreshPreview({
+          idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+          idTemplateMubaligh: MubalighActive
+            ? newIdTemplateMubaligh
+            : undefined,
+          ...(bulanan && { month: month }),
+        });
     }
     if (newDKMActive !== undefined) {
       setDKMActive(newDKMActive);
-      refreshPreview({
-        idTemplateDKM: newDKMActive ? idTemplateDKM : undefined,
-        idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
-        ...(bulanan && { month: month }),
-      });
+      ((newDKMActive && idTemplateDKM) ||
+        (MubalighActive && idTemplateMubaligh)) &&
+        refreshPreview({
+          idTemplateDKM: newDKMActive ? idTemplateDKM : undefined,
+          idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
+          ...(bulanan && { month: month }),
+        });
     }
     if (newMubalighActive !== undefined) {
       setMubalighActive(newMubalighActive);
-      refreshPreview({
-        idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
-        idTemplateMubaligh: newMubalighActive ? idTemplateMubaligh : undefined,
-        ...(bulanan && { month: month }),
-      });
+      ((DKMActive && idTemplateDKM) ||
+        (newMubalighActive && idTemplateMubaligh)) &&
+        refreshPreview({
+          idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+          idTemplateMubaligh: newMubalighActive
+            ? idTemplateMubaligh
+            : undefined,
+          ...(bulanan && { month: month }),
+        });
     }
   };
 
   function changeMonth(newMonth: string) {
     setMonth(newMonth);
-    refreshPreview({
-      idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
-      idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
-      ...(bulanan && { month: newMonth }),
-    });
+    ((DKMActive && idTemplateDKM) || (MubalighActive && idTemplateMubaligh)) &&
+      refreshPreview({
+        idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
+        idTemplateMubaligh: MubalighActive ? idTemplateMubaligh : undefined,
+        ...(bulanan && { month: newMonth }),
+      });
   }
 
   return (
@@ -156,6 +169,7 @@ export function BroadcastPopover({
                   })
                 }
                 placeholder="Pilih Template..."
+                disabled={!DKMActive}
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -173,6 +187,7 @@ export function BroadcastPopover({
                 value={idTemplateMubaligh}
                 onChange={(id) => updateTemplates({ idTemplateMubaligh: id })}
                 placeholder="Pilih Template..."
+                disabled={!MubalighActive}
               />
             </div>
           </div>
@@ -236,15 +251,15 @@ export function BroadcastPopover({
                 (MubalighActive && idTemplateMubaligh)
               )
             }
-            onClick={() => {
+            onClick={() =>
               onSend({
                 idTemplateDKM: DKMActive ? idTemplateDKM : undefined,
                 idTemplateMubaligh: MubalighActive
                   ? idTemplateMubaligh
                   : undefined,
                 ...(bulanan && { month: month }),
-              });
-            }}
+              })
+            }
           >
             Kirim
           </Button>

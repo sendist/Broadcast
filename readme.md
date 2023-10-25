@@ -14,11 +14,11 @@ We used these tech stacks to develop this app:
 2. PostgreSQL
 3. Docker
 
-## Guide
+## Development Guide
 
 1. Clone this repository.
 
-2. copy `.env.example` to `.env` in app folder.
+2. copy `.env.example` to `.env` both in root folder and the app folder.
 
 3. Install dependencies.
 
@@ -32,3 +32,16 @@ We used these tech stacks to develop this app:
    ```console
    $ cd .. && npm run dev
    ```
+
+## Deployment Guide
+
+1. Clone this repository.
+
+2. copy `.env.example` to `.env` both in root folder and the app folder.
+
+   > ⚠️ **WARNING!** ⚠️
+   >
+   > DO NOT FORGET TO CHANGE ALL THE PASSWORDS AND CREDENTIALS IN BOTH .env files
+
+3. If you wish to not use nginx, you can comment out the nginx service in `docker-compose.yml` file.
+4. run `docker-compose up -d --build` in root folder.

@@ -6,6 +6,21 @@ import {
 } from "./etc.util";
 import prisma from "./prisma.util";
 
+const listMonths = {
+  0: "Januari",
+  1: "Februari",
+  2: "Maret",
+  3: "April",
+  4: "Mei",
+  5: "Juni",
+  6: "Juli",
+  7: "Agustus",
+  8: "September",
+  9: "Oktober",
+  10: "November",
+  11: "Desember",
+};
+
 export const pengajianMessages = ({
   templateIdDKM,
   templateIdMubaligh,
@@ -246,14 +261,6 @@ export const pengajianBulananMessages = ({
     > = {};
 
     for (const pengajian of pengajians) {
-      const replacements: [string, string][] = [
-        ["tanggal", formatDate(pengajian.tanggal)],
-        ["waktu", pengajian.waktu],
-        ["nama_masjid", pengajian.masjid.nama_masjid],
-        ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
-        ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
-      ];
-
       if (masjidGroups[pengajian.masjid.id.toString()]) {
         masjidGroups[pengajian.masjid.id.toString()].pengajians.push(pengajian);
         masjidGroups[pengajian.masjid.id.toString()].mubalighs.add(
@@ -271,6 +278,7 @@ export const pengajianBulananMessages = ({
     )) {
       if (templateDKM) {
         const replacements = pengajians.map((pengajian) => [
+          ["bulan", listMonths[month as keyof typeof listMonths]],
           ["tanggal", formatDate(pengajian.tanggal)],
           ["waktu", pengajian.waktu],
           ["nama_masjid", pengajian.masjid.nama_masjid],
@@ -288,6 +296,7 @@ export const pengajianBulananMessages = ({
           const replacements = pengajians
             .filter((pengajian) => pengajian.mubaligh.id === mubaligh)
             .map((pengajian) => [
+              ["bulan", listMonths[month as keyof typeof listMonths]],
               ["tanggal", formatDate(pengajian.tanggal)],
               ["waktu", pengajian.waktu],
               ["nama_masjid", pengajian.masjid.nama_masjid],

@@ -4,7 +4,6 @@ import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
 import { body, param, query } from "express-validator";
-import { humanize } from "../utils/etc.util";
 import { $Enums } from "@prisma/client";
 
 const router = express.Router();
@@ -131,6 +130,7 @@ const templateEnum: {
   label: string;
   replacements: string[];
   repetition: boolean;
+  guide: string;
 }[] = [
   {
     value: "pengajian_bulanan",
@@ -144,6 +144,30 @@ const templateEnum: {
       "nama_ketua_dkm",
     ],
     repetition: true,
+    guide: `Anda dapat menggunakan
+{{bulan}},
+{{tanggal}},
+{{waktu}},
+{{nama_masjid}},
+{{nama_mubaligh}},
+{{nama_ketua_dkm}}
+sebagai substitusi template.
+
+Anda juga dapat menggunakan [[ ]] untuk mengulangi konten yang ada di dalamnya.
+
+Contoh:
+
+Kepada {{nama_ketua_dkm}} selaku pengurus {{nama_masjid}}.
+Berikut adalah jadwal pengajian untuk bulan {{bulan}}
+
+[[
+tanggal: {{tanggal}}
+waktu: {{waktu}}
+nama_mubaligh: {{nama_mubaligh}}
+
+]]
+
+Demikian pemberitahuan ini kami sampaikan. Terima kasih.`,
   },
   {
     value: "pengajian_reminder",
@@ -156,12 +180,39 @@ const templateEnum: {
       "nama_ketua_dkm",
     ],
     repetition: false,
+    guide: `Anda dapat menggunakan
+{{tanggal}},
+{{waktu}},
+{{nama_masjid}},
+{{nama_mubaligh}},
+{{nama_ketua_dkm}}
+sebagai substitusi template.
+
+Contoh:
+
+Kepada {{nama_ketua_dkm}} selaku pengurus {{nama_masjid}} dan {{nama_mubaligh}} selaku mubaligh.
+Akan diadakan pengajian pada tanggal {{tanggal}} dengan waktu {{waktu}}.
+
+Demikian pemberitahuan ini kami sampaikan. Terima kasih.`,
   },
   {
     value: "jumatan_reminder",
     label: "Jumatan Reminder",
     replacements: ["tanggal", "nama_masjid", "nama_mubaligh", "nama_ketua_dkm"],
     repetition: false,
+    guide: `Anda dapat menggunakan
+{{tanggal}},
+{{nama_masjid}},
+{{nama_mubaligh}},
+{{nama_ketua_dkm}}
+sebagai substitusi template.
+
+Contoh:
+
+Kepada {{nama_ketua_dkm}} selaku pengurus {{nama_masjid}} dan {{nama_mubaligh}} selaku mubaligh.
+Akan diadakan jumatan pada tanggal {{tanggal}}.
+
+Demikian pemberitahuan ini kami sampaikan. Terima kasih.`,
   },
 ];
 

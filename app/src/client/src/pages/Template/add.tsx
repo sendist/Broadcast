@@ -8,6 +8,8 @@ import {
 } from "react-hook-form";
 import AddForm, { RenderFormInput } from "@/components/custom/addForm";
 import InputDropdown from "@/components/custom/inputDropdown";
+import { useState } from "react";
+import { whatsappFormatting } from "@/lib/utils";
 export function AddTemplateForm({
   types,
   children,
@@ -18,6 +20,7 @@ export function AddTemplateForm({
     value: string;
     replacements: string[];
     repetition: boolean;
+    guide: string;
   }[];
   children: React.ReactNode;
   onSubmit: (data: {
@@ -26,6 +29,7 @@ export function AddTemplateForm({
     type: string;
   }) => void;
 }) {
+  const [currentTemplateType, setCurrentTemplateType] = useState<string>("");
   const templateFormSchema = z.object({
     nama_template: z.string().min(1, "Nama Template harus diisi"),
     content: z.string().min(1, "Content harus diisi"),
@@ -57,12 +61,6 @@ export function AddTemplateForm({
       placeholder: "Nama Template",
     },
     {
-      name: "content",
-      label: "Content Pesan",
-      placeholder: "Content Pesan",
-      textarea: true,
-    },
-    {
       name: "type",
       label: "Tipe Pesan Broadcast",
       customInput: <T extends FieldValues>({
@@ -74,13 +72,39 @@ export function AddTemplateForm({
           <InputDropdown
             value={field.value}
             select={types}
-            onChange={field.onChange}
+            onChange={(value) => {
+              setCurrentTemplateType(value);
+              field.onChange(value);
+            }}
             placeholder="Pilih Tipe..."
             align={"start"}
             side={"top"}
           />
         );
       },
+    },
+    {
+      name: "content",
+      label: "Content Pesan",
+      placeholder: "Content Pesan",
+      textarea: true,
+      guide: (
+        <p className="font-normal whitespace-pre-wrap leading-4">
+          {types.find((type) => type.value === currentTemplateType)
+            ? whatsappFormatting(
+                types.find((type) => type.value === currentTemplateType)!.guide,
+                {
+                  replacements: types.find(
+                    (type) => type.value === currentTemplateType
+                  )!.replacements,
+                  repetition: types.find(
+                    (type) => type.value === currentTemplateType
+                  )!.repetition,
+                }
+              )
+            : "Silakan pilih tipe pesan untuk melihat contoh content pesan"}
+        </p>
+      ),
     },
   ];
 

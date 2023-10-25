@@ -19,6 +19,7 @@ type Props = {
   placeholder?: string;
   align?: "start" | "end" | "center";
   side?: "top" | "bottom" | "right" | "left";
+  disabled?: boolean;
 };
 
 export default function InputDropdown({
@@ -28,16 +29,18 @@ export default function InputDropdown({
   placeholder,
   align,
   side,
+  disabled,
 }: Props) {
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={disabled}
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-[200px] justify-between disabled:cursor-not-allowed"
         >
           {value
             ? select.find((item) => item.value === value)?.label

@@ -13,6 +13,7 @@ import ConfirmDialog from "@/components/custom/confirmDialog";
 import Broadcast from "./broadcast";
 import BroadcastBulanan from "./broadcastBulanan";
 import useFirstRender from "@/hooks/firstRender";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 const limit = 20;
 
@@ -20,6 +21,20 @@ export default function JadwalPengajianPage() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<JadwalPengajian>[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [dateRange, setDateRange] = useState<{
+    from: Date;
+    to: Date;
+  }>({
+    from: new Date(new Date().setHours(0, 0, 0, 0)),
+    to: new Date(
+      new Date(new Date().setMonth(new Date().getMonth() + 1)).setHours(
+        0,
+        0,
+        0,
+        0
+      )
+    ),
+  });
   const { data, loading, update, remove, create, get } =
     useCRUD<JadwalPengajian>({
       url: "/jadwal-pengajian",
@@ -30,6 +45,14 @@ export default function JadwalPengajianPage() {
           orderBy: sorting[0].id,
           orderType: sorting[0].desc ? "desc" : "asc",
         }),
+        dateStart: new Date(
+          new Date(dateRange.from).setHours(
+            new Date().getTimezoneOffset() / -60
+          )
+        ).toISOString(),
+        dateEnd: new Date(
+          new Date(dateRange.to).setHours(new Date().getTimezoneOffset() / -60)
+        ).toISOString(),
       },
     });
 
@@ -124,7 +147,7 @@ export default function JadwalPengajianPage() {
       get();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, sorting]);
+  }, [page, sorting, dateRange]);
 
   return (
     <div>
@@ -186,6 +209,17 @@ export default function JadwalPengajianPage() {
             </>
           ) : null}
         </div>
+      </div>
+      <div className="mb-4">
+        <DateRangePicker
+          onUpdate={({ range: { from, to } }) =>
+            setDateRange({ from, to: to! })
+          }
+          initialDateFrom={dateRange.from}
+          initialDateTo={dateRange.to}
+          align="start"
+          locale="id-ID"
+        />
       </div>
       <DataTable
         ref={tableRef}

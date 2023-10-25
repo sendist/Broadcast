@@ -16,6 +16,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,6 +25,13 @@ import {
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
+import { ScrollArea } from "../ui/scroll-area";
 
 export type RenderFormInput<T extends FieldValues> = {
   name: string;
@@ -31,6 +39,8 @@ export type RenderFormInput<T extends FieldValues> = {
   placeholder?: string;
   textarea?: boolean;
   customInput?: (props: { field: ControllerRenderProps<T> }) => JSX.Element;
+  description?: string;
+  guide?: JSX.Element | string;
 }[];
 
 type Props<T extends FieldValues> = {
@@ -77,7 +87,24 @@ export default function AddForm<T extends FieldValues>({
                 name={item.name as Path<T>}
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{item.label}</FormLabel>
+                    <FormLabel className="flex flex-row gap-2">
+                      {item.label}{" "}
+                      {item.guide && (
+                        <HoverCard>
+                          <HoverCardTrigger>
+                            <InfoCircledIcon />
+                          </HoverCardTrigger>
+                          <HoverCardContent side="right">
+                            <ScrollArea className="max-h-64">
+                              {item.guide}
+                            </ScrollArea>
+                          </HoverCardContent>
+                        </HoverCard>
+                      )}
+                    </FormLabel>
+                    {item.description && (
+                      <FormDescription>{item.description}</FormDescription>
+                    )}
                     <FormControl>
                       {item.textarea ? (
                         <Textarea placeholder={item.placeholder} {...field} />

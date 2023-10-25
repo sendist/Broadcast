@@ -230,6 +230,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (data) {
+      console.log(data);
       setSchedule(data);
       setUnsavedChanges(
         Object.keys(data).reduce((acc, curr) => {
@@ -274,6 +275,7 @@ export default function SchedulePage() {
             <div>
               Kirim jadwal pengajian bulanan setiap H-{" "}
               <Input
+                disabled={!schedule.pengajian_bulanan.active}
                 type="number"
                 min="0"
                 max="30"
@@ -292,6 +294,7 @@ export default function SchedulePage() {
               </CustomTooltip>
               awal bulan pada jam{" "}
               <Input
+                disabled={!schedule.pengajian_bulanan.active}
                 type="time"
                 className="w-fit inline-block"
                 value={LocalTimeUTCConverter(
@@ -308,6 +311,7 @@ export default function SchedulePage() {
               />{" "}
               dengan template DKM{" "}
               <InputDropdown
+                disabled={!schedule.pengajian_bulanan.active}
                 placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
@@ -330,6 +334,7 @@ export default function SchedulePage() {
               />{" "}
               dan template Mubaligh{" "}
               <InputDropdown
+                disabled={!schedule.pengajian_bulanan.active}
                 placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
@@ -404,6 +409,7 @@ export default function SchedulePage() {
             <div className="flex items-center gap-2">
               Tetap broadcast jadwal yang sudah di broadcast{" "}
               <Switch
+                disabled={!schedule.pengajian_reminder.active}
                 checked={schedule.pengajian_reminder.force_broadcast}
                 onCheckedChange={(checked) => {
                   changeSchedule(
@@ -424,6 +430,7 @@ export default function SchedulePage() {
             <div>
               Kirim jadwal pengajian setiap H-{" "}
               <Input
+                disabled={!schedule.pengajian_reminder.active}
                 type="number"
                 min="0"
                 max="30"
@@ -442,6 +449,7 @@ export default function SchedulePage() {
               </CustomTooltip>{" "}
               pada jam{" "}
               <Input
+                disabled={!schedule.pengajian_reminder.active}
                 type="time"
                 className="w-fit inline-block"
                 value={LocalTimeUTCConverter(
@@ -458,6 +466,7 @@ export default function SchedulePage() {
               />{" "}
               dengan template DKM{" "}
               <InputDropdown
+                disabled={!schedule.pengajian_reminder.active}
                 placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
@@ -480,6 +489,7 @@ export default function SchedulePage() {
               />{" "}
               dan template Mubaligh{" "}
               <InputDropdown
+                disabled={!schedule.pengajian_reminder.active}
                 placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
@@ -554,6 +564,7 @@ export default function SchedulePage() {
             <div className="flex items-center gap-2">
               Tetap broadcast jadwal yang sudah di broadcast{" "}
               <Switch
+                disabled={!schedule.jumatan_reminder.active}
                 checked={schedule.jumatan_reminder.force_broadcast}
                 onCheckedChange={(checked) => {
                   changeSchedule(
@@ -574,6 +585,7 @@ export default function SchedulePage() {
             <div>
               Kirim jadwal jumatan setiap H-{" "}
               <Input
+                disabled={!schedule.jumatan_reminder.active}
                 type="number"
                 min="0"
                 max="30"
@@ -592,6 +604,7 @@ export default function SchedulePage() {
               </CustomTooltip>{" "}
               pada jam{" "}
               <Input
+                disabled={!schedule.jumatan_reminder.active}
                 type="time"
                 className="w-fit inline-block"
                 value={LocalTimeUTCConverter(
@@ -608,6 +621,7 @@ export default function SchedulePage() {
               />{" "}
               dengan template DKM{" "}
               <InputDropdown
+                disabled={!schedule.jumatan_reminder.active}
                 placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(
@@ -630,6 +644,7 @@ export default function SchedulePage() {
               />{" "}
               dan template Mubaligh{" "}
               <InputDropdown
+                disabled={!schedule.jumatan_reminder.active}
                 placeholder="Pilih Template..."
                 value={
                   templateDropdown?.find(

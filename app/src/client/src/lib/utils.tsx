@@ -51,7 +51,7 @@ export function whatsappFormatting(
     ...(extendedFormatting?.repetition
       ? [
           {
-            regex: /(\[\[)(.*)(\]\])/s,
+            regex: /(\[\[)(.*?)(\]\])/gs,
             replacement:
               "<span class='text-blue-600'>$1</span>$2<span class='text-blue-600'>$3</span>",
           },

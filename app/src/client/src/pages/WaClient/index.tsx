@@ -1,5 +1,5 @@
 import QRCode from "react-qr-code";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useWebSocket } from "@/hooks/backend";
@@ -9,13 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 
 export default function WaClient() {
-  const [waClientInfo, setWaClientInfo] = useState<{
-    qr: string;
-    state: string;
-  }>({
-    qr: "",
-    state: "LOADING",
-  });
   const { lastJsonMessage } = useWebSocket<{
     qr: string;
     /*
@@ -36,11 +29,7 @@ export default function WaClient() {
     state: "LOADING" | "CONNECTED" | "UNPAIRED" | "UNPAIRED_IDLE" | string;
   }>("/waclient/ws", "/waclient/connect");
 
-  useEffect(() => {
-    if (lastJsonMessage !== null) {
-      setWaClientInfo(lastJsonMessage);
-    }
-  }, [lastJsonMessage]);
+  const waClientInfo = lastJsonMessage || { qr: "", state: "LOADING" };
 
   const httpCall = useApiFetch();
 

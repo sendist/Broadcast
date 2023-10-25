@@ -20,14 +20,28 @@ router.get(
     query("limit").optional().isNumeric().notEmpty(),
     query("orderBy").optional().isString().notEmpty(),
     query("orderType").optional().isString().notEmpty(),
+    query("dateStart").optional().isISO8601(),
+    query("dateEnd").optional().isISO8601(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { page, limit, orderBy, orderType } = req.query;
+    const { page, limit, orderBy, orderType, dateStart, dateEnd } = req.query;
 
     const { fields } = req.query;
     const fieldsArr = fields ? fields.toString().split(",") : undefined;
     prisma.jumatan
       .findMany({
+        where: {
+          ...((dateStart || dateEnd) && {
+            tanggal: {
+              ...(dateStart && {
+                gte: new Date(dateStart as string),
+              }),
+              ...(dateEnd && {
+                lte: new Date(dateEnd as string),
+              }),
+            },
+          }),
+        },
         ...(fields && {
           select: {
             id: fieldsArr?.includes("id"),
@@ -165,8 +179,12 @@ router.get(
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
     return jumatanMessages({
-      templateIdDKM: BigInt(templateDKM as string),
-      templateIdMubaligh: BigInt(templateMubaligh as string),
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
       jumatanId: idArr,
     })
       .then((messages) => {
@@ -198,8 +216,12 @@ router.get(
     const idArr = (id as string).split(",").map((id) => BigInt(id));
 
     return jumatanMessages({
-      templateIdDKM: BigInt(templateDKM as string),
-      templateIdMubaligh: BigInt(templateMubaligh as string),
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
       jumatanId: idArr,
       changeStatusToBroadcasted: true,
     })

@@ -38,6 +38,7 @@ export default function TemplatePage() {
     label: string;
     replacements: string[];
     repetition: boolean;
+    guide: string;
   }>({
     url: "/template/types",
   });
