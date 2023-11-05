@@ -14,6 +14,10 @@ We used these tech stacks to develop this app:
 2. PostgreSQL
 3. Docker
 
+## Updates
+1. Access 127.0.0.1:5173 or 127.0.0.1:5173/ to access the landing page
+2. Access 127.0.0.1:5173/login to access the login page
+
 ## Development Guide
 
 1. Clone this repository.

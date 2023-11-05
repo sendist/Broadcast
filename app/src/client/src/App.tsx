@@ -19,7 +19,7 @@ import Logo from "./assets/logo";
 
 const menus = [
   {
-    path: "/",
+    path: "/home",
     name: "Home",
     icon: (
       <svg

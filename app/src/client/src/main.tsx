@@ -17,6 +17,7 @@ import SplashScreen from "./pages/SplashScreen/index.tsx";
 import MessageLogs from "./pages/MessageLogs/index.tsx";
 import SchedulePage from "./pages/Schedule/index.tsx";
 import Home from "./pages/Home/index.tsx";
+import LandingPage from "./pages/LandingPage/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -34,14 +35,14 @@ const router = createBrowserRouter([
     element: (
       <AccountProvider>
         <SplashScreen>
-          <App />
+          { window.location.pathname === "/" ? <LandingPage /> : <App /> }
         </SplashScreen>
       </AccountProvider>
     ),
     errorElement: <NotFound />,
     children: [
       {
-        path: "",
+        path: "home",
         element: <Home />,
       },
       {
@@ -75,8 +76,8 @@ const router = createBrowserRouter([
       {
         path: "message-logs",
         element: <MessageLogs />,
-      },
-    ],
+      }
+    ]
   },
 ]);
 
