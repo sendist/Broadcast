@@ -55,6 +55,7 @@ export default function JadwalPengajianPage() {
         ).toISOString(),
       },
     });
+    console.log(data)
 
   const { data: masjidForDropdown } = useCRUD<{
     id: string;

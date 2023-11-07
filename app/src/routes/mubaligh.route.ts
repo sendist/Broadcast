@@ -98,7 +98,7 @@ router.post("/upload", (req: Request, res: Response, next: NextFunction) => {
         .createMany({
           data,
         })
-        .then((jumatan) => {
+        .then((mubaligh) => {
           sendResponse({
             res,
             data: "OK",

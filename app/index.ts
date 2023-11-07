@@ -18,6 +18,7 @@ import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
 import prismaErrorHandler from "./src/middlewares/prismaErrorHandler.middleware";
 import { initCron } from "./src/utils/cron.util";
+import landingRoute from "./src/routes/landing.route";
 dotenv.config();
 
 const app = express();
@@ -62,6 +63,8 @@ router.use((req: Request, res: Response, next) => {
 });
 
 router.use("/auth", authRoute);
+
+router.use("/landing", landingRoute);
 
 // all routes below this line will require authentication
 router.use(authentication);
