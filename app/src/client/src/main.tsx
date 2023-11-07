@@ -21,22 +21,22 @@ import LandingPage from "./pages/LandingPage/index.tsx";
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
     path: "/login",
     element: (
       <AccountProvider>
-        <SplashScreen>
-          <Login />
-        </SplashScreen>
+        <Login />
       </AccountProvider>
     ),
   },
   {
-    path: "/",
+    path: "/*",
     element: (
       <AccountProvider>
-        <SplashScreen>
-          { window.location.pathname === "/" ? <LandingPage /> : <App /> }
-        </SplashScreen>
+        <App />
       </AccountProvider>
     ),
     errorElement: <NotFound />,
@@ -76,8 +76,12 @@ const router = createBrowserRouter([
       {
         path: "message-logs",
         element: <MessageLogs />,
-      }
-    ]
+      },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
+    ],
   },
 ]);
 
