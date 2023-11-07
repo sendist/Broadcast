@@ -84,7 +84,7 @@ const AccountProvider = ({ children }: AccountProviderProps) => {
           });
         } else if (data) {
           dispatch({ type: "success", payload: data });
-          navigate("/");
+          navigate("/home");
         }
       })
       .catch((err) => {

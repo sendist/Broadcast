@@ -8,7 +8,7 @@ import {
   ExitIcon,
   DotsHorizontalIcon,
 } from "@radix-ui/react-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import Logo from "./assets/logo";
 
 const menus = [
   {
-    path: "/",
+    path: "/home",
     name: "Home",
     icon: (
       <svg
@@ -222,13 +222,19 @@ const menus = [
 ];
 
 function App() {
-  const { account, logout } = useAccount();
+  const { account, logout, loading } = useAccount();
   const navigate = useNavigate();
   const { width } = useWindowSize();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(
     menus.find((menu) => menu.path === location.pathname)?.name ?? menus[0].name
   );
+  useEffect(() => {
+    if (!loading && !account && location.pathname !== "/") {
+      navigate("/login");
+    }
+  }, [account, loading, loading]);
+
   const logoutAdmin = (
     <div className="mt-auto flex justify-between items-center">
       <span className="text-sm font-medium text-black">

@@ -17,31 +17,32 @@ import SplashScreen from "./pages/SplashScreen/index.tsx";
 import MessageLogs from "./pages/MessageLogs/index.tsx";
 import SchedulePage from "./pages/Schedule/index.tsx";
 import Home from "./pages/Home/index.tsx";
+import LandingPage from "./pages/LandingPage/index.tsx";
 
 const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LandingPage />,
+  },
   {
     path: "/login",
     element: (
       <AccountProvider>
-        <SplashScreen>
-          <Login />
-        </SplashScreen>
+        <Login />
       </AccountProvider>
     ),
   },
   {
-    path: "/",
+    path: "/*",
     element: (
       <AccountProvider>
-        <SplashScreen>
-          <App />
-        </SplashScreen>
+        <App />
       </AccountProvider>
     ),
     errorElement: <NotFound />,
     children: [
       {
-        path: "",
+        path: "home",
         element: <Home />,
       },
       {
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "message-logs",
         element: <MessageLogs />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
