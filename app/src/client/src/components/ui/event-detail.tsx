@@ -15,23 +15,23 @@ const EventDetail: React.FC<EventProps> = ({
   mubaligh,
   waktu,
 }) => (
-  <Card>
+  <Card className="border-border border shadow-none">
     <CardHeader>
       <CardTitle>{jadwal}</CardTitle>
     </CardHeader>
     <CardContent>
-    <Table>
-      <TableHeader>
-        <td>Masjid</td>
-        <td>Mubaligh</td>
-        {waktu ? <td>Waktu</td> : null}
-      </TableHeader>
-      <TableBody className="font-bold">
-        <td>{masjid}</td>
-        <td>{mubaligh}</td>
-        {waktu ? <td>{waktu}</td> : null}
-      </TableBody>
-    </Table>
+      <Table>
+        <TableHeader>
+          <td>Masjid</td>
+          <td>Mubaligh</td>
+          {waktu ? <td>Waktu</td> : null}
+        </TableHeader>
+        <TableBody className="font-bold">
+          <td>{masjid}</td>
+          <td>{mubaligh}</td>
+          {waktu ? <td>{waktu}</td> : null}
+        </TableBody>
+      </Table>
     </CardContent>
   </Card>
 );

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "../types/express.type";
 import prisma from "../utils/prisma.util";
 import sendResponse from "../utils/response.util";
 import validate from "../middlewares/validation.middleware";
-import { body, param, query } from "express-validator";
+import { query } from "express-validator";
 
 const router = express.Router();
 router.get(
@@ -14,12 +14,12 @@ router.get(
     query("limit").optional().isNumeric().notEmpty(),
     query("orderBy").optional().isString().notEmpty(),
     query("orderType").optional().isString().notEmpty(),
+    query("month").optional().isNumeric().notEmpty(),
     query("dateStart").optional().isISO8601(),
     query("dateEnd").optional().isISO8601(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { page, limit, orderBy, orderType, dateStart, dateEnd } = req.query;
-
     const { fields } = req.query;
     const fieldsArr = fields ? fields.toString().split(",") : undefined;
     Promise.all([
@@ -74,60 +74,26 @@ router.get(
         },
       }),
     ])
-      .then(([jadwalpengajians, masjids, mubalighs]) => {
-      
-        let tempPengajians: {
+      .then(([jadwalPengajians, masjids, mubalighs]) => {
+
+        const jadwalBulanan: {
+          tanggal: string;
           waktu: string;
           masjid: string;
           mubaligh: string;
         }[] = [];
 
-        const jadwalBulanan: {
-          tanggal: number;
-          pengajians: {
-            waktu: string;
-            masjid: string;
-            mubaligh: string;
-          }[];
-        }[] = [];
-
-        const endDateLastMonth = new Date( new Date().getFullYear(), new Date().getMonth(), 0).getDate()
-        const endDateThisMonth = new Date( new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
-        const startDayThisMonth  = new Date( new Date().getFullYear(), new Date().getMonth(), 1).getDay()
-        const remainingDate = 35 - endDateThisMonth - startDayThisMonth
-
-        for ( let i = endDateLastMonth - startDayThisMonth + 1; i <= endDateLastMonth; i++) {
+        for (let jadwalPengajian of jadwalPengajians) {
           jadwalBulanan.push({
-            tanggal: i,
-            pengajians: []
+            tanggal: jadwalPengajian.tanggal.toISOString(),
+            waktu: jadwalPengajian.waktu,
+            masjid: masjids.find((masjid) => masjid.id === jadwalPengajian.id_masjid)
+              ?.nama_masjid as string,
+            mubaligh: mubalighs.find(
+              (mubaligh) => mubaligh.id === jadwalPengajian.id_mubaligh
+            )?.nama_mubaligh as string,
           })
-        }
-
-        for ( let i = 1; i <= endDateThisMonth; i++) {
-          let filteredPengajians = jadwalpengajians.filter(pengajian => pengajian.tanggal.getDate() === i)
-          for (const pengajian of filteredPengajians) {
-            tempPengajians.push({
-              waktu: pengajian.waktu,
-              masjid: masjids.find((masjid) => masjid.id === pengajian.id_masjid)
-                ?.nama_masjid as string,
-              mubaligh: mubalighs.find(
-                (mubaligh) => mubaligh.id === pengajian.id_mubaligh
-              )?.nama_mubaligh as string,
-            });
-          }
-          jadwalBulanan.push({
-            tanggal: i,
-            pengajians: tempPengajians
-          })
-          tempPengajians = []
-        }
-
-        for ( let i = 1; i <= remainingDate; i++) {
-          jadwalBulanan.push({
-            tanggal: i,
-            pengajians: []
-          })
-        }
+        };
 
         sendResponse({
           res,
