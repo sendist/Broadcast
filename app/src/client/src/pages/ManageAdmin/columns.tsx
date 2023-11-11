@@ -7,15 +7,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  DotsHorizontalIcon,
-  Pencil1Icon,
-  TrashIcon,
-} from "@radix-ui/react-icons";
+import { DotsHorizontalIcon, TrashIcon } from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
-import { useState } from "react";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -25,40 +20,9 @@ export type User = {
   password: string;
 };
 
-const [isPasswordHovered, setIsPasswordHovered] = useState(false);
-
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
 }
-
-const renderPasswordCell = (cell: any) => {
-  const { isEditing, value } = cell;
-
-  // Jika dalam mode editing, render EditCell
-  if (isEditing) {
-    return <EditCell {...cell} />;
-  }
-
-  // Jika tidak dalam mode editing dan kursor berada di atasnya, tampilkan Pencil1Icon sebagai placeholder
-  if (isPasswordHovered) {
-    return (
-      <span className="group" onMouseLeave={() => setIsPasswordHovered(false)}>
-        <Pencil1Icon className="text-gray-500 mr-1 cursor-pointer group-hover:opacity-100" />
-        {Array.from({ length: value.length }, () => "*").join("")}
-      </span>
-    );
-  }
-
-  // Jika tidak dalam mode editing dan kursor tidak berada di atasnya, tampilkan karakter bintang
-  return (
-    <span
-      onMouseEnter={() => setIsPasswordHovered(true)}
-      onMouseLeave={() => setIsPasswordHovered(false)}
-    >
-      {Array.from({ length: value.length }, () => "*").join("")}
-    </span>
-  );
-};
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -94,7 +58,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "password",
     header: (header) => CellHeaderSortable(header, "Password"),
-    cell: renderPasswordCell,
+    cell: EditCell,
     enableSorting: true,
   },
   {
