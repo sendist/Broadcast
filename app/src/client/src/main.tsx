@@ -18,6 +18,7 @@ import MessageLogs from "./pages/MessageLogs/index.tsx";
 import SchedulePage from "./pages/Schedule/index.tsx";
 import Home from "./pages/Home/index.tsx";
 import LandingPage from "./pages/LandingPage/index.tsx";
+import UserPage from "./pages/ManageAdmin/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "manage-admin",
+        element: <UserPage />,
       },
       {
         path: "template",

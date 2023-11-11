@@ -31,11 +31,13 @@ export const authLogin = (req: Request, res: Response, next: NextFunction) => {
               const token = generateAccessToken({
                 id: user.id,
                 username: user.username,
+                role: user.role,
               });
               generateRefreshToken({
                 res,
                 id: user.id,
                 username: user.username,
+                role: user.role,
               });
               sendResponse({
                 res,
@@ -43,6 +45,7 @@ export const authLogin = (req: Request, res: Response, next: NextFunction) => {
                   id: user.id,
                   username: user.username,
                   accessToken: token,
+                  role: user.role,
                 },
               });
             } else {
@@ -86,15 +89,22 @@ export const authRefresh = (req: Request, res: Response) => {
       const token = generateAccessToken({
         id: user.id,
         username: user.username,
+        role: user.role,
       });
       generateRefreshToken({
         res,
         id: user.id,
         username: user.username,
+        role: user.role,
       });
       return sendResponse({
         res,
-        data: { id: user.id, username: user.username, accessToken: token },
+        data: {
+          id: user.id,
+          username: user.username,
+          accessToken: token,
+          role: user.role,
+        },
       });
     }
   } catch (err) {
