@@ -22,13 +22,13 @@ const EventDetail: React.FC<EventProps> = ({
     <CardContent>
       <Table>
         <TableHeader>
-          <td>Masjid</td>
-          <td>Mubaligh</td>
+          <td className="w-40">Masjid</td>
+          <td className="w-40">Mubaligh</td>
           {waktu ? <td>Waktu</td> : null}
         </TableHeader>
-        <TableBody className="font-bold">
-          <td>{masjid}</td>
-          <td>{mubaligh}</td>
+        <TableBody className="font-bold align-top">
+          <td className="pe-2">{masjid}</td>
+          <td className="pe-2">{mubaligh}</td>
           {waktu ? <td>{waktu}</td> : null}
         </TableBody>
       </Table>
