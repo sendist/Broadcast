@@ -36,19 +36,17 @@ router.get(
             },
           }),
         },
-        ...{
-          select: {
-            tanggal: true,
-            waktu: true,
-            masjid: {
-              select: {
-                nama_masjid: true,
-              },
+        select: {
+          tanggal: true,
+          waktu: true,
+          masjid: {
+            select: {
+              nama_masjid: true,
             },
-            mubaligh: {
-              select: {
-                nama_mubaligh: true,
-              },
+          },
+          mubaligh: {
+            select: {
+              nama_mubaligh: true,
             },
           },
         },
