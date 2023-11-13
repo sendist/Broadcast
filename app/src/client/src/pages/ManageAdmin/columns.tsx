@@ -7,7 +7,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  DotsHorizontalIcon,
+  LockClosedIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
@@ -56,12 +60,6 @@ export const columns: ColumnDef<User>[] = [
     enableSorting: true,
   },
   {
-    accessorKey: "password",
-    header: (header) => CellHeaderSortable(header, "Password"),
-    cell: EditCell,
-    enableSorting: true,
-  },
-  {
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
@@ -77,6 +75,10 @@ export const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <LockClosedIcon className="mr-2" />
+              Change Password (not implemented)
+            </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-600 focus:bg-red-600 focus:text-white"
               onClick={() =>
@@ -86,7 +88,7 @@ export const columns: ColumnDef<User>[] = [
               }
             >
               <TrashIcon className="mr-2" />
-              Delete
+              Delete User
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

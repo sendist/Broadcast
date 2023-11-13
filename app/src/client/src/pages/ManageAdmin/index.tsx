@@ -35,7 +35,7 @@ export default function UserPage() {
 
   function deleteBatch() {
     apiFetch({
-      url: `${BASE_URL}/user/batch?${
+      url: `${BASE_URL}/manage-admin/batch?${
         new URLSearchParams({
           id: selectedRows.map((row) => row.original.id).join(","),
         }).toString() || ""

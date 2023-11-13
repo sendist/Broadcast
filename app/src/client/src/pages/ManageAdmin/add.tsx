@@ -43,8 +43,8 @@ export function AddUserForm({ children, onSubmit }: Props) {
 
   return (
     <AddForm
-      title="Tambah Data Admin"
-      subtitle="Input data admin yang akan ditambahkan ke dalam daftar"
+      title="Tambah Admin"
+      subtitle="Input data akun admin yang akan dibuat"
       onSubmit={onSubmit}
       form={form}
       renderFormInput={renderFormInput}

@@ -15,12 +15,6 @@ const getUsers = (req: Request, res: Response, next: NextFunction) => {
 
   const { fields } = req.query;
   const fieldsArr = fields ? fields.toString().split(",") : undefined;
-  if (req.user?.role !== "superadmin") {
-    return sendResponse({
-      res,
-      error: "Not a superadmin!",
-    });
-  }
 
   return prisma.user
     .findMany({
@@ -80,12 +74,6 @@ router.get(
 const postUser = (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
 
-  if (req.user?.role !== "superadmin") {
-    return sendResponse({
-      res,
-      error: "Not a superadmin!",
-    });
-  }
   return bcrypt.hash(password, 10).then((hash) =>
     prisma.user
       .create({
@@ -106,10 +94,44 @@ const postUser = (req: Request, res: Response, next: NextFunction) => {
       })
   );
 };
+
 router.post(
   "/",
-  validate([body("username").notEmpty(), body("password").notEmpty()]),
+  validate([
+    body("username").isString().notEmpty(),
+    body("password").isString().notEmpty(),
+  ]),
   postUser
+);
+
+router.delete(
+  "/batch",
+  validate([
+    query("id").matches(
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})*$/i
+    ),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.query;
+    const idArr = (id as string).split(",");
+    prisma.user
+      .deleteMany({
+        where: {
+          id: {
+            in: idArr,
+          },
+        },
+      })
+      .then((users) => {
+        sendResponse({
+          res,
+          data: "OK",
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
 );
 
 // router.get(
@@ -141,43 +163,40 @@ router.post(
 //     }
 // );
 
-const patchUser = (req: Request, res: Response, next: NextFunction) => {
+const patchUser = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { username, password } = req.body;
 
-  if (req.user?.role !== "superadmin") {
-    return sendResponse({
-      res,
-      error: "Not a superadmin!",
-    });
+  let hash = undefined;
+  if (password) {
+    hash = await bcrypt.hash(password, 10);
   }
 
-  return bcrypt.hash(password, 10).then((hash) =>
-    prisma.user
-      .update({
-        where: {
-          id: id,
-        },
-        data: {
-          username,
-          password: hash,
-        },
-      })
-      .then((user) => {
-        sendResponse({
-          res,
-          data: { ...user, password: undefined },
-        });
-      })
-      .catch((err) => {
-        next(err);
-      })
-  );
+  return prisma.user
+    .update({
+      where: {
+        id: id,
+      },
+      data: {
+        username,
+        password: hash,
+      },
+    })
+    .then((user) => {
+      sendResponse({
+        res,
+        data: { ...user, password: undefined },
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
+
 router.patch(
   "/:id",
   validate([
-    param("id").isString().notEmpty(),
+    param("id").isUUID().notEmpty(),
     body("username").optional().isString(),
     body("password").optional().isString(),
   ]),
@@ -211,10 +230,7 @@ const deleteUser = (req: Request, res: Response, next: NextFunction) => {
       next(err);
     });
 };
-router.delete(
-  "/:id",
-  validate([param("id").isString().notEmpty()]),
-  deleteUser
-);
+
+router.delete("/:id", validate([param("id").isUUID().notEmpty()]), deleteUser);
 
 export default router;

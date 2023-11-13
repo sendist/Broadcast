@@ -7,6 +7,7 @@ import {
   ChevronDownIcon,
   ExitIcon,
   DotsHorizontalIcon,
+  LockClosedIcon,
 } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import {
@@ -271,6 +272,10 @@ function App() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem>
+            <LockClosedIcon className="mr-2" />
+            Change Password (not implemented)
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600 focus:bg-red-600 focus:text-white"
             onClick={() => {

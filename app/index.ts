@@ -20,6 +20,7 @@ import { verifyWSToken } from "./src/utils/jwt.util";
 import prismaErrorHandler from "./src/middlewares/prismaErrorHandler.middleware";
 import { initCron } from "./src/utils/cron.util";
 import landingRoute from "./src/routes/landing.route";
+import superadmin from "./src/middlewares/superadmin.middleware";
 dotenv.config();
 
 const app = express();
@@ -85,6 +86,9 @@ router.use("/jadwal-jumatan", jadwalJumatanRoute);
 router.use("/schedule", scheduleRoute);
 
 router.use("/message-logs", messageLogsRoute);
+
+// all routes below this line will require superadmin role
+router.use(superadmin);
 
 router.use("/manage-admin", manageAdminRoute);
 
