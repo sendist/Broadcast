@@ -8,8 +8,8 @@ import Logo from "@/assets/logo";
 type Jadwal = {
   tanggal: string;
   waktu: string;
-  masjid: string;
-  mubaligh: string;
+  masjid: { nama_masjid: string };
+  mubaligh: { nama_mubaligh: string };
 };
 export default function LandingPage() {
   const [date, setDate] = useState(new Date());
@@ -69,7 +69,6 @@ export default function LandingPage() {
   }[] = [];
 
   if (!loading && data) {
-    console.log(dateArr);
     for (let i = 0; i < dateArr.length; i++) {
       let filteredData = data.filter(
         (pengajian) =>
@@ -81,8 +80,8 @@ export default function LandingPage() {
         isDateInThisMonth: dateArr[i].getMonth() === date.getMonth(),
         pengajians: filteredData.map((pengajian) => ({
           waktu: pengajian.waktu,
-          masjid: pengajian.masjid,
-          mubaligh: pengajian.mubaligh,
+          masjid: pengajian.masjid.nama_masjid,
+          mubaligh: pengajian.mubaligh.nama_mubaligh,
         })),
       });
       filteredData = [];
@@ -112,13 +111,16 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="w-full p-8">
-      <div className="mb-4 flex items-center rounded-lg px-3 py-2 text-slate-900">
-        <Logo className="w-9 h-9" />
-        <span className="ml-1 text-base font-semibold">Broadcast</span>
+    <div className="w-full p-8 xl:px-32">
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center rounded-lg text-slate-900">
+          <Logo className="w-9 h-9" />
+          <span className="ml-1 text-base font-semibold">Broadcast</span>
+        </div>
+        <h1 className="font-semibold text-xl">Jadwal Pengajian</h1>
       </div>
       {data && (
-        <div className="container mx-auto mt-6">
+        <div className=" mx-auto mt-6">
           <div className="wrapper bg-white rounded shadow w-full border border-slate-400">
             <div className="header flex justify-between border-b p-2">
               <span className="text-lg font-bold">
@@ -203,28 +205,27 @@ export default function LandingPage() {
                     "bg-gray-100"
                   }`}
                 >
-                  <div className="flex flex-col h-40 w-full mx-auto overflow-hidden">
-                    <div className="top h-full w-full">
-                      <p className="text-gray-500 mb-4 p-2">
-                        {jadwal.tanggal.getDate()}
-                      </p>
-                      <EventDialog
-                        tanggal={new Date()}
-                        eventData={jadwal.pengajians}
-                      >
+                  <EventDialog
+                    tanggal={jadwal.tanggal}
+                    eventData={jadwal.pengajians}
+                  >
+                    <div className="flex flex-col h-40 w-full mx-auto overflow-hidden">
+                      <div className="top h-full w-full">
+                        <p className="text-gray-500 mb-4 p-2">
+                          {jadwal.tanggal.getDate()}
+                        </p>
+
                         <div className="px-1">
                           {jadwal.pengajians.slice(0, 2).map((pengajian) => (
-                            <Event
-                              masjid={pengajian.masjid}
-                            />
+                            <Event masjid={pengajian.masjid} />
                           ))}
                           {jadwal.pengajians.length > 2 && (
-                            <div>{jadwal.pengajians.length - 2} more</div>
+                            <p>{jadwal.pengajians.length - 2} more</p>
                           )}
                         </div>
-                      </EventDialog>
+                      </div>
                     </div>
-                  </div>
+                  </EventDialog>
                 </div>
               ))}
             </div>

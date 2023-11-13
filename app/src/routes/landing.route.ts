@@ -36,16 +36,22 @@ router.get(
             },
           }),
         },
-        ...(fields && {
+        ...{
           select: {
-            id: fieldsArr?.includes("id"),
-            tanggal: fieldsArr?.includes("tanggal"),
-            waktu: fieldsArr?.includes("waktu"),
-            id_masjid: fieldsArr?.includes("id_masjid"),
-            id_mubaligh: fieldsArr?.includes("id_mubaligh"),
-            broadcasted: fieldsArr?.includes("broadcasted"),
+            tanggal: true,
+            waktu: true,
+            masjid: {
+              select: {
+                nama_masjid: true,
+              },
+            },
+            mubaligh: {
+              select: {
+                nama_mubaligh: true,
+              },
+            },
           },
-        }),
+        },
         ...(page && {
           skip: (Number(page) - 1) * (Number(limit) || 10),
         }),
@@ -61,43 +67,11 @@ router.get(
           },
         }),
       }),
-      prisma.masjid.findMany({
-        select: {
-          id: true,
-          nama_masjid: true,
-        },
-      }),
-      prisma.mubaligh.findMany({
-        select: {
-          id: true,
-          nama_mubaligh: true,
-        },
-      }),
     ])
-      .then(([jadwalPengajians, masjids, mubalighs]) => {
-
-        const jadwalBulanan: {
-          tanggal: string;
-          waktu: string;
-          masjid: string;
-          mubaligh: string;
-        }[] = [];
-
-        for (let jadwalPengajian of jadwalPengajians) {
-          jadwalBulanan.push({
-            tanggal: jadwalPengajian.tanggal.toISOString(),
-            waktu: jadwalPengajian.waktu,
-            masjid: masjids.find((masjid) => masjid.id === jadwalPengajian.id_masjid)
-              ?.nama_masjid as string,
-            mubaligh: mubalighs.find(
-              (mubaligh) => mubaligh.id === jadwalPengajian.id_mubaligh
-            )?.nama_mubaligh as string,
-          })
-        };
-
+      .then(([jadwalPengajians]) => {
         sendResponse({
           res,
-          data: jadwalBulanan,
+          data: jadwalPengajians,
         });
       })
       .catch((err) => {
