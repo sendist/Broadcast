@@ -1,6 +1,6 @@
 import React from "react";
-import { Table, TableBody, TableHeader } from "./table";
-import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Table, TableBody, TableHeader } from "../ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 interface EventProps {
   jadwal: string;

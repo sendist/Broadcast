@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./dialog";
+} from "../ui/dialog";
 import EventDetail from "./event-detail";
 import { formatDate } from "@/lib/utils";
 
@@ -32,8 +32,13 @@ export default function EventDialog({ children, tanggal, eventData }: Props) {
         <DialogHeader>
           <DialogTitle>{formatDate(tanggal)}</DialogTitle>
         </DialogHeader>
-        {eventData.map((event)=>(
-          <EventDetail jadwal="pengajian" masjid={event.masjid} mubaligh={event.mubaligh} waktu={event.waktu} />
+        {eventData.map((event) => (
+          <EventDetail
+            jadwal="pengajian"
+            masjid={event.masjid}
+            mubaligh={event.mubaligh}
+            waktu={event.waktu}
+          />
         ))}
       </DialogContent>
     </Dialog>

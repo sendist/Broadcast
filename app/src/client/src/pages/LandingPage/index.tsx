@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCRUD } from "@/hooks/backend";
-import EventDialog from "@/components/ui/event-dialog";
-import Event from "@/components/ui/event";
+import EventDialog from "@/components/custom/event-dialog";
+import Event from "@/components/custom/event";
 import { useIsFirstRender } from "usehooks-ts";
 import Logo from "@/assets/logo";
 
