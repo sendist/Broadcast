@@ -13,11 +13,11 @@ import WaClient from "./pages/WaClient/index.tsx";
 import Template from "./pages/Template/index.tsx";
 import JadwalPengajian from "./pages/JadwalPengajian/index.tsx";
 import JadwalJumatan from "./pages/JadwalJumatan/index.tsx";
-import SplashScreen from "./pages/SplashScreen/index.tsx";
 import MessageLogs from "./pages/MessageLogs/index.tsx";
 import SchedulePage from "./pages/Schedule/index.tsx";
 import Home from "./pages/Home/index.tsx";
 import LandingPage from "./pages/LandingPage/index.tsx";
+import ManageAdmin from "./pages/ManageAdmin/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "manage-admin",
+        element: <ManageAdmin />,
       },
       {
         path: "template",

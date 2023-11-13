@@ -41,6 +41,30 @@ const menus = [
     ),
   },
   {
+    path: "/manage-admin",
+    name: "Manage Admin",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5"
+        width="24"
+        height="24"
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
     path: "/template",
     name: "Template",
     icon: (
@@ -233,8 +257,7 @@ function App() {
     if (!loading && !account && location.pathname !== "/") {
       navigate("/login");
     }
-  }, [account, loading, loading]);
-
+  }, [account, loading, navigate]);
   const logoutAdmin = (
     <div className="mt-auto flex justify-between items-center">
       <span className="text-sm font-medium text-black">
@@ -277,23 +300,30 @@ function App() {
                 <span className="ml-1 text-base font-semibold">Broadcast</span>
               </div>
               <ul className="space-y-2 text-sm font-medium">
-                {menus.map((menu, index) => (
-                  <li key={index} onClick={() => setSelectedMenu(menu.name)}>
-                    <Link
-                      to={menu.path}
-                      className={`flex items-center rounded-lg px-3 py-2 hover:bg-slate-100 ${
-                        selectedMenu === menu.name
-                          ? "text-green-600"
-                          : "text-slate-900"
-                      }`}
-                    >
-                      {menu.icon}
-                      <span className="ml-3 flex-1 whitespace-nowrap">
-                        {menu.name}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                {menus.map(
+                  (menu, index) =>
+                    (account?.role === "superadmin" ||
+                      menu.path !== "/manage-admin") && (
+                      <li
+                        key={index}
+                        onClick={() => setSelectedMenu(menu.name)}
+                      >
+                        <Link
+                          to={menu.path}
+                          className={`flex items-center rounded-lg px-3 py-2 hover:bg-slate-100 ${
+                            selectedMenu === menu.name
+                              ? "text-green-600"
+                              : "text-slate-900"
+                          }`}
+                        >
+                          {menu.icon}
+                          <span className="ml-3 flex-1 whitespace-nowrap">
+                            {menu.name}
+                          </span>
+                        </Link>
+                      </li>
+                    )
+                )}
               </ul>
               {logoutAdmin}
             </div>

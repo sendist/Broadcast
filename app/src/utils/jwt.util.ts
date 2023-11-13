@@ -21,13 +21,13 @@ export type VerifyErrors =
 export function generateAccessToken({
   id,
   username,
-  role
+  role,
 }: {
   id: string;
   username: string;
   role: $Enums.role_t;
 }) {
-  const token = jwt.sign({ id, username, role}, ACCESS_TOKEN_SECRET, {
+  const token = jwt.sign({ id, username, role }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRES_IN,
   });
   return token;
@@ -37,12 +37,12 @@ export function generateRefreshToken({
   res,
   id,
   username,
-  role
+  role,
 }: {
   res: Response;
   id: string;
   username: string;
-  role: $Enums.role_t
+  role: $Enums.role_t;
 }) {
   const token = jwt.sign({ id, username, role }, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
@@ -60,7 +60,7 @@ export function generateWSToken(user: User) {
     {
       id: user.id,
       username: user.username,
-      role: user.role
+      role: user.role,
     },
     WS_TOKEN_SECRET,
     {
