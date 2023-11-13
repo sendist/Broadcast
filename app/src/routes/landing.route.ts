@@ -9,7 +9,6 @@ const router = express.Router();
 router.get(
   "/",
   validate([
-    query("fields").optional().isString().notEmpty(),
     query("page").optional().isNumeric().notEmpty(),
     query("limit").optional().isNumeric().notEmpty(),
     query("orderBy").optional().isString().notEmpty(),
@@ -20,8 +19,6 @@ router.get(
   ]),
   (req: Request, res: Response, next: NextFunction) => {
     const { page, limit, orderBy, orderType, dateStart, dateEnd } = req.query;
-    const { fields } = req.query;
-    const fieldsArr = fields ? fields.toString().split(",") : undefined;
     Promise.all([
       prisma.pengajian.findMany({
         where: {
