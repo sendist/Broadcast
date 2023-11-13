@@ -1,0 +1,126 @@
+import { DataTable } from "@/components/ui/data-table";
+import { User, columns } from "./columns";
+import { useCRUD } from "@/hooks/backend";
+import { AddUserForm } from "./add";
+import { Button } from "@/components/ui/button";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { useApiFetch } from "@/hooks/fetch";
+import { BASE_URL } from "@/lib/constants";
+import { useState, useRef, useEffect } from "react";
+import ConfirmDialog from "@/components/custom/confirmDialog";
+import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
+import useFirstRender from "@/hooks/firstRender";
+
+const limit = 20;
+
+export default function UserPage() {
+  const [page, setPage] = useState(1);
+  const [selectedRows, setSelectedRows] = useState<Row<User>[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const { data, loading, update, remove, create, get } = useCRUD<User>({
+    url: "/manage-admin",
+    params: {
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(sorting[0] && {
+        orderBy: sorting[0].id,
+        orderType: sorting[0].desc ? "desc" : "asc",
+      }),
+    },
+  });
+
+  const apiFetch = useApiFetch();
+  const tableRef = useRef<TableType<User>>(null);
+  const isFirstRender = useFirstRender();
+
+  function deleteBatch() {
+    apiFetch({
+      url: `${BASE_URL}/manage-admin/batch?${
+        new URLSearchParams({
+          id: selectedRows.map((row) => row.original.id).join(","),
+        }).toString() || ""
+      }`,
+      options: {
+        method: "DELETE",
+      },
+    }).then(() => {
+      get().then(() => {
+        tableRef.current?.toggleAllPageRowsSelected(false);
+      });
+    });
+  }
+
+  useEffect(() => {
+    if (!isFirstRender) {
+      get();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sorting]);
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4  items-start gap-4 sm:gap-0">
+        <div>
+          <h1 className="inline-block text-xl font-semibold">Admin</h1>
+          <p className="text-sm text-muted-foreground">Atur Daftar Admin</p>
+        </div>
+        <div className="space-x-4 space-y-2 -mt-2">
+          <AddUserForm onSubmit={create}>
+            <Button variant="white" className="ml-4 mt-2">
+              <PlusIcon className="mr-2" />
+              Add
+            </Button>
+          </AddUserForm>
+          {selectedRows?.length ? (
+            <>
+              <ConfirmDialog
+                title={`Apakah Anda Yakin Untuk Menghapus ${selectedRows.length} Data Admin?`}
+                description="Data yang sudah dihapus tidak dapat dikembalikan"
+                cancelText="Batal"
+                confirmText="Hapus"
+                onConfirm={deleteBatch}
+                dangerous
+              >
+                <Button
+                  variant="white"
+                  className="text-red-600 hover:text-red-600 hover:bg-red-100"
+                >
+                  <TrashIcon className="mr-2" />
+                  Delete Selected ({selectedRows?.length})
+                </Button>
+              </ConfirmDialog>
+            </>
+          ) : null}
+        </div>
+      </div>
+      <DataTable
+        ref={tableRef}
+        columns={columns}
+        data={data}
+        isLoading={loading}
+        page={page}
+        limit={limit}
+        meta={{
+          previousPage: () => {
+            if (page > 1) {
+              setPage(page - 1);
+            }
+          },
+          nextPage: () => {
+            setPage(page + 1);
+          },
+          updateData: (id: string, key: string, value: unknown) => {
+            update(id, {
+              [key]: value,
+            });
+          },
+          removeData: (id: string) => {
+            remove(id);
+          },
+        }}
+        onSortingChange={setSorting}
+        onSelectedRowsChange={setSelectedRows}
+      />
+    </div>
+  );
+}

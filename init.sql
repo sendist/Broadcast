@@ -1,15 +1,18 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+create TYPE role_t as enum('superadmin', 'admin');
+
 CREATE TABLE IF NOT EXISTS "user" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    role role_t NOT NULL
 );
 
-
--- admin password: admin
-INSERT INTO "user" (username, password) VALUES ('admin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6');
+-- admin and superadmin password: "admin"
+INSERT INTO "user" (username, password, role) VALUES ('admin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6', 'admin');
+INSERT INTO "user" (username, password, role) VALUES ('superadmin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6', 'superadmin');
 
 CREATE TABLE IF NOT EXISTS "masjid" (
     id BIGSERIAL PRIMARY KEY,

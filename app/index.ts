@@ -14,11 +14,13 @@ import jadwalJumatanRoute from "./src/routes/jadwaljumatan.route";
 import mubalighRoute from "./src/routes/mubaligh.route";
 import scheduleRoute from "./src/routes/schedule.route";
 import messageLogsRoute from "./src/routes/messagelogs.route";
+import manageAdminRoute from "./src/routes/manageadmin.route";
 import errorHandler from "./src/middlewares/errorHandler.middleware";
 import { verifyWSToken } from "./src/utils/jwt.util";
 import prismaErrorHandler from "./src/middlewares/prismaErrorHandler.middleware";
 import { initCron } from "./src/utils/cron.util";
 import landingRoute from "./src/routes/landing.route";
+import superadmin from "./src/middlewares/superadmin.middleware";
 dotenv.config();
 
 const app = express();
@@ -85,9 +87,10 @@ router.use("/schedule", scheduleRoute);
 
 router.use("/message-logs", messageLogsRoute);
 
-router.get("/protected", (req: Request, res: Response) => {
-  res.send("You are authenticated");
-});
+// all routes below this line will require superadmin role
+router.use(superadmin);
+
+router.use("/manage-admin", manageAdminRoute);
 
 //serve static assets if in production
 if (process.env.NODE_ENV === "production") {
