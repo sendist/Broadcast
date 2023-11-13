@@ -215,7 +215,6 @@ export default function LandingPage() {
                         <div className="px-1">
                           {jadwal.pengajians.slice(0, 2).map((pengajian) => (
                             <Event
-                              jadwal="pengajian"
                               masjid={pengajian.masjid}
                             />
                           ))}
