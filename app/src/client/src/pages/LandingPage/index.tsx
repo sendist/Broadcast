@@ -1,30 +1,237 @@
+import { useEffect, useState } from "react";
+import { useCRUD } from "@/hooks/backend";
+import EventDialog from "@/components/custom/event-dialog";
+import Event from "@/components/custom/event";
+import { useIsFirstRender } from "usehooks-ts";
 import Logo from "@/assets/logo";
 
-// import { DataTable } from "@/components/ui/data-table";
-// import { Table as TableType, Row, SortingState } from "@tanstack/react-table";
-// import { JadwalJumatan, columns } from "./columns";
-// import { useCRUD } from "@/hooks/backend";
-// import { useApiFetch } from "@/hooks/fetch";
-// import { BASE_URL } from "@/lib/constants";
-// import { useEffect, useRef, useState } from "react";
-// import Broadcast from "./broadcast";
-// import useFirstRender from "@/hooks/firstRender";
-// import { DateRangePicker } from "@/components/ui/date-range-picker";
-
-
-
+type Jadwal = {
+  tanggal: string;
+  waktu: string;
+  masjid: { nama_masjid: string };
+  mubaligh: { nama_mubaligh: string };
+};
 export default function LandingPage() {
+  const [date, setDate] = useState(new Date());
+  const isFirstRender = useIsFirstRender();
+
+  const dateArr: Date[] = [];
+  const endDateThisMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const startDateThisMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+
+  for (
+    let i = startDateThisMonth;
+    i < endDateThisMonth;
+    i = new Date(i.setDate(i.getDate() + 1))
+  ) {
+    dateArr.push(new Date(i));
+  }
+  while (dateArr[0].getDay() !== 0) {
+    dateArr.unshift(
+      new Date(
+        dateArr[0].getFullYear(),
+        dateArr[0].getMonth(),
+        dateArr[0].getDate() - 1
+      )
+    );
+  }
+  while (dateArr[dateArr.length - 1].getDay() !== 6) {
+    dateArr.push(
+      new Date(
+        dateArr[dateArr.length - 1].getFullYear(),
+        dateArr[dateArr.length - 1].getMonth(),
+        dateArr[dateArr.length - 1].getDate() + 1
+      )
+    );
+  }
+
+  const { data, loading, get } = useCRUD<Jadwal>({
+    url: "/landing",
+    params: {
+      dateStart: dateArr[0].toISOString(),
+      dateEnd: dateArr[dateArr.length - 1].toISOString(),
+    },
+  });
+  useEffect(() => {
+    if (!isFirstRender) {
+      get();
+    }
+  }, [date]);
+
+  const jadwalPengajian: {
+    tanggal: Date;
+    isDateInThisMonth: boolean;
+    pengajians: {
+      waktu: string;
+      masjid: string;
+      mubaligh: string;
+    }[];
+  }[] = [];
+
+  if (!loading && data) {
+    for (let i = 0; i < dateArr.length; i++) {
+      let filteredData = data.filter(
+        (pengajian) =>
+          new Date(pengajian.tanggal as string).setHours(0, 0, 0, 0) ===
+          dateArr[i].setHours(0, 0, 0, 0)
+      );
+      jadwalPengajian.push({
+        tanggal: dateArr[i],
+        isDateInThisMonth: dateArr[i].getMonth() === date.getMonth(),
+        pengajians: filteredData.map((pengajian) => ({
+          waktu: pengajian.waktu,
+          masjid: pengajian.masjid.nama_masjid,
+          mubaligh: pengajian.mubaligh.nama_mubaligh,
+        })),
+      });
+      filteredData = [];
+    }
+  }
+
+  const handleNextMonth = () => {
+    setDate(new Date(date.setMonth(date.getMonth() + 1)));
+  };
+
+  const handlePreviousMonth = () => {
+    setDate(new Date(date.setMonth(date.getMonth() - 1)));
+  };
+  const monthName = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   return (
-    <div className="w-screen h-screen grid">
-      <div className="flex flex-col gap-4 justify-stretch p-4">
-        <div className="mb-4 flex flex-col items-center rounded-lg px-3 py-2 text-slate-900">
-          <Logo className="w-20 h-20" />
-          <span className="ml-1 text-xl font-semibold mt-4">Broadcast</span>
-          <span className="ml-1 text-sm text-muted-foreground">
-            Ini Landing Page untuk Jadwal
-          </span>
+    <div className="w-full p-8 xl:px-32">
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center rounded-lg text-slate-900">
+          <Logo className="w-9 h-9" />
+          <span className="ml-1 text-base font-semibold">Broadcast</span>
         </div>
+        <h1 className="font-semibold text-xl">Jadwal Pengajian</h1>
       </div>
+      {data && (
+        <div className=" mx-auto mt-6">
+          <div className="wrapper bg-white rounded shadow w-full border border-slate-400">
+            <div className="header flex justify-between border-b p-2">
+              <span className="text-lg font-bold">
+                {date.getFullYear() + " " + monthName[date.getMonth()]}
+              </span>
+              <div className="buttons">
+                <button className="p-1" onClick={handlePreviousMonth}>
+                  <svg
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 16 16"
+                    className="bi bi-arrow-left-circle"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"
+                    />
+                  </svg>
+                </button>
+                <button className="p-1" onClick={handleNextMonth}>
+                  <svg
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 16 16"
+                    className="bi bi-arrow-right-circle"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-7">
+              {[
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+              ].map((day, index) => (
+                <div
+                  key={index}
+                  className="p-2 border h-full w-full xl:text-sm text-xs"
+                >
+                  <span className="xl:block lg:block md:block sm:block hidden">
+                    {day}
+                  </span>
+                  <span className="xl:hidden lg:hidden md:hidden sm:hidden block">
+                    {day.slice(0, 3)}
+                  </span>
+                </div>
+              ))}
+              {jadwalPengajian.map((jadwal) => (
+                <div
+                  key={jadwal.tanggal.toISOString()}
+                  className={`border p-1 h-full w-full overflow-auto transition cursor-pointer duration-500 ease hover:bg-gray-300 ${
+                    jadwal.tanggal.getMonth() !== date.getMonth() &&
+                    "bg-gray-100"
+                  }`}
+                >
+                  <EventDialog
+                    tanggal={jadwal.tanggal}
+                    eventData={jadwal.pengajians}
+                  >
+                    <div className="flex flex-col h-40 w-full mx-auto overflow-hidden">
+                      <div className="top h-full w-full">
+                        <p className="text-gray-500 mb-4 p-2">
+                          {jadwal.tanggal.getDate()}
+                        </p>
+
+                        <div className="px-1">
+                          {jadwal.pengajians.slice(0, 2).map((pengajian) => (
+                            <Event masjid={pengajian.masjid} />
+                          ))}
+                          {jadwal.pengajians.length > 2 && (
+                            <p>{jadwal.pengajians.length - 2} more</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </EventDialog>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
