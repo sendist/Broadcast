@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     role role_t NOT NULL
 );
 
-
--- admin password: admin
+-- admin and superadmin password: "admin"
 INSERT INTO "user" (username, password, role) VALUES ('admin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6', 'admin');
 INSERT INTO "user" (username, password, role) VALUES ('superadmin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6', 'superadmin');
 
