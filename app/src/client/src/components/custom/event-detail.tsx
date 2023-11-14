@@ -1,26 +1,21 @@
 import React from "react";
 import { Table, TableBody, TableHeader } from "../ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 
 interface EventProps {
-  jadwal: string;
   masjid: string;
   mubaligh: string;
   waktu?: string;
 }
 
 const EventDetail: React.FC<EventProps> = ({
-  jadwal,
   masjid,
   mubaligh,
   waktu,
 }) => (
   <Card className="border-border border shadow-none">
-    <CardHeader>
-      <CardTitle>{jadwal}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <Table>
+    <CardContent className="pt-5">
+      <Table className="text-xs md:text-lg">
         <TableHeader>
           <td className="w-40">Masjid</td>
           <td className="w-40">Mubaligh</td>
