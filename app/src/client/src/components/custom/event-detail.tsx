@@ -15,7 +15,7 @@ const EventDetail: React.FC<EventProps> = ({
 }) => (
   <Card className="border-border border shadow-none">
     <CardContent className="pt-5">
-      <Table className="text-xs md:text-lg">
+      <Table className="text-xs md:text-base">
         <TableHeader>
           <td className="w-40">Masjid</td>
           <td className="w-40">Mubaligh</td>
