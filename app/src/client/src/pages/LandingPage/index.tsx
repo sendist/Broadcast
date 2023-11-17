@@ -7,10 +7,17 @@ import Logo from "@/assets/logo";
 import { useWindowSize } from "@/hooks/windowSize";
 
 type Jadwal = {
-  tanggal: string;
-  waktu: string;
-  masjid: { nama_masjid: string };
-  mubaligh: { nama_mubaligh: string };
+  jadwalPengajians: {
+    tanggal: string;
+    waktu: string;
+    masjid: { nama_masjid: string };
+    mubaligh: { nama_mubaligh: string };
+  }[],
+  jadwalJumatans : {
+    tanggal: string;
+    masjid: { nama_masjid: string };
+    mubaligh: { nama_mubaligh: string };
+  }[]
 };
 export default function LandingPage() {
   const [date, setDate] = useState(new Date());
@@ -83,8 +90,9 @@ export default function LandingPage() {
   }[] = [];
 
   if (!loading && data) {
+    console.log(data.jadwalPengajians)
     for (let i = 0; i < dateArr.length; i++) {
-      let filteredData = data.filter(
+      let filteredData = data.jadwalPengajians.filter(
         (pengajian) =>
           new Date(pengajian.tanggal as string).setHours(0, 0, 0, 0) ===
           dateArr[i].setHours(0, 0, 0, 0)
