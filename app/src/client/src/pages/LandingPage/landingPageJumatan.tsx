@@ -12,11 +12,18 @@ import {
 import MonthPicker from "@/components/custom/month-picker";
 
 type Jadwal = {
-  tanggal: string;
-  waktu: string;
-  masjid: { nama_masjid: string };
-  mubaligh: { nama_mubaligh: string };
-};
+    jadwalPengajians: {
+      tanggal: string;
+      waktu: string;
+      masjid: { nama_masjid: string };
+      mubaligh: { nama_mubaligh: string };
+    }[],
+    jadwalJumatans : {
+      tanggal: string;
+      masjid: { nama_masjid: string };
+      mubaligh: { nama_mubaligh: string };
+    }[]
+  };
 
 export default function LandingPageJadwalJumatan() {
   const [date, setDate] = useState(new Date());
