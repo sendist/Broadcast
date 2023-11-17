@@ -62,11 +62,52 @@ router.get(
           },
         }),
       }),
+      prisma.jumatan.findMany({
+        where: {
+          ...((dateStart || dateEnd) && {
+            tanggal: {
+              ...(dateStart && {
+                gte: new Date(dateStart as string),
+              }),
+              ...(dateEnd && {
+                lte: new Date(dateEnd as string),
+              }),
+            },
+          }),
+        },
+        select: {
+          tanggal: true,
+          masjid: {
+            select: {
+              nama_masjid: true,
+            },
+          },
+          mubaligh: {
+            select: {
+              nama_mubaligh: true,
+            },
+          },
+        },
+        ...(page && {
+          skip: (Number(page) - 1) * (Number(limit) || 10),
+        }),
+        ...(limit && {
+          take: Number(limit),
+        }),
+        orderBy: {
+          id: "desc",
+        },
+        ...(orderBy && {
+          orderBy: {
+            [orderBy.toString()]: orderType?.toString() || "asc",
+          },
+        }),
+      }),
     ])
-      .then(([jadwalPengajians]) => {
+      .then(([jadwalPengajians, jadwalJumatans]) => {
         sendResponse({
           res,
-          data: jadwalPengajians,
+          data: {jadwalPengajians, jadwalJumatans},
         });
       })
       .catch((err) => {
