@@ -4,6 +4,7 @@ import EventDialog from "@/components/custom/event-dialog";
 import Event from "@/components/custom/event";
 import { useIsFirstRender } from "usehooks-ts";
 import Logo from "@/assets/logo";
+import { useWindowSize } from "@/hooks/windowSize";
 
 type Jadwal = {
   jadwalPengajians: {
@@ -25,6 +26,19 @@ export default function LandingPage() {
   const dateArr: Date[] = [];
   const endDateThisMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
   const startDateThisMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const { width } = useWindowSize();
+
+  const [numOfDisplayedEvent, setNumOfDisplayedEvent] = useState(1);
+  
+  useEffect(() => {
+    if (width >= 640) {
+      setNumOfDisplayedEvent(2);
+    } else {
+      setNumOfDisplayedEvent(1);
+    }
+    console.log(numOfDisplayedEvent)
+  }, [width]);
+
 
   for (
     let i = startDateThisMonth;
@@ -125,13 +139,13 @@ export default function LandingPage() {
           <Logo className="w-9 h-9" />
           <span className="ml-1 text-base font-semibold">Broadcast</span>
         </div>
-        <h1 className="font-semibold text-xl">Jadwal Pengajian</h1>
+        <h1 className="font-semibold md:text-xl ">Jadwal Pengajian</h1>
       </div>
       {data && (
         <div className=" mx-auto mt-6">
           <div className="wrapper bg-white rounded shadow w-full border border-slate-400">
             <div className="header flex justify-between border-b p-2">
-              <span className="text-lg font-bold">
+              <span className="md:text-lg font-bold">
                 {date.getFullYear() + " " + monthName[date.getMonth()]}
               </span>
               <div className="buttons">
@@ -217,18 +231,18 @@ export default function LandingPage() {
                     tanggal={jadwal.tanggal}
                     eventData={jadwal.pengajians}
                   >
-                    <div className="flex flex-col h-40 w-full mx-auto overflow-hidden">
+                    <div className="flex flex-col h-20 sm:h-40 w-full mx-auto overflow-hidden">
                       <div className="top h-full w-full">
-                        <p className="text-gray-500 mb-4 p-2">
+                        <p className="text-gray-500 md:mb-4 p-2 text-xs md:text-base">
                           {jadwal.tanggal.getDate()}
                         </p>
 
                         <div className="px-1">
-                          {jadwal.pengajians.slice(0, 2).map((pengajian) => (
+                          {jadwal.pengajians.slice(0, numOfDisplayedEvent).map((pengajian) => (
                             <Event masjid={pengajian.masjid} />
                           ))}
                           {jadwal.pengajians.length > 2 && (
-                            <p>{jadwal.pengajians.length - 2} more</p>
+                            <p className="sm:text-xs md:text-base text-[8px]">{jadwal.pengajians.length - numOfDisplayedEvent} more</p>
                           )}
                         </div>
                       </div>

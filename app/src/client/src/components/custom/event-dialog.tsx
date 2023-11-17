@@ -30,11 +30,10 @@ export default function EventDialog({ children, tanggal, eventData }: Props) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{formatDate(tanggal)}</DialogTitle>
+          <DialogTitle className="text-sm md:text-lg">{formatDate(tanggal)}</DialogTitle>
         </DialogHeader>
         {eventData.map((event) => (
           <EventDetail
-            jadwal="pengajian"
             masjid={event.masjid}
             mubaligh={event.mubaligh}
             waktu={event.waktu}
