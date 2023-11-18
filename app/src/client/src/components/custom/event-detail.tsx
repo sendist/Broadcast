@@ -17,9 +17,9 @@ const EventDetail: React.FC<EventProps> = ({
     <CardContent className="pt-5">
       <Table className="text-xs md:text-base">
         <TableHeader>
-          <td className="w-40">Masjid</td>
-          <td className="w-40">Mubaligh</td>
-          {waktu ? <td>Waktu</td> : null}
+          <td className="w-1/3">Masjid</td>
+          <td className="w-1/3">Mubaligh</td>
+          {waktu ? <td className="w-1/3">Waktu</td> : null}
         </TableHeader>
         <TableBody className="font-bold align-top">
           <td className="pe-2">{masjid}</td>
