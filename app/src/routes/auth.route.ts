@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import {
   generateAccessToken,
   generateRefreshToken,
+  verifyAccessToken,
   verifyRefreshToken,
 } from "../utils/jwt.util";
 import validate from "../middlewares/validation.middleware";
@@ -129,5 +130,87 @@ export const authLogout = (req: Request, res: Response) => {
   });
 };
 router.get("/logout", authLogout);
+
+export const changePassword = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token == null) return sendResponse({ res, error: "No access token" });
+
+  const { data, error } = verifyAccessToken(token);
+
+  if (error || !data) {
+    return sendResponse({
+      res,
+      error: "Invalid access token",
+      status: 401,
+    });
+  }
+
+  const userId = data.id;
+
+  return prisma.user
+    .findUnique({
+      where: {
+        // where the username is the same as JSON.parse(localStorage.account).id
+        id: userId,
+      },
+    })
+    .then((user) => {
+      if (user) {
+        return bcrypt
+          .compare(oldPassword, user.password.replace(/^\$2y/, "$2a"))
+          .then((result) => {
+            //if the user is authenticated
+            if (result) {
+              return bcrypt
+                .hash(newPassword, 10)
+                .then((hash) => {
+                  return prisma.user.update({
+                    where: {
+                      id: userId,
+                    },
+                    data: {
+                      password: hash,
+                    },
+                  });
+                })
+                .then(() => {
+                  sendResponse({
+                    res,
+                    data: "Password changed successfully",
+                  });
+                });
+            } else {
+              sendResponse({
+                res,
+                error: "Invalid old password",
+                status: 401,
+              });
+            }
+          });
+      } else {
+        sendResponse({
+          res,
+          error: "Invalid user",
+          status: 401,
+        });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+router.post(
+  "/change-password",
+  validate([body("oldPassword").notEmpty(), body("newPassword").notEmpty()]),
+  changePassword
+);
 
 export default router;
