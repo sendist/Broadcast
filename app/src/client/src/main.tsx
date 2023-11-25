@@ -6,6 +6,7 @@ import "./index.css";
 import Login from "./pages/Login/index.tsx";
 import { AccountProvider } from "./context/account.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
+import Rebrand from "./pages/Rebrand/index.tsx";
 import MasjidPage from "./pages/Masjid/index.tsx";
 import MubalighPage from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
     ),
     errorElement: <NotFound />,
     children: [
+      {
+        path: "rebrand",
+        element: <Rebrand />,
+      },
       {
         path: "home",
         element: <Home />,

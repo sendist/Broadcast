@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
 import Logo from "./assets/logo";
+import { getPreferencesFromLocalStorage } from "@/lib/preferences";
 
 const menus = [
   {
@@ -38,6 +39,29 @@ const menus = [
       >
         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
         <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    ),
+  },
+  {
+    path: "/rebrand",
+    name: "Rebrand",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5"
+        width="28"
+        height="28"
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path
+          d="M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"/
+        >
       </svg>
     ),
   },
@@ -290,6 +314,11 @@ function App() {
       </DropdownMenu>
     </div>
   );
+
+  const preferences = getPreferencesFromLocalStorage();
+  const appName = preferences.app_name;
+  const logoImg = preferences.logo_img;
+
   return (
     <>
       <div className="h-screen w-screen bg-dark flex flex-row">
@@ -301,8 +330,8 @@ function App() {
           >
             <div className="flex h-full flex-col overflow-y-auto border-r border-slate-200 bg-white px-3 py-4">
               <div className="mb-10 flex items-center rounded-lg px-3 py-2 text-slate-900">
-                <Logo className="w-9 h-9" />
-                <span className="ml-1 text-base font-semibold">Broadcast</span>
+                <Logo imagePath={logoImg} className="w-9 h-9" />
+                <span className="ml-1 text-base font-semibold">{appName}</span>
               </div>
               <ul className="space-y-2 text-sm font-medium">
                 {menus.map(
@@ -336,26 +365,9 @@ function App() {
         ) : (
           <header>
             <div className="fixed w-full p-2 flex items-center border border-r border-slate-200 bg-white z-10">
-              <svg
-                className="h-9 w-9"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0.2999999999999998 89 102.1"
-                width="50.4"
-                height="58.1643594"
-                x="4.800000000000001"
-                y="5.539463443183575"
-                fill="#557A82"
-              >
-                <path
-                  d="M24.6 89V57.7c0-11 19.9-19.9 19.9-19.9s19.9 8.9 19.9 19.9V89m-.1-16.2v-28c0-11-19.9-19.9-19.9-19.9s-19.9 8.9-19.9 19.9v28m39.8-11.1v-28c0-11-19.9-19.9-19.9-19.9s-19.9 8.9-19.9 19.9v28M2 75.9l42.5 24.5L87 75.9V26.8L44.5 2.3 2 26.8v49.1zm73.9-55.4v61.8M13.1 20.5v61.8"
-                  fill="none"
-                  stroke="#557A82"
-                  strokeWidth="4px"
-                  strokeMiterlimit="10"
-                ></path>
-              </svg>
-              <span className="ml-1 font-semibold">Broadcast</span>
+              
+              <Logo imagePath={logoImg} className="w-9 h-9" />
+              <span className="ml-1 font-semibold">{appName}</span>
               <button
                 type="button"
                 className="ml-auto p-1 border rounded hover:border-slate-400"
