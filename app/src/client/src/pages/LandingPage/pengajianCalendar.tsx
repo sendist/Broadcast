@@ -138,21 +138,23 @@ export default function PengajianCalendar() {
     <>
       {data && (
         <div className=" mx-auto mt-6">
-          <div className="flex flex-row mb-2">
-            {jadwalType.map((item, index) => (
-              <p
-                key={index}
-                className={`px-3 py-1 text-sm font-semibold rounded-md ${
-                  selectedJadwalType === item
-                    ? "bg-green-700 text-white"
-                    : "bg-white text-slate-900"
-                }`}
-                onClick={() => setSelectedJadwalType(item)}
-              >
-                {item}
-              </p>
-            ))}
-          </div>
+          {width >= 768 && (
+            <div className="flex flex-row mb-2">
+              {jadwalType.map((item, index) => (
+                <p
+                  key={index}
+                  className={`px-3 py-1 text-sm font-semibold rounded-md ${
+                    selectedJadwalType === item
+                      ? "bg-green-700 text-white"
+                      : "bg-white text-slate-900"
+                  }`}
+                  onClick={() => setSelectedJadwalType(item)}
+                >
+                  {item}
+                </p>
+              ))}
+            </div>
+          )}
           {selectedJadwalType === "Calendar" && width >= 768 ? (
             <div className="wrapper bg-white rounded shadow w-full border border-slate-400">
               <div className="header flex justify-between border-b p-2">
