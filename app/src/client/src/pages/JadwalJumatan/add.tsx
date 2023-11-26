@@ -6,7 +6,7 @@ import {
   Path,
   useForm,
 } from "react-hook-form";
-import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import FormDialog, { RenderFormInput } from "@/components/custom/formDialog";
 import InputDropdown from "@/components/custom/inputDropdown";
 import InputCalendar from "@/components/custom/inputCalendar";
 import { resetDateTimeToMidnight } from "@/lib/utils";
@@ -99,7 +99,7 @@ export function AddJadwalJumatanForm({
     },
   ];
   return (
-    <AddForm
+    <FormDialog
       title="Tambah Data Jadwal Jumatan"
       subtitle="Input data jadwal jumatan yang akan ditambahkan"
       onSubmit={onSubmit}
@@ -107,6 +107,6 @@ export function AddJadwalJumatanForm({
       renderFormInput={renderFormInput}
     >
       {children}
-    </AddForm>
+    </FormDialog>
   );
 }

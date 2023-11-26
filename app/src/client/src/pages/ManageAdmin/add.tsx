@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import FormDialog, { RenderFormInput } from "@/components/custom/formDialog";
 import { User } from "./columns";
 
 const userFormSchema = z.object({
@@ -38,11 +38,12 @@ export function AddUserForm({ children, onSubmit }: Props) {
       name: "password",
       label: "Password",
       placeholder: "Password",
+      type: "password",
     },
   ];
 
   return (
-    <AddForm
+    <FormDialog
       title="Tambah Admin"
       subtitle="Input data akun admin yang akan dibuat"
       onSubmit={onSubmit}
@@ -50,6 +51,6 @@ export function AddUserForm({ children, onSubmit }: Props) {
       renderFormInput={renderFormInput}
     >
       {children}
-    </AddForm>
+    </FormDialog>
   );
 }

@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import FormDialog, { RenderFormInput } from "@/components/custom/formDialog";
 import { Masjid } from "./columns";
 
 const masjidFormSchema = z.object({
@@ -51,7 +51,7 @@ export function AddMasjidForm({ children, onSubmit }: Props) {
   ];
 
   return (
-    <AddForm
+    <FormDialog
       title="Tambah Data Masjid"
       subtitle="Input data masjid yang akan ditambahkan ke dalam daftar"
       onSubmit={onSubmit}
@@ -59,6 +59,6 @@ export function AddMasjidForm({ children, onSubmit }: Props) {
       renderFormInput={renderFormInput}
     >
       {children}
-    </AddForm>
+    </FormDialog>
   );
 }

@@ -17,6 +17,9 @@ import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
 import Broadcast from "./broadcast";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import ConfirmDialogContent from "@/components/custom/confirmDialogContent";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -119,29 +122,41 @@ export const columns: (
     cell: ({ row, table }) => {
       const jadwaljumatan = row.original;
 
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              className="text-red-600 focus:bg-red-600 focus:text-white"
-              onClick={() =>
-                (
-                  table.options.meta as CustomTableMeta<JadwalJumatan>
-                )?.removeData?.(jadwaljumatan.id)
-              }
-            >
-              <TrashIcon className="mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem className="text-red-600 focus:bg-red-600 focus:text-white">
+                  <TrashIcon className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ConfirmDialogContent
+            title={`Apakah Anda Yakin Untuk Menghapus Jadwal dengan ID ${jadwaljumatan.id}?`}
+            description="Data yang sudah dihapus tidak dapat dikembalikan"
+            cancelText="Batal"
+            confirmText="Hapus"
+            onConfirm={() =>
+              (
+                table.options.meta as CustomTableMeta<JadwalJumatan>
+              )?.removeData?.(jadwaljumatan.id)
+            }
+            dangerous
+          />
+        </AlertDialog>
       );
     },
   },

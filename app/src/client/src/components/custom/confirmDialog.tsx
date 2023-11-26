@@ -1,15 +1,5 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import ConfirmDialogContent from "./confirmDialogContent";
 
 type Props = {
   children: React.ReactNode;
@@ -33,36 +23,14 @@ export default function ConfirmDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          {title && <AlertDialogTitle>{title}</AlertDialogTitle>}
-          {description && (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          )}
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col">
-          {dangerous ? (
-            <>
-              <AlertDialogAction asChild onClick={onConfirm}>
-                <Button
-                  className="bg-red-500 hover:bg-red-600 hover:text-white"
-                  variant="ghost"
-                >
-                  {confirmText ?? "Continue"}
-                </Button>
-              </AlertDialogAction>
-              <AlertDialogCancel>{cancelText ?? "Cancel"}</AlertDialogCancel>
-            </>
-          ) : (
-            <>
-              <AlertDialogCancel>{cancelText ?? "Cancel"}</AlertDialogCancel>
-              <AlertDialogAction onClick={onConfirm}>
-                {confirmText ?? "Continue"}
-              </AlertDialogAction>
-            </>
-          )}
-        </AlertDialogFooter>
-      </AlertDialogContent>
+      <ConfirmDialogContent
+        title={title}
+        description={description}
+        onConfirm={onConfirm}
+        cancelText={cancelText}
+        confirmText={confirmText}
+        dangerous={dangerous}
+      />
     </AlertDialog>
   );
 }

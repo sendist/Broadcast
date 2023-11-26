@@ -16,57 +16,106 @@ router.get(
     query("month").optional().isNumeric().notEmpty(),
     query("dateStart").optional().isISO8601(),
     query("dateEnd").optional().isISO8601(),
+    query("jadwalType")
+      .optional()
+      .isString()
+      .notEmpty()
+      .isIn(["pengajian", "jumatan"]),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { page, limit, orderBy, orderType, dateStart, dateEnd } = req.query;
+    const { page, limit, orderBy, orderType, dateStart, dateEnd, jadwalType } =
+      req.query;
     Promise.all([
-      prisma.pengajian.findMany({
-        where: {
-          ...((dateStart || dateEnd) && {
-            tanggal: {
-              ...(dateStart && {
-                gte: new Date(dateStart as string),
-              }),
-              ...(dateEnd && {
-                lte: new Date(dateEnd as string),
-              }),
+      jadwalType === "pengajian" &&
+        prisma.pengajian.findMany({
+          where: {
+            ...((dateStart || dateEnd) && {
+              tanggal: {
+                ...(dateStart && {
+                  gte: new Date(dateStart as string),
+                }),
+                ...(dateEnd && {
+                  lte: new Date(dateEnd as string),
+                }),
+              },
+            }),
+          },
+          select: {
+            tanggal: true,
+            waktu: true,
+            masjid: {
+              select: {
+                nama_masjid: true,
+              },
+            },
+            mubaligh: {
+              select: {
+                nama_mubaligh: true,
+              },
+            },
+          },
+          ...(page && {
+            skip: (Number(page) - 1) * (Number(limit) || 10),
+          }),
+          ...(limit && {
+            take: Number(limit),
+          }),
+          orderBy: {
+            id: "desc",
+          },
+          ...(orderBy && {
+            orderBy: {
+              [orderBy.toString()]: orderType?.toString() || "asc",
             },
           }),
-        },
-        select: {
-          tanggal: true,
-          waktu: true,
-          masjid: {
-            select: {
-              nama_masjid: true,
+        }),
+      jadwalType === "jumatan" &&
+        prisma.jumatan.findMany({
+          where: {
+            ...((dateStart || dateEnd) && {
+              tanggal: {
+                ...(dateStart && {
+                  gte: new Date(dateStart as string),
+                }),
+                ...(dateEnd && {
+                  lte: new Date(dateEnd as string),
+                }),
+              },
+            }),
+          },
+          select: {
+            tanggal: true,
+            masjid: {
+              select: {
+                nama_masjid: true,
+              },
+            },
+            mubaligh: {
+              select: {
+                nama_mubaligh: true,
+              },
             },
           },
-          mubaligh: {
-            select: {
-              nama_mubaligh: true,
-            },
-          },
-        },
-        ...(page && {
-          skip: (Number(page) - 1) * (Number(limit) || 10),
-        }),
-        ...(limit && {
-          take: Number(limit),
-        }),
-        orderBy: {
-          id: "desc",
-        },
-        ...(orderBy && {
+          ...(page && {
+            skip: (Number(page) - 1) * (Number(limit) || 10),
+          }),
+          ...(limit && {
+            take: Number(limit),
+          }),
           orderBy: {
-            [orderBy.toString()]: orderType?.toString() || "asc",
+            id: "desc",
           },
+          ...(orderBy && {
+            orderBy: {
+              [orderBy.toString()]: orderType?.toString() || "asc",
+            },
+          }),
         }),
-      }),
     ])
-      .then(([jadwalPengajians]) => {
+      .then(([jadwalPengajians, jadwalJumatans]) => {
         sendResponse({
           res,
-          data: jadwalPengajians,
+          data: jadwalPengajians || jadwalJumatans,
         });
       })
       .catch((err) => {
