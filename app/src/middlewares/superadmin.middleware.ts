@@ -10,7 +10,6 @@ export default function superadmin(
     return sendResponse({
       res,
       error: "Not a superadmin!",
-      status: 401,
     });
   }
   next();

@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import FormDialog, { RenderFormInput } from "@/components/custom/formDialog";
 import { Mubaligh } from "./columns";
 
 const mubalighFormSchema = z.object({
@@ -44,7 +44,7 @@ export function AddMubalighForm({ children, onSubmit }: Props) {
   ];
 
   return (
-    <AddForm
+    <FormDialog
       title="Tambah Data Mubaligh"
       subtitle="Input data mubaligh yang akan ditambahkan ke dalam daftar"
       onSubmit={onSubmit}
@@ -52,6 +52,6 @@ export function AddMubalighForm({ children, onSubmit }: Props) {
       renderFormInput={renderFormInput}
     >
       {children}
-    </AddForm>
+    </FormDialog>
   );
 }
