@@ -1,55 +1,43 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AddForm, { RenderFormInput } from "@/components/custom/changePassword";
-import { User } from "./columns";
+import FormDialogContent from "@/components/custom/formDialogContent";
+import { RenderFormInput } from "@/components/custom/formDialog";
 
 const changePasswordFormSchema = z.object({
-  username: z.string().min(1, "Username harus diisi"),
-  password: z.string().min(1, "Password harus diisi"),
+  password: z.string().min(1, "Password baru harus diisi"),
 });
 
 type Fields = z.infer<typeof changePasswordFormSchema>;
 
-type FormValues = Fields & { role: "superadmin" | "admin" };
-
 type Props = {
-  children: React.ReactNode;
-  onSubmit: (data: Omit<User, "id">) => void;
+  onSubmit: (data: Fields) => void;
 };
 
-export function ChangePasswordForm({ children, onSubmit }: Props) {
-  const form = useForm<FormValues>({
+export function ChangePasswordForm({ onSubmit }: Props) {
+  const form = useForm<Fields>({
     resolver: zodResolver(changePasswordFormSchema),
     defaultValues: {
-      username: "",
       password: "",
-      role: "admin",
     },
   });
 
-  const renderFormInput: RenderFormInput<FormValues> = [
+  const renderFormInput: RenderFormInput<Fields> = [
     {
-      name: "username",
-      label: "Username",
-      placeholder: "Username",
+      name: "password",
+      label: "Password",
+      placeholder: "Password",
+      type: "password",
     },
-    // {
-    //   name: "password",
-    //   label: "Password",
-    //   placeholder: "Password",
-    // },
   ];
 
   return (
-    <AddForm
-      title="Edit Data Admin"
-      subtitle="Edit data admin"
+    <FormDialogContent
+      title="Change Password Admin"
+      subtitle="Reset password admin menjadi password baru"
       onSubmit={onSubmit}
       form={form}
       renderFormInput={renderFormInput}
-    >
-      {children}
-    </AddForm>
+    />
   );
 }

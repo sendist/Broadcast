@@ -53,7 +53,6 @@ export const authLogin = (req: Request, res: Response, next: NextFunction) => {
               sendResponse({
                 res,
                 error: "Invalid username or password",
-                status: 401,
               });
             }
           });
@@ -61,7 +60,6 @@ export const authLogin = (req: Request, res: Response, next: NextFunction) => {
         sendResponse({
           res,
           error: "Invalid username or password",
-          status: 401,
         });
       }
     })
@@ -136,12 +134,20 @@ export const changePassword = (
   res: Response,
   next: NextFunction
 ) => {
-  const { oldPassword, newPassword } = req.body;
+  const { old_password, new_password, confirm_password } = req.body;
 
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
-  if (token == null) return sendResponse({ res, error: "No access token" });
+  if (!token)
+    return sendResponse({ res, error: "No access token", status: 401 });
+
+  if (new_password !== confirm_password) {
+    return sendResponse({
+      res,
+      error: "New password and confirm password must be the same",
+    });
+  }
 
   const { data, error } = verifyAccessToken(token);
 
@@ -158,40 +164,36 @@ export const changePassword = (
   return prisma.user
     .findUnique({
       where: {
-        // where the username is the same as JSON.parse(localStorage.account).id
         id: userId,
       },
     })
     .then((user) => {
       if (user) {
         return bcrypt
-          .compare(oldPassword, user.password.replace(/^\$2y/, "$2a"))
+          .compare(old_password, user.password.replace(/^\$2y/, "$2a"))
           .then((result) => {
-            //if the user is authenticated
             if (result) {
-              return bcrypt
-                .hash(newPassword, 10)
-                .then((hash) => {
-                  return prisma.user.update({
+              return bcrypt.hash(new_password, 10).then((hash) => {
+                return prisma.user
+                  .update({
                     where: {
                       id: userId,
                     },
                     data: {
                       password: hash,
                     },
+                  })
+                  .then(() => {
+                    sendResponse({
+                      res,
+                      data: "Password changed successfully",
+                    });
                   });
-                })
-                .then(() => {
-                  sendResponse({
-                    res,
-                    data: "Password changed successfully",
-                  });
-                });
+              });
             } else {
               sendResponse({
                 res,
                 error: "Invalid old password",
-                status: 401,
               });
             }
           });
@@ -199,7 +201,6 @@ export const changePassword = (
         sendResponse({
           res,
           error: "Invalid user",
-          status: 401,
         });
       }
     })
@@ -209,7 +210,11 @@ export const changePassword = (
 };
 router.post(
   "/change-password",
-  validate([body("oldPassword").notEmpty(), body("newPassword").notEmpty()]),
+  validate([
+    body("old_password").notEmpty(),
+    body("new_password").notEmpty(),
+    body("confirm_password").notEmpty(),
+  ]),
   changePassword
 );
 

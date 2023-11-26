@@ -17,6 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
 import Logo from "./assets/logo";
+import { Dialog, DialogTrigger } from "./components/ui/dialog";
+import { ChangeSelfPasswordForm } from "./components/custom/changeSelfPassword";
+import { useApiFetch } from "./hooks/fetch";
+import { BASE_URL } from "./lib/constants";
+import { toast } from "./components/ui/use-toast";
 
 const menus = [
   {
@@ -249,45 +254,84 @@ const menus = [
 function App() {
   const { account, logout, loading } = useAccount();
   const navigate = useNavigate();
+  const apiFetch = useApiFetch();
   const { width } = useWindowSize();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(
     menus.find((menu) => menu.path === location.pathname)?.name ?? menus[0].name
   );
+  const [dialogOpen, setDialogOpen] = useState(false);
   useEffect(() => {
     if (!loading && !account && location.pathname !== "/") {
       navigate("/login");
     }
   }, [account, loading, navigate]);
+
+  function changePassword(data: {
+    old_password: string;
+    new_password: string;
+    confirm_password: string;
+  }) {
+    return apiFetch<string>({
+      url: `${BASE_URL}/auth/change-password`,
+      options: {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    }).then((res) => {
+      if (res?.data) {
+        toast({
+          title: "Success",
+          description: res.data,
+        });
+        return true;
+      }
+      return false;
+    });
+  }
+
   const logoutAdmin = (
     <div className="mt-auto flex justify-between items-center">
       <span className="text-sm font-medium text-black">
         {account?.username}
       </span>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <DotsHorizontalIcon className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>
-            <LockClosedIcon className="mr-2" />
-            Change Password (not implemented)
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="text-red-600 focus:bg-red-600 focus:text-white"
-            onClick={() => {
-              logout();
-              navigate("/login");
-            }}
-          >
-            <ExitIcon className="mr-2" />
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <DotsHorizontalIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DialogTrigger asChild>
+              <DropdownMenuItem>
+                <LockClosedIcon className="mr-2" />
+                Change Password
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <DropdownMenuItem
+              className="text-red-600 focus:bg-red-600 focus:text-white"
+              onClick={() => {
+                logout();
+                navigate("/login");
+              }}
+            >
+              <ExitIcon className="mr-2" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <ChangeSelfPasswordForm
+          onSubmit={(data) => {
+            changePassword(data).then((success) => {
+              if (success) {
+                setDialogOpen(false);
+              }
+            });
+          }}
+        />
+      </Dialog>
     </div>
   );
   return (

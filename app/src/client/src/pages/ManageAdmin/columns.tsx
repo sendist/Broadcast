@@ -10,22 +10,16 @@ import {
 import {
   DotsHorizontalIcon,
   LockClosedIcon,
-  PlusIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
 import { ColumnDef, TableMeta } from "@tanstack/react-table";
 import { EditCell } from "@/components/custom/editCell";
 import CellHeaderSortable from "@/components/custom/cellHeaderSortable";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useCRUD } from "@/hooks/backend";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ChangePasswordForm } from "./changePassword";
+import { useState } from "react";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import ConfirmDialogContent from "@/components/custom/confirmDialogContent";
 
 // const { update } = useCRUD<User>;
 
@@ -39,6 +33,7 @@ export type User = {
 
 interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
+  updateData?: (id: string, key: string, value: unknown) => void;
 }
 
 export const columns: ColumnDef<User>[] = [
@@ -78,47 +73,64 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row, table }) => {
       const user = row.original;
 
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const [dialogOpen, setDialogOpen] = useState(false);
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+
       return (
         <>
-          <Dialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <DotsHorizontalIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DialogTrigger>
-                  <DropdownMenuItem>
-                    <LockClosedIcon className="mr-2" />
-                    Change Password (not implemented)
-                  </DropdownMenuItem>
-                </DialogTrigger>
-                <DropdownMenuItem
-                  className="text-red-600 focus:bg-red-600 focus:text-white"
-                  onClick={() =>
-                    (table.options.meta as CustomTableMeta<User>)?.removeData?.(
-                      user.id
-                    )
-                  }
-                >
-                  <TrashIcon className="mr-2" />
-                  Delete User
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DialogContent>
-              ABCDE
-              {/* <ChangePasswordForm onSubmit={update}>
-                <Button variant="white" className="ml-4 mt-2">
-                  <PlusIcon className="mr-2" />
-                  Add
-                </Button>
-              </ChangePasswordForm> */}
-            </DialogContent>
-          </Dialog>
+          <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <DotsHorizontalIcon className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <>
+                        <LockClosedIcon className="mr-2" />
+                        Change Password
+                      </>
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem className="text-red-600 focus:bg-red-600 focus:text-white">
+                      <TrashIcon className="mr-2" />
+                      Delete User
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ChangePasswordForm
+                onSubmit={(data) => {
+                  setDialogOpen(false);
+                  (table.options.meta as CustomTableMeta<User>)?.updateData?.(
+                    user.id,
+                    "password",
+                    data.password
+                  );
+                }}
+              />
+            </Dialog>
+            <ConfirmDialogContent
+              title={`Apakah Anda Yakin Untuk Menghapus Admin ${user.username}?`}
+              description="Data yang sudah dihapus tidak dapat dikembalikan"
+              cancelText="Batal"
+              confirmText="Hapus"
+              onConfirm={() =>
+                (table.options.meta as CustomTableMeta<User>)?.removeData?.(
+                  user.id
+                )
+              }
+              dangerous
+            />
+          </AlertDialog>
         </>
       );
     },

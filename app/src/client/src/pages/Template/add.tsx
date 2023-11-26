@@ -6,7 +6,7 @@ import {
   Path,
   useForm,
 } from "react-hook-form";
-import AddForm, { RenderFormInput } from "@/components/custom/addForm";
+import FormDialog, { RenderFormInput } from "@/components/custom/formDialog";
 import InputDropdown from "@/components/custom/inputDropdown";
 import { useState } from "react";
 import { whatsappFormatting } from "@/lib/utils";
@@ -109,7 +109,7 @@ export function AddTemplateForm({
   ];
 
   return (
-    <AddForm
+    <FormDialog
       title="Tambah Data Template"
       subtitle="Input data template yang akan ditambahkan ke dalam daftar"
       onSubmit={onSubmit}
@@ -117,6 +117,6 @@ export function AddTemplateForm({
       renderFormInput={renderFormInput}
     >
       {children}
-    </AddForm>
+    </FormDialog>
   );
 }
