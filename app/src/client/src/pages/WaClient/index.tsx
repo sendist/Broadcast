@@ -7,6 +7,7 @@ import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import useCustomization from "@/hooks/customization";
 
 export default function WaClient() {
   const { lastJsonMessage } = useWebSocket<{
@@ -35,6 +36,7 @@ export default function WaClient() {
 
   // TEMPORARY
   const [noHP, setNoHP] = useState("");
+  const { appLogo } = useCustomization();
 
   return (
     <>
@@ -188,7 +190,12 @@ export default function WaClient() {
                     </div>
                     <div className="absolute z-10 left-0 right-0 bottom-0 top-0 text-center grid place-items-center">
                       <div className="relative">
-                        <div className="w-8 h-8 sm:w-16 sm:h-16 bg-[url('/broadcast-logo.svg')] bg-contain bg-no-repeat bg-center" />
+                        <div
+                          className={`w-8 h-8 sm:w-16 sm:h-16 bg-contain bg-no-repeat bg-center`}
+                          style={{
+                            backgroundImage: `url(/${appLogo})`,
+                          }}
+                        />
                       </div>
                     </div>
                   </div>

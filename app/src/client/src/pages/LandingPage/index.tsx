@@ -2,17 +2,19 @@ import { useState } from "react";
 import Logo from "@/assets/logo";
 import PengajianCalendar from "./pengajianCalendar";
 import LandingPageJadwalJumatan from "./landingPageJumatan";
+import useCustomization from "@/hooks/customization";
 
 export default function LandingPage() {
   const [selectedJadwal, setSelectedJadwal] = useState<string>("Pengajian");
   const jadwal = ["Pengajian", "Jumatan"];
+  const { appName } = useCustomization();
 
   return (
     <div className="w-full p-8 xl:px-32">
       <div className="flex items-center justify-between pt-2">
         <div className="flex items-center rounded-lg text-slate-900">
-          <Logo className="w-9 h-9" />
-          <span className="ml-1 text-base font-semibold">Broadcast</span>
+          <Logo className="w-12 h-12" />
+          <span className="ml-1 text-base font-semibold">{appName}</span>
         </div>
         <div className="flex flex-row">
           {jadwal.map((item, index) => (

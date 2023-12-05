@@ -6,7 +6,6 @@ import "./index.css";
 import Login from "./pages/Login/index.tsx";
 import { AccountProvider } from "./context/account.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
-import Rebrand from "./pages/Rebrand/index.tsx";
 import MasjidPage from "./pages/Masjid/index.tsx";
 import MubalighPage from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
@@ -19,33 +18,38 @@ import SchedulePage from "./pages/Schedule/index.tsx";
 import Home from "./pages/Home/index.tsx";
 import LandingPage from "./pages/LandingPage/index.tsx";
 import ManageAdmin from "./pages/ManageAdmin/index.tsx";
+import { CustomizationProvider } from "./context/customization.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <CustomizationProvider>
+        <LandingPage />
+      </CustomizationProvider>
+    ),
   },
   {
     path: "/login",
     element: (
-      <AccountProvider>
-        <Login />
-      </AccountProvider>
+      <CustomizationProvider>
+        <AccountProvider>
+          <Login />
+        </AccountProvider>
+      </CustomizationProvider>
     ),
   },
   {
     path: "/*",
     element: (
-      <AccountProvider>
-        <App />
-      </AccountProvider>
+      <CustomizationProvider>
+        <AccountProvider>
+          <App />
+        </AccountProvider>
+      </CustomizationProvider>
     ),
     errorElement: <NotFound />,
     children: [
-      {
-        path: "rebrand",
-        element: <Rebrand />,
-      },
       {
         path: "home",
         element: <Home />,

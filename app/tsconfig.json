@@ -16,6 +16,6 @@
   "typeAcquisition": {
     "include": ["jest"]
   },
-  "include": ["src/**/*.ts", "index.ts"],
+  "include": ["src/**/*.ts", "index.ts", "src/client/src/lib/utils.tsx"],
   "exclude": ["node_modules", "src/client/**/*"]
 }

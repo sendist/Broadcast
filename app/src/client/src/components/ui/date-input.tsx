@@ -65,10 +65,6 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
 
       // only call onChange when the entry is valid
       if (isValid) {
-        console.log(
-          "aaa",
-          new Date(newDate.year, newDate.month - 1, newDate.day)
-        );
         onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
       }
     };
