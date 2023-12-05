@@ -99,12 +99,13 @@ const AccountProvider = ({ children }: AccountProviderProps) => {
   function refresh(): Promise<false | Account> {
     return fetch(BASE_URL + "/auth/refresh")
       .then((res) => {
-        if (res.status === 401) {
+        if ([400, 401].includes(res.status)) {
           dispatch({ type: "error", payload: "Session expired" });
           toast({
             title: "Please re-login",
             description: "Session expired",
           });
+          logout();
           return false;
         } else {
           return res.json().then(({ data }: ServerResult<Account>) => {

@@ -8,6 +8,8 @@ import authentication from "./src/middlewares/authentication.middleware";
 import authRoute from "./src/routes/auth.route";
 import templateRoute from "./src/routes/template.route";
 import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
+import rebrandRoute from "./src/routes/rebrand.route";
+import publicRoute from "./src/routes/public.route";
 import masjidRoute from "./src/routes/masjid.route";
 import jadwalPengajianRoute from "./src/routes/jadwalpengajian.route";
 import jadwalJumatanRoute from "./src/routes/jadwaljumatan.route";
@@ -32,6 +34,8 @@ app.use(
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   })
 );
+//support upload for images
+app.use(bodyParser.raw({ type: "image/*" }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -68,6 +72,8 @@ router.use("/auth", authRoute);
 
 router.use("/landing", landingRoute);
 
+router.use("/public", publicRoute);
+
 // all routes below this line will require authentication
 router.use(authentication);
 
@@ -91,6 +97,8 @@ router.use("/message-logs", messageLogsRoute);
 router.use(superadmin);
 
 router.use("/manage-admin", manageAdminRoute);
+
+router.use("/rebrand", rebrandRoute);
 
 //serve static assets if in production
 if (process.env.NODE_ENV === "production") {

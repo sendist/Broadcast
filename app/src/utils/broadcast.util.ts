@@ -150,9 +150,7 @@ export const pengajianMessages = ({
           ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
         ]);
         messages.push({
-          phone: [
-            ...new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp]),
-          ],
+          phone: [pengajian.masjid.no_hp],
           recipients: [pengajian.masjid.nama_ketua_dkm],
           message: message,
         });
@@ -166,9 +164,7 @@ export const pengajianMessages = ({
           ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
         ]);
         messages.push({
-          phone: [
-            ...new Set([pengajian.masjid.no_hp, pengajian.mubaligh.no_hp]),
-          ],
+          phone: [pengajian.mubaligh.no_hp],
           recipients: [pengajian.mubaligh.nama_mubaligh],
           message: message,
         });
@@ -442,7 +438,7 @@ export const jumatanMessages = ({
           ["nama_ketua_dkm", jumatan.masjid.nama_ketua_dkm],
         ]);
         messages.push({
-          phone: [...new Set([jumatan.masjid.no_hp, jumatan.mubaligh.no_hp])],
+          phone: [jumatan.masjid.no_hp],
           recipients: [jumatan.masjid.nama_ketua_dkm],
           message: message,
         });
@@ -455,7 +451,7 @@ export const jumatanMessages = ({
           ["nama_ketua_dkm", jumatan.masjid.nama_ketua_dkm],
         ]);
         messages.push({
-          phone: [...new Set([jumatan.masjid.no_hp, jumatan.mubaligh.no_hp])],
+          phone: [jumatan.mubaligh.no_hp],
           recipients: [jumatan.mubaligh.nama_mubaligh],
           message: message,
         });

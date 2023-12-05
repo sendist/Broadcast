@@ -17,11 +17,16 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
 import Logo from "./assets/logo";
-import { Dialog, DialogTrigger } from "./components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+} from "./components/ui/dialog";
 import { ChangeSelfPasswordForm } from "./components/custom/changeSelfPassword";
 import { useApiFetch } from "./hooks/fetch";
 import { BASE_URL } from "./lib/constants";
 import { toast } from "./components/ui/use-toast";
+import useCustomization from "./hooks/customization";
+import CustomizeBrandingDialog from "./components/custom/customizeBrandingDialog";
 
 const menus = [
   {
@@ -266,6 +271,7 @@ function App() {
       navigate("/login");
     }
   }, [account, loading, navigate]);
+  const { appName } = useCustomization();
 
   function changePassword(data: {
     old_password: string;
@@ -334,6 +340,7 @@ function App() {
       </Dialog>
     </div>
   );
+
   return (
     <>
       <div className="h-screen w-screen bg-dark flex flex-row">
@@ -344,11 +351,12 @@ function App() {
             aria-label="Sidebar"
           >
             <div className="flex h-full flex-col overflow-y-auto border-r border-slate-200 bg-white px-3 py-4">
-              <div className="mb-10 flex items-center rounded-lg px-3 py-2 text-slate-900">
-                <Logo className="w-9 h-9" />
-                <span className="ml-1 text-base font-semibold">Broadcast</span>
+              <div className="flex items-center rounded-lg px-3 py-2 text-slate-900">
+                <Logo className="w-12 h-12" />
+                <span className="ml-1 text-base font-semibold">{appName}</span>
               </div>
-              <ul className="space-y-2 text-sm font-medium">
+              {account?.role === "superadmin" && <CustomizeBrandingDialog />}
+              <ul className="space-y-2 text-sm font-medium mt-10">
                 {menus.map(
                   (menu, index) =>
                     (account?.role === "superadmin" ||
@@ -380,26 +388,8 @@ function App() {
         ) : (
           <header>
             <div className="fixed w-full p-2 flex items-center border border-r border-slate-200 bg-white z-10">
-              <svg
-                className="h-9 w-9"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0.2999999999999998 89 102.1"
-                width="50.4"
-                height="58.1643594"
-                x="4.800000000000001"
-                y="5.539463443183575"
-                fill="#557A82"
-              >
-                <path
-                  d="M24.6 89V57.7c0-11 19.9-19.9 19.9-19.9s19.9 8.9 19.9 19.9V89m-.1-16.2v-28c0-11-19.9-19.9-19.9-19.9s-19.9 8.9-19.9 19.9v28m39.8-11.1v-28c0-11-19.9-19.9-19.9-19.9s-19.9 8.9-19.9 19.9v28M2 75.9l42.5 24.5L87 75.9V26.8L44.5 2.3 2 26.8v49.1zm73.9-55.4v61.8M13.1 20.5v61.8"
-                  fill="none"
-                  stroke="#557A82"
-                  strokeWidth="4px"
-                  strokeMiterlimit="10"
-                ></path>
-              </svg>
-              <span className="ml-1 font-semibold">Broadcast</span>
+              <Logo className="w-9 h-9" />
+              <span className="ml-1 font-semibold">{appName}</span>
               <button
                 type="button"
                 className="ml-auto p-1 border rounded hover:border-slate-400"

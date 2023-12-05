@@ -40,7 +40,7 @@ export default function ConfirmDialogContent({
             <AlertDialogAction asChild onClick={onConfirm}>
               <Button
                 className="bg-red-500 hover:bg-red-600 hover:text-white"
-                variant="ghost"
+                variant="destructive"
               >
                 {confirmText ?? "Continue"}
               </Button>

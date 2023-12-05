@@ -84,3 +84,12 @@ INSERT INTO "broadcast_schedule" (id, active, force_broadcast, h, jam) VALUES
 ('pengajian_bulanan', FALSE, FALSE, 0, '00:00:00'),
 ('pengajian_reminder', FALSE, FALSE, 0, '00:00:00'),
 ('jumatan_reminder', FALSE, FALSE, 0, '00:00:00');
+
+CREATE TABLE IF NOT EXISTS "customization" (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+INSERT INTO "customization" (key, value) VALUES
+('app_logo', 'default-logo.svg'),
+('app_name', 'Broadcast');

@@ -18,26 +18,35 @@ import SchedulePage from "./pages/Schedule/index.tsx";
 import Home from "./pages/Home/index.tsx";
 import LandingPage from "./pages/LandingPage/index.tsx";
 import ManageAdmin from "./pages/ManageAdmin/index.tsx";
+import { CustomizationProvider } from "./context/customization.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <CustomizationProvider>
+        <LandingPage />
+      </CustomizationProvider>
+    ),
   },
   {
     path: "/login",
     element: (
-      <AccountProvider>
-        <Login />
-      </AccountProvider>
+      <CustomizationProvider>
+        <AccountProvider>
+          <Login />
+        </AccountProvider>
+      </CustomizationProvider>
     ),
   },
   {
     path: "/*",
     element: (
-      <AccountProvider>
-        <App />
-      </AccountProvider>
+      <CustomizationProvider>
+        <AccountProvider>
+          <App />
+        </AccountProvider>
+      </CustomizationProvider>
     ),
     errorElement: <NotFound />,
     children: [
