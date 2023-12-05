@@ -66,7 +66,10 @@ const postLogo = (req: Request, res: Response, next: NextFunction) => {
 
   // Save the file to the public folder
   if (process.env.NODE_ENV === "production") {
-    fs.writeFileSync(path.join(__dirname, `../client/${fileName}`), image);
+    fs.writeFileSync(
+      path.join(__dirname, `../../client/dist/${fileName}`),
+      image
+    );
   } else {
     fs.writeFileSync(
       path.join(__dirname, `../client/public/${fileName}`),
