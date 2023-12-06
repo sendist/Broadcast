@@ -6,11 +6,12 @@ import { ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon } fro
 
 interface MonthPickerProps {
   onUpdate: (newDate: Date) => void;
+  date: Date;
 }
 
-const MonthPicker: React.FC<MonthPickerProps> = ({ onUpdate }) => {
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+const MonthPicker: React.FC<MonthPickerProps> = ({ onUpdate , date}) => {
+  const [selectedMonth, setSelectedMonth] = useState(date.getMonth());
+  const [selectedYear, setSelectedYear] = useState(date.getFullYear());
   const [isOpen, setIsOpen] = useState(false);
 
   const monthName = [
@@ -50,16 +51,8 @@ const MonthPicker: React.FC<MonthPickerProps> = ({ onUpdate }) => {
     </Button>
   );
 
-  const resetValues = (): void => {
-    setSelectedMonth(new Date().getMonth());
-    setSelectedYear(new Date().getFullYear());
-  };
-
   return (
     <Popover open={isOpen} onOpenChange={(open: boolean) => {
-        if (!open) {
-          resetValues();
-        }
         setIsOpen(open);
       }}>
       <PopoverTrigger asChild>
@@ -95,7 +88,6 @@ const MonthPicker: React.FC<MonthPickerProps> = ({ onUpdate }) => {
           <Button
             onClick={() => {
               setIsOpen(false);
-              resetValues();
             }}
             variant="ghost"
           >

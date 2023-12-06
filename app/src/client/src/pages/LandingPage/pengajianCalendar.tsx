@@ -272,7 +272,7 @@ export default function PengajianCalendar() {
           ) : (
             <div>
               <div className="mb-4 mt-6 sm:mx-4 md:mx-12 lg:mx-28 xl:mx-60">
-                <MonthPicker onUpdate={handleMonthChange} />
+                <MonthPicker onUpdate={handleMonthChange} date={date}/>
               </div>
               {jadwalPengajian.map((jadwal) => (
                 <>
