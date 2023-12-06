@@ -113,7 +113,7 @@ export default function LandingPageJadwalJumatan() {
   return (
     <div>
       <div className="mb-4 mt-6">
-        <MonthPicker onUpdate={handleMonthChange} />
+        <MonthPicker onUpdate={handleMonthChange} date={date}/>
       </div>
       <div className="rounded-md border bg-white">
         <Table>
