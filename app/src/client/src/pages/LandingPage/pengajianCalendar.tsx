@@ -5,8 +5,9 @@ import Event from "@/components/custom/event";
 import { useIsFirstRender } from "usehooks-ts";
 import { useWindowSize } from "@/hooks/windowSize";
 import EventDetail from "@/components/custom/event-detail";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import MonthPicker from "@/components/custom/month-picker";
+import { Button } from "@/components/ui/button";
 
 type Jadwal = {
   tanggal: string;
@@ -141,17 +142,14 @@ export default function PengajianCalendar() {
           {width >= 768 && (
             <div className="flex flex-row mb-2">
               {jadwalType.map((item, index) => (
-                <p
+                <Button
                   key={index}
-                  className={`px-3 py-1 text-sm font-semibold rounded-md ${
-                    selectedJadwalType === item
-                      ? "bg-green-700 text-white"
-                      : "bg-white text-slate-900"
-                  }`}
+                  className={cn(selectedJadwalType === item && "pointer-events-none")}
+                  variant={selectedJadwalType === item ? "default" : "ghost"}
                   onClick={() => setSelectedJadwalType(item)}
                 >
                   {item}
-                </p>
+                </Button>
               ))}
             </div>
           )}
