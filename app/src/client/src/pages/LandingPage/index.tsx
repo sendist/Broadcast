@@ -3,6 +3,8 @@ import Logo from "@/assets/logo";
 import PengajianCalendar from "./pengajianCalendar";
 import LandingPageJadwalJumatan from "./landingPageJumatan";
 import useCustomization from "@/hooks/customization";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   const [selectedJadwal, setSelectedJadwal] = useState<string>("Pengajian");
@@ -18,17 +20,14 @@ export default function LandingPage() {
         </div>
         <div className="flex flex-row">
           {jadwal.map((item, index) => (
-            <p
+            <Button
               key={index}
-              className={`px-4 py-2 text-base font-semibold rounded-lg ${
-                selectedJadwal === item
-                  ? "bg-green-700 text-white"
-                  : "bg-white text-slate-900"
-              }`}
+              className={cn(selectedJadwal === item && "pointer-events-none")}
+              variant={selectedJadwal === item ? "default" : "ghost"}
               onClick={() => setSelectedJadwal(item)}
             >
               {item}
-            </p>
+            </Button>
           ))}
         </div>
       </div>
@@ -37,6 +36,12 @@ export default function LandingPage() {
       ) : (
         <LandingPageJadwalJumatan />
       )}
+
+      <div className="mt-10 flex flex-wrap items-center text-xs md:text-sm text-gray-400 justify-center text-center">
+        <p>
+          &copy; Pancaswastamita - Politeknik Negeri Bandung
+        </p>
+      </div>
     </div>
   );
 }
