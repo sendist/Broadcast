@@ -15,29 +15,7 @@ We used these tech stacks to develop this app:
 3. Docker
 
 ## Important Update
-1. Resolving the problem of `whatsapp-web.js` package: using this [source of information](https://stackoverflow.com/questions/78265879/whatsapp-web-js-how-can-i-fix-typeerror-cannot-read-properties-of-null-readin):<br/>
-   After searching the problem related to whatsapp-web.js output in console,:<br/>
-   ```cmd
-   [0] C:\Users\....\Broadcast\app\node_modules\whatsapp-web.js\src\webCache\LocalWebCache.js:34
-   [0]         const version = indexHtml.match(/manifest-([\d\\.]+)\.json/)[1];
-   [0]                                                                     ^
-   [0] TypeError: Cannot read properties of null (reading '1')
-   [0]     at LocalWebCache.persist (C:\Users\....\Broadcast\app\node_modules\whatsapp-web.js\src\webCache\LocalWebCache.js:34:69)
-   [0]     at C:\Users\....\Broadcast\app\node_modules\whatsapp-web.js\src\Client.js:728:36
-   [0]     at processTicksAndRejections (node:internal/process/task_queues:95:5)
-   ```
-
-   we have to change below syntax:<br/>
-   ```typescript
-   const version = indexHtml.match(/manifest-([\d\\.]+)\.json/)[1];
-   ```
-   <br/>
-
-   into new syntax below (look at new question mark before index number):<br/>
-   ```typescript
-   const version = indexHtml.match(/manifest-([\d\\.]+)\.json/)?[1];
-                                                               ^
-   ```
+1. Resolving the problem of `whatsapp-web.js` package: using this [source of information](https://stackoverflow.com/questions/78265879/whatsapp-web-js-how-can-i-fix-typeerror-cannot-read-properties-of-null-readin). For more information, refer to [Issues #34](https://github.com/sendist/Broadcast/issues/34) on how to solve such issue.
 
 ## Guide
 ### User Guide
@@ -64,7 +42,7 @@ We used these tech stacks to develop this app:
 
 4. Run the 'app'.
    ```console
-   $ cd .. && npm run dev
+   $ npm run dev
    ```
 
 ### Deployment Guide

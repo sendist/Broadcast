@@ -1,0 +1,13 @@
+diff --git a/node_modules/whatsapp-web.js/src/webCache/LocalWebCache.js b/node_modules/whatsapp-web.js/src/webCache/LocalWebCache.js
+index a377f55..e4345bf 100644
+--- a/node_modules/whatsapp-web.js/src/webCache/LocalWebCache.js
++++ b/node_modules/whatsapp-web.js/src/webCache/LocalWebCache.js
+@@ -31,7 +31,7 @@ class LocalWebCache extends WebCache {
+ 
+     async persist(indexHtml) {
+         // extract version from index (e.g. manifest-2.2206.9.json -> 2.2206.9)
+-        const version = indexHtml.match(/manifest-([\d\\.]+)\.json/)[1];
++        const version = indexHtml.match(/manifest-([\d\\.]+)\.json/)?.[1];
+         if(!version) return;
+    
+         const filePath = path.join(this.path, `${version}.html`);
