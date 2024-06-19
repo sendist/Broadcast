@@ -47,7 +47,7 @@
     "lucide-react": "^0.395.0",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
-    "whatsapp-web.js": "latest",
+    "whatsapp-web.js": "^1.24.0",
     "ws": "^8.14.2"
   }
 }
