@@ -14,7 +14,7 @@ services:
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
-      - ./migration.sql:/docker-entrypoint-initdb.d/migration.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - broadcast:/var/lib/postgresql/data
     restart: unless-stopped
 
@@ -27,7 +27,7 @@ services:
       - db
     restart: unless-stopped
 
-# comment out if you don't want to use nginx
+  # comment out if you don't want to use nginx
   nginx:
     build:
       context: ./nginx
