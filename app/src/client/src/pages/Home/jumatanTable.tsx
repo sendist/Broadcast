@@ -12,8 +12,8 @@ export default function JumatanTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const currentDate = new Date();
-  const dateStart = new Date(currentDate.setHours(0, 0, 0)).toISOString();
-  const dateEnd = new Date(currentDate.setDate(currentDate.getDate() + 3)).toISOString();
+  const dateStart = new Date().toISOString();
+  const dateEnd = new Date(currentDate.setDate(currentDate.getDate() + 2)).toISOString();
 
   const { data, loading, get } = useCRUD<JadwalJumatan>({
     url: "/jadwal-jumatan",

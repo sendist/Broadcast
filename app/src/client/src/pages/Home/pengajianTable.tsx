@@ -13,9 +13,9 @@ export default function PengajianTable() {
 
   const currentDate = new Date();
   const dateStart = new Date().toISOString();
-  const dateEnd = new Date(currentDate.setDate(currentDate.getDate() + 3)).toISOString();
+  const dateEnd = new Date(currentDate.setDate(currentDate.getDate() + 2)).toISOString();
 
-  const { data, loading, update, remove, get } = useCRUD<JadwalPengajian>({
+  const { data, loading, get } = useCRUD<JadwalPengajian>({
     url: "/jadwal-pengajian",
     params: {
       page: page.toString(),
@@ -88,14 +88,6 @@ export default function PengajianTable() {
         },
         nextPage: () => {
           setPage(page + 1);
-        },
-        updateData: (id: string, key: string, value: unknown) => {
-          update(id, {
-            [key]: value,
-          });
-        },
-        removeData: (id: string) => {
-          remove(id);
         },
       }}
       onSortingChange={setSorting}
