@@ -1,24 +1,42 @@
-import Logo from "@/assets/logo";
-import useCustomization from "@/hooks/customization";
-import { useWindowSize } from "usehooks-ts";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import JumatanTable from "./jumatanTable";
+import PengajianTable from "./pengajianTable";
 
 export default function Home() {
-  const { width } = useWindowSize();
-  const { appName } = useCustomization();
+  const [selectedJadwal, setSelectedJadwal] = useState<string>("Pengajian");
+  const jadwal = ["Pengajian", "Jumatan"];
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
-      <Logo className="w-16 h-16 mb-6" />
-      <p className="text-lg">
-        Selamat Datang di <span className="font-semibold">{appName}</span>
-      </p>
-      <p className="text-sm text-muted-foreground text-center">
-        Untuk memulai, silakan pilih menu yang tersedia pada{" "}
-        <span className="font-medium">
-          {width > 1024 ? "sidebar" : "hamburger icon"}
-        </span>
-        .
-      </p>
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4  items-start gap-4 sm:gap-0">
+        <div>
+          <h1 className="inline-block text-xl font-semibold">
+            Upcoming Broadcast
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Jadwal pengajian dan jumatan untuk 3 hari ke depan
+          </p>
+        </div>
+        <div>
+          {jadwal.map((item, index) => (
+            <Button
+              key={index}
+              className={cn(selectedJadwal === item && "pointer-events-none")}
+              variant={selectedJadwal === item ? "default" : "ghost"}
+              onClick={() => setSelectedJadwal(item)}
+            >
+              {item}
+            </Button>
+          ))}
+        </div>
+      </div>
+      {selectedJadwal === "Pengajian" ? (
+        <PengajianTable />
+      ) : (
+        <JumatanTable />
+      )}
     </div>
   );
 }
