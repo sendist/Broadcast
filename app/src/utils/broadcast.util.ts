@@ -3,6 +3,7 @@ import {
   resetDateTimeToMidnight,
   templateReplacer,
   templateReplacerBulanan,
+  templateReplacerBulananAggregate,
 } from "./etc.util";
 import prisma from "./prisma.util";
 
@@ -256,6 +257,11 @@ export const pengajianBulananMessages = ({
       { pengajians: (typeof pengajians)[number][]; mubalighs: Set<bigint> }
     > = {};
 
+    let mubalighGroups: Record<
+      string,
+      { pengajians: (typeof pengajians)[number][]; masjids: Set<bigint> }
+    > = {};
+
     for (const pengajian of pengajians) {
       if (masjidGroups[pengajian.masjid.id.toString()]) {
         masjidGroups[pengajian.masjid.id.toString()].pengajians.push(pengajian);
@@ -268,7 +274,18 @@ export const pengajianBulananMessages = ({
           mubalighs: new Set([pengajian.mubaligh.id]),
         };
       }
+
+      if (mubalighGroups[pengajian.mubaligh.id.toString()]) {
+        mubalighGroups[pengajian.mubaligh.id.toString()].pengajians.push(pengajian);
+        mubalighGroups[pengajian.mubaligh.id.toString()].masjids.add(pengajian.masjid.id);
+      } else {
+        mubalighGroups[pengajian.mubaligh.id.toString()] = {
+          pengajians: [pengajian],
+          masjids: new Set([pengajian.masjid.id]),
+        };
+      }
     }
+
     for (const [id, { pengajians, mubalighs }] of Object.entries(
       masjidGroups
     )) {
@@ -287,26 +304,28 @@ export const pengajianBulananMessages = ({
           message: templateReplacerBulanan(templateDKM.content, replacements),
         });
       }
+    }
+
+    for (const [id, { pengajians }] of Object.entries(mubalighGroups)) {
+      pengajians.sort((a, b) => Number(a.masjid.id) - Number(b.masjid.id));
+    }
+
+    for (const [id, { pengajians, masjids }] of Object.entries(
+      mubalighGroups
+    )) {
       if (templateMubaligh) {
-        [...mubalighs].forEach((mubaligh) => {
-          const replacements = pengajians
-            .filter((pengajian) => pengajian.mubaligh.id === mubaligh)
-            .map((pengajian) => [
-              ["bulan", listMonths[month as keyof typeof listMonths]],
-              ["tanggal", formatDate(pengajian.tanggal)],
-              ["waktu", pengajian.waktu],
-              ["nama_masjid", pengajian.masjid.nama_masjid],
-              ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
-              ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
-            ]) as [string, string][][];
-          messages.push({
-            phone: [pengajians[0].mubaligh.no_hp],
-            recipients: [pengajians[0].mubaligh.nama_mubaligh],
-            message: templateReplacerBulanan(
-              templateMubaligh.content,
-              replacements
-            ),
-          });
+        const replacements = pengajians.map((pengajian) => [
+          ["bulan", listMonths[month as keyof typeof listMonths]],
+          ["tanggal", formatDate(pengajian.tanggal)],
+          ["waktu", pengajian.waktu],
+          ["nama_masjid", pengajian.masjid.nama_masjid],
+          ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
+        ]) as [string, string][][];
+        messages.push({
+          phone: [pengajians[0].mubaligh.no_hp],
+          recipients: [pengajians[0].mubaligh.nama_mubaligh],
+          message: templateReplacerBulananAggregate(templateMubaligh.content, replacements),
         });
       }
     }
