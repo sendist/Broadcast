@@ -16,9 +16,10 @@ router.get(
     query("limit").optional().isNumeric().notEmpty(),
     query("orderBy").optional().isString().notEmpty(),
     query("orderType").optional().isString().notEmpty(),
+    query("search").optional().isString().notEmpty(),
   ]),
   (req: Request, res: Response, next: NextFunction) => {
-    const { page, limit, orderBy, orderType } = req.query;
+    const { page, limit, orderBy, orderType, search } = req.query;
 
     const { fields } = req.query;
     const fieldsArr = fields ? fields.toString().split(",") : undefined;
@@ -29,6 +30,14 @@ router.get(
             id: fieldsArr?.includes("id"),
             nama_mubaligh: fieldsArr?.includes("nama_mubaligh"),
             no_hp: fieldsArr?.includes("no_hp"),
+          },
+        }),
+        ...(search && {
+          where: {
+            nama_mubaligh: {
+              contains: search.toString(),
+              mode: "insensitive",
+            },
           },
         }),
         ...(page && {
