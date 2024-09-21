@@ -10,6 +10,7 @@ import { BASE_URL } from "@/lib/constants";
 import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
+import { SearchBar } from "@/components/ui/search-bar";
 import useFirstRender from "@/hooks/firstRender";
 
 const limit = 20;
@@ -18,6 +19,7 @@ export default function MasjidPage() {
   const [page, setPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Row<Masjid>[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [searchText, setSearchText] = useState("");
   const { data, loading, update, remove, create, get } = useCRUD<Masjid>({
     url: "/masjid",
     params: {
@@ -26,6 +28,9 @@ export default function MasjidPage() {
       ...(sorting[0] && {
         orderBy: sorting[0].id,
         orderType: sorting[0].desc ? "desc" : "asc",
+      }),
+      ...(searchText && {
+        search: searchText,
       }),
     },
   });
@@ -67,11 +72,15 @@ export default function MasjidPage() {
   }
 
   useEffect(() => {
+    setPage(1);
+  }, [searchText]);
+
+  useEffect(() => {
     if (!isFirstRender) {
       get();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, sorting]);
+  }, [page, sorting, searchText]);
 
   return (
     <div>
@@ -80,15 +89,20 @@ export default function MasjidPage() {
           <h1 className="inline-block text-xl font-semibold">Masjid</h1>
           <p className="text-sm text-muted-foreground">Atur Daftar Masjid</p>
         </div>
-        <div className="space-x-4 space-y-2 -mt-2">
+        <div className="flex items-center space-x-4">
+          <SearchBar
+            value={searchText}
+            onChange={(newValue) => setSearchText(newValue)}
+            placeholder="Cari Masjid / Ketua DKM"
+          />
           <AddMasjidForm onSubmit={create}>
-            <Button variant="white" className="ml-4 mt-2">
+            <Button variant="white" className="ml-4">
               <PlusIcon className="mr-2" />
               Add
             </Button>
           </AddMasjidForm>
           <AddMasjidBulk onSubmit={uploadTemplate}>
-            <Button variant="white">
+            <Button variant="white" className="whitespace-nowrap">
               <PlusIcon className="mr-2" />
               Bulk Upload
             </Button>
