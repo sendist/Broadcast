@@ -17,10 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
 import Logo from "./assets/logo";
-import {
-  Dialog,
-  DialogTrigger,
-} from "./components/ui/dialog";
+import { Dialog, DialogTrigger } from "./components/ui/dialog";
 import { ChangeSelfPasswordForm } from "./components/custom/changeSelfPassword";
 import { useApiFetch } from "./hooks/fetch";
 import { BASE_URL } from "./lib/constants";
@@ -456,7 +453,7 @@ function App() {
         </div>
 
         {/* content */}
-        <div className="flex-1 flex flex-col h-screen w-full overflow-auto p-4 bg-background max-lg:pt-16">
+        <div className="flex-1 flex flex-col h-screen w-full overflow-auto p-4 bg-background max-lg:pt-16 lg:max-1025:pt-16">
           <Outlet />
         </div>
       </div>
