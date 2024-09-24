@@ -102,6 +102,7 @@ enum template_t {
   pengajian_bulanan
   pengajian_reminder
   jumatan_reminder
+  jumatan_bulanan
 }
 
 enum message_status_t {

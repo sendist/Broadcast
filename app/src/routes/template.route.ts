@@ -214,6 +214,35 @@ Akan diadakan jumatan pada tanggal {{tanggal}}.
 
 Demikian pemberitahuan ini kami sampaikan. Terima kasih.`,
   },
+  {
+    value: "jumatan_bulanan",
+    label: "Jumatan Bulanan",
+    replacements: ["bulan", "tanggal", "nama_masjid", "nama_mubaligh", "nama_ketua_dkm"],
+    repetition: true,
+    guide: `Anda dapat menggunakan
+{{bulan}},
+{{tanggal}},
+{{nama_masjid}},
+{{nama_mubaligh}},
+{{nama_ketua_dkm}}
+sebagai substitusi template.
+
+Anda juga dapat menggunakan [[ ]] untuk mengulangi konten yang ada di dalamnya.
+
+Contoh:
+
+Kepada {{nama_ketua_dkm}} selaku pengurus {{nama_masjid}} dan {{nama_mubaligh}} selaku mubaligh.
+Akan diadakan jumatan pada tanggal {{tanggal}}.
+
+[[
+tanggal: {{tanggal}}
+waktu: {{waktu}}
+nama_mubaligh: {{nama_mubaligh}}
+
+]]
+
+Demikian pemberitahuan ini kami sampaikan. Terima kasih.`,
+  },
 ];
 
 router.get("/types", (req: Request, res: Response) => {

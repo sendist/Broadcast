@@ -58,7 +58,7 @@ export function templateReplacerBulananAggregate(
     let namaMasjid = "init";
     for (const replacement of replacements) {
       const temp = templateReplacer(insideBrackets, replacement);
-      if (replacement[3][1] !== namaMasjid && namaMasjid !== "init") {
+      if (replacement[replacement.findIndex(innerArray => innerArray.includes("nama_masjid"))][1] !== namaMasjid && namaMasjid !== "init") {
         insideContent += "\n------------------------------\n";
       }
       insideContent += temp;
