@@ -12,7 +12,7 @@ import { Input } from "../ui/input";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import ConfirmDialogContent from "./confirmDialogContent";
 import useCustomization from "@/hooks/customization";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RightArrowIcon from "@/assets/rightArrowIcon";
 import { useApiFetch } from "@/hooks/fetch";
 import { BASE_URL } from "@/lib/constants";
@@ -23,6 +23,10 @@ const CustomizeBrandingDialog = () => {
   const [updateName, setUpdateName] = useState(appName);
   const [file, setFile] = useState<File | undefined>(undefined);
   const apiFetch = useApiFetch();
+
+  useEffect(() => {
+    setUpdateName(appName);
+  }, [appName]);
 
   function resetBranding() {
     apiFetch<string>({
