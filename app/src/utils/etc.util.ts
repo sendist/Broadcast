@@ -46,6 +46,30 @@ export function templateReplacerBulanan(
   return result2;
 }
 
+export function templateReplacerBulananAggregate(
+  template: string,
+  replacements: [string, string][][]
+) {
+  let result = template;
+  if (/\[\[.*\]\]/s.test(template)) {
+    const [_, brackets, insideBrackets] =
+      template.match(/(\[\[([\s\S]*?)\]\])/)!;
+    let insideContent = "";
+    let namaMasjid = "init";
+    for (const replacement of replacements) {
+      const temp = templateReplacer(insideBrackets, replacement);
+      if (replacement[replacement.findIndex(innerArray => innerArray.includes("nama_masjid"))][1] !== namaMasjid && namaMasjid !== "init") {
+        insideContent += "\n------------------------------\n";
+      }
+      insideContent += temp;
+      namaMasjid = replacement[3][1];
+    }
+    result = template.replaceAll(brackets, insideContent);
+  }
+  const result2 = templateReplacer(result, replacements[0]);
+  return result2;
+}
+
 export function templateReplacer(
   template: string,
   replacements: [string, string][]

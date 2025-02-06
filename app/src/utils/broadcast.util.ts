@@ -3,6 +3,7 @@ import {
   resetDateTimeToMidnight,
   templateReplacer,
   templateReplacerBulanan,
+  templateReplacerBulananAggregate,
 } from "./etc.util";
 import prisma from "./prisma.util";
 
@@ -256,6 +257,11 @@ export const pengajianBulananMessages = ({
       { pengajians: (typeof pengajians)[number][]; mubalighs: Set<bigint> }
     > = {};
 
+    let mubalighGroups: Record<
+      string,
+      { pengajians: (typeof pengajians)[number][]; masjids: Set<bigint> }
+    > = {};
+
     for (const pengajian of pengajians) {
       if (masjidGroups[pengajian.masjid.id.toString()]) {
         masjidGroups[pengajian.masjid.id.toString()].pengajians.push(pengajian);
@@ -268,7 +274,18 @@ export const pengajianBulananMessages = ({
           mubalighs: new Set([pengajian.mubaligh.id]),
         };
       }
+
+      if (mubalighGroups[pengajian.mubaligh.id.toString()]) {
+        mubalighGroups[pengajian.mubaligh.id.toString()].pengajians.push(pengajian);
+        mubalighGroups[pengajian.mubaligh.id.toString()].masjids.add(pengajian.masjid.id);
+      } else {
+        mubalighGroups[pengajian.mubaligh.id.toString()] = {
+          pengajians: [pengajian],
+          masjids: new Set([pengajian.masjid.id]),
+        };
+      }
     }
+
     for (const [id, { pengajians, mubalighs }] of Object.entries(
       masjidGroups
     )) {
@@ -287,26 +304,28 @@ export const pengajianBulananMessages = ({
           message: templateReplacerBulanan(templateDKM.content, replacements),
         });
       }
+    }
+
+    for (const [id, { pengajians }] of Object.entries(mubalighGroups)) {
+      pengajians.sort((a, b) => Number(a.masjid.id) - Number(b.masjid.id));
+    }
+
+    for (const [id, { pengajians, masjids }] of Object.entries(
+      mubalighGroups
+    )) {
       if (templateMubaligh) {
-        [...mubalighs].forEach((mubaligh) => {
-          const replacements = pengajians
-            .filter((pengajian) => pengajian.mubaligh.id === mubaligh)
-            .map((pengajian) => [
-              ["bulan", listMonths[month as keyof typeof listMonths]],
-              ["tanggal", formatDate(pengajian.tanggal)],
-              ["waktu", pengajian.waktu],
-              ["nama_masjid", pengajian.masjid.nama_masjid],
-              ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
-              ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
-            ]) as [string, string][][];
-          messages.push({
-            phone: [pengajians[0].mubaligh.no_hp],
-            recipients: [pengajians[0].mubaligh.nama_mubaligh],
-            message: templateReplacerBulanan(
-              templateMubaligh.content,
-              replacements
-            ),
-          });
+        const replacements = pengajians.map((pengajian) => [
+          ["bulan", listMonths[month as keyof typeof listMonths]],
+          ["tanggal", formatDate(pengajian.tanggal)],
+          ["waktu", pengajian.waktu],
+          ["nama_masjid", pengajian.masjid.nama_masjid],
+          ["nama_mubaligh", pengajian.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", pengajian.masjid.nama_ketua_dkm],
+        ]) as [string, string][][];
+        messages.push({
+          phone: [pengajians[0].mubaligh.no_hp],
+          recipients: [pengajians[0].mubaligh.nama_mubaligh],
+          message: templateReplacerBulananAggregate(templateMubaligh.content, replacements),
         });
       }
     }
@@ -459,6 +478,162 @@ export const jumatanMessages = ({
     }
     return messages;
   });
+
+export const jumatanBulananMessages = ({
+  templateIdDKM,
+  templateIdMubaligh,
+  month,
+  year,
+}: {
+  templateIdDKM?: bigint;
+  templateIdMubaligh?: bigint;
+  month: number; // 0-11
+  year: number;
+  changeStatusToBroadcasted?: boolean;
+}) =>
+  Promise.all([
+    prisma.jumatan.findMany({
+      where: {
+        tanggal: {
+          gte: resetDateTimeToMidnight(new Date(year, +month, 1)),
+          lt: resetDateTimeToMidnight(new Date(year, +month + 1, 1)),
+        },
+      },
+      select: {
+        id: true,
+        tanggal: true,
+        masjid: {
+          select: {
+            id: true,
+            no_hp: true,
+            nama_ketua_dkm: true,
+            nama_masjid: true,
+          },
+        },
+        mubaligh: {
+          select: {
+            id: true,
+            no_hp: true,
+            nama_mubaligh: true,
+          },
+        },
+      },
+      orderBy: {
+        tanggal: "asc",
+      },
+    }),
+    templateIdDKM !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdDKM,
+        },
+        select: {
+          content: true,
+        },
+      }),
+    templateIdMubaligh !== undefined &&
+      prisma.template.findUnique({
+        where: {
+          id: templateIdMubaligh,
+        },
+        select: {
+          content: true,
+        },
+      }),
+  ]).then(([jumatans, templateDKM, templateMubaligh]) => {
+    if (templateDKM === null || templateMubaligh === null) {
+      throw new Error("Template tidak ditemukan");
+    }
+    if (!jumatans.length) {
+      throw new Error(
+        "Jadwal jumatan tidak ditemukan (mungkin dikarenakan tidak ada jumatan pada bulan tersebut)"
+      );
+    }
+
+    const messages: {
+      phone: string[];
+      recipients: string[];
+      message: string;
+    }[] = [];
+
+    let masjidGroups: Record<
+      string,
+      { jumatans: (typeof jumatans)[number][]; mubalighs: Set<bigint> }
+    > = {};
+
+    let mubalighGroups: Record<
+      string,
+      { jumatans: (typeof jumatans)[number][]; masjids: Set<bigint> }
+    > = {};
+
+    for (const jumatan of jumatans) {
+      if (masjidGroups[jumatan.masjid.id.toString()]) {
+        masjidGroups[jumatan.masjid.id.toString()].jumatans.push(jumatan);
+        masjidGroups[jumatan.masjid.id.toString()].mubalighs.add(
+          jumatan.mubaligh.id
+        );
+      } else {
+        masjidGroups[jumatan.masjid.id.toString()] = {
+          jumatans: [jumatan],
+          mubalighs: new Set([jumatan.mubaligh.id]),
+        };
+      }
+
+      if (mubalighGroups[jumatan.mubaligh.id.toString()]) {
+        mubalighGroups[jumatan.mubaligh.id.toString()].jumatans.push(jumatan);
+        mubalighGroups[jumatan.mubaligh.id.toString()].masjids.add(jumatan.masjid.id);
+      } else {
+        mubalighGroups[jumatan.mubaligh.id.toString()] = {
+          jumatans: [jumatan],
+          masjids: new Set([jumatan.masjid.id]),
+        };
+      }
+    }
+
+    for (const [id, { jumatans, mubalighs }] of Object.entries(
+      masjidGroups
+    )) {
+      if (templateDKM) {
+        const replacements = jumatans.map((jumatan) => [
+          ["bulan", listMonths[month as keyof typeof listMonths]],
+          ["tanggal", formatDate(jumatan.tanggal)],
+          ["nama_masjid", jumatan.masjid.nama_masjid],
+          ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
+          ["nama_ketua_dkm", jumatan.masjid.nama_ketua_dkm],
+        ]) as [string, string][][];
+        messages.push({
+          phone: [jumatans[0].masjid.no_hp],
+          recipients: [jumatans[0].masjid.nama_ketua_dkm],
+          message: templateReplacerBulanan(templateDKM.content, replacements),
+        });
+      }
+    }
+
+    for (const [id, { jumatans }] of Object.entries(mubalighGroups)) {
+      jumatans.sort((a, b) => Number(a.masjid.id) - Number(b.masjid.id));
+    }
+
+    for (const [id, { jumatans, masjids }] of Object.entries(
+      mubalighGroups
+    )) {
+      if (templateMubaligh) {
+        const replacements = jumatans.map((jumatan) => [
+          ["bulan", listMonths[month as keyof typeof listMonths]],
+          ["tanggal", formatDate(jumatan.tanggal)],
+          ["nama_mubaligh", jumatan.mubaligh.nama_mubaligh],
+          ["nama_masjid", jumatan.masjid.nama_masjid],
+          ["nama_ketua_dkm", jumatan.masjid.nama_ketua_dkm],
+        ]) as [string, string][][];
+        messages.push({
+          phone: [jumatans[0].mubaligh.no_hp],
+          recipients: [jumatans[0].mubaligh.nama_mubaligh],
+          message: templateReplacerBulananAggregate(templateMubaligh.content, replacements),
+        });
+      }
+    }
+    return messages;
+  });
+
 
 export const transformPhoneMessageToSingle = (
   messages: {

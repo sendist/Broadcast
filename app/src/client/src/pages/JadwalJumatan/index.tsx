@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import Broadcast from "./broadcast";
 import useFirstRender from "@/hooks/firstRender";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import BroadcastBulanan from "./broadcastBulanan";
 
 const limit = 20;
 
@@ -131,6 +132,18 @@ export default function JadwalMasjidPage() {
     });
   }
 
+  const { data: templateBulanan } = useCRUD<{
+    id: string;
+    content: string;
+    nama_template: string;
+  }>({
+    url: "/template",
+    params: {
+      fields: "id,content,nama_template",
+      type: "jumatan_bulanan",
+    },
+  });
+
   useEffect(() => {
     if (!isFirstRender) {
       get();
@@ -162,6 +175,12 @@ export default function JadwalMasjidPage() {
               Bulk Upload
             </Button>
           </AddJadwalJumatanBulk>
+          <BroadcastBulanan template={templateBulanan || []}>
+            <Button variant="white">
+              <RocketIcon className="mr-2" />
+              Broadcast Bulanan
+            </Button>
+          </BroadcastBulanan>
           {selectedRows?.length ? (
             <>
               <ConfirmDialog

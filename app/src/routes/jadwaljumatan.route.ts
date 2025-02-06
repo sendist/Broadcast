@@ -7,6 +7,7 @@ import { body, param, query } from "express-validator";
 import { getFilledTemplate, getExcelContent } from "../utils/xlsx.util";
 import { addToQueue } from "../utils/waweb.util";
 import {
+  jumatanBulananMessages,
   jumatanMessages,
   transformPhoneMessageToSingle,
 } from "../utils/broadcast.util";
@@ -233,6 +234,81 @@ router.get(
       });
   }
 );
+
+router.get(
+  "/broadcast-bulanan-preview",
+  validate([
+    query("month")
+      .matches(/^(1[0-1]|0?[0-9])$/)
+      .notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { month, templateDKM, templateMubaligh } = req.query;
+    const year =
+      Number(month) >= new Date().getMonth()
+        ? new Date().getFullYear()
+        : new Date().getFullYear() + 1;
+    jumatanBulananMessages({
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
+      month: Number(month),
+      year: year,
+    })
+      .then((messages) => {
+        sendResponse({
+          res,
+          data: messages.map((message) => ({
+            message: message.message,
+            recipients: message.recipients,
+          })),
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
+router.get(
+  "/broadcast-bulanan",
+  validate([
+    query("month")
+      .matches(/^(1[0-1]|0?[0-9])$/)
+      .notEmpty(),
+    query("templateDKM").optional().isNumeric().notEmpty(),
+    query("templateMubaligh").optional().isNumeric().notEmpty(),
+  ]),
+  (req: Request, res: Response, next: NextFunction) => {
+    const { month, templateDKM, templateMubaligh } = req.query;
+    const year =
+      Number(month) >= new Date().getMonth()
+        ? new Date().getFullYear()
+        : new Date().getFullYear() + 1;
+    jumatanBulananMessages({
+      templateIdDKM:
+        templateDKM !== undefined ? BigInt(templateDKM as string) : undefined,
+      templateIdMubaligh:
+        templateMubaligh !== undefined
+          ? BigInt(templateMubaligh as string)
+          : undefined,
+      month: Number(month),
+      year: year,
+    })
+      .then((messages) => {
+        addToQueue(transformPhoneMessageToSingle(messages));
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
 
 router.delete(
   "/batch",

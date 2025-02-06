@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS "jumatan" (
     FOREIGN KEY (id_mubaligh) REFERENCES mubaligh(id) ON DELETE CASCADE
 );
 
-create TYPE template_t as enum('pengajian_bulanan', 'pengajian_reminder', 'jumatan_reminder');
+create TYPE template_t as enum('pengajian_bulanan', 'pengajian_reminder', 'jumatan_reminder', 'jumatan_bulanan');
 
 CREATE TABLE IF NOT EXISTS "template" (
     id BIGSERIAL PRIMARY KEY,
