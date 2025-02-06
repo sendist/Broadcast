@@ -11,7 +11,7 @@ const router = express.Router();
 
 const getMasjid = (req: Request, res: Response, next: NextFunction) => {
   // pagination (optional)
-  const { page, limit, orderBy, orderType } = req.query;
+  const { page, limit, orderBy, orderType, search } = req.query;
 
   const { fields } = req.query;
   const fieldsArr = fields ? fields.toString().split(",") : undefined;
@@ -23,6 +23,24 @@ const getMasjid = (req: Request, res: Response, next: NextFunction) => {
           nama_masjid: fieldsArr?.includes("nama_masjid"),
           nama_ketua_dkm: fieldsArr?.includes("nama_ketua_dkm"),
           no_hp: fieldsArr?.includes("no_hp"),
+        },
+      }),
+      ...(search && {
+        where: {
+          OR: [
+            {
+              nama_masjid: {
+                contains: search.toString(),
+                mode: "insensitive",
+              },
+            },
+            {
+              nama_ketua_dkm: {
+                contains: search.toString(),
+                mode: "insensitive",
+              },
+            },
+          ],
         },
       }),
       ...(page && {
@@ -58,6 +76,7 @@ router.get(
     query("limit").optional().isNumeric().notEmpty(),
     query("orderBy").optional().isString().notEmpty(),
     query("orderType").optional().isString().notEmpty(),
+    query("search").optional().isString().notEmpty(),
   ]),
   getMasjid
 );
