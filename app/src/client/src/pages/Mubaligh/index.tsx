@@ -12,6 +12,7 @@ import ConfirmDialog from "@/components/custom/confirmDialog";
 import { Row, SortingState, Table as TableType } from "@tanstack/react-table";
 import { SearchBar } from "@/components/ui/search-bar";
 import useFirstRender from "@/hooks/firstRender";
+import { useDebounce } from "usehooks-ts";
 
 const limit = 20;
 
@@ -20,6 +21,7 @@ export default function MubalighPage() {
   const [selectedRows, setSelectedRows] = useState<Row<Mubaligh>[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchText, setSearchText] = useState("");
+  const debouncedSearchText = useDebounce(searchText, 300);
   const { data, loading, update, remove, create, get } = useCRUD<Mubaligh>({
     url: "/mubaligh",
     params: {
@@ -29,8 +31,8 @@ export default function MubalighPage() {
         orderBy: sorting[0].id,
         orderType: sorting[0].desc ? "desc" : "asc",
       }),
-      ...(searchText && {
-        search: searchText,
+      ...(debouncedSearchText && {
+        search: debouncedSearchText,
       }),
     },
   });
@@ -73,14 +75,14 @@ export default function MubalighPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [searchText]);
+  }, [debouncedSearchText]);
 
   useEffect(() => {
     if (!isFirstRender) {
       get();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, sorting, searchText]);
+  }, [page, sorting, debouncedSearchText]);
 
   return (
     <div>
