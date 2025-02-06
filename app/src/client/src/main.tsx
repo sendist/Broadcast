@@ -19,12 +19,14 @@ import Home from "./pages/Home/index.tsx";
 import LandingPage from "./pages/LandingPage/index.tsx";
 import ManageAdmin from "./pages/ManageAdmin/index.tsx";
 import { CustomizationProvider } from "./context/customization.tsx";
+import HeadUpdater from "./components/custom/headUpdater.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
       <CustomizationProvider>
+        <HeadUpdater />
         <LandingPage />
       </CustomizationProvider>
     ),
@@ -34,6 +36,7 @@ const router = createBrowserRouter([
     element: (
       <CustomizationProvider>
         <AccountProvider>
+          <HeadUpdater />
           <Login />
         </AccountProvider>
       </CustomizationProvider>
@@ -44,6 +47,7 @@ const router = createBrowserRouter([
     element: (
       <CustomizationProvider>
         <AccountProvider>
+          <HeadUpdater />
           <App />
         </AccountProvider>
       </CustomizationProvider>

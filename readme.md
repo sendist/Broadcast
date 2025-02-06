@@ -36,10 +36,6 @@ We used these tech stacks to develop this app:
    $ cd ../.. && npx prisma generate
    ```
 
-   > ⚠️ **WARNING!** ⚠️
-   >
-   > If necessary, install lucide-react first: `npm i lucide-react`
-
 4. Run the 'app'.
    ```console
    $ npm run dev
