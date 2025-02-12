@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 INSERT INTO "user" (username, password, role) VALUES ('admin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6', 'admin');
 INSERT INTO "user" (username, password, role) VALUES ('superadmin', '$2y$10$4vdkuf1yNPX.AVchl1He/u4nWkZD5SEh9.D7cznNfZ5ozz5AGbqC6', 'superadmin');
 
-CREATE TABLE IF NOT EXIST "jamaah" (
+CREATE TABLE IF NOT EXISTS "jamaah" (
     id BIGSERIAL PRIMARY KEY,
     nama_jamaah TEXT NOT NULL,
     no_hp TEXT NOT NULL
