@@ -98,6 +98,12 @@ model masjid_mubaligh {
   @@id([id_masjid, id_mubaligh])
 }
 
+model jamaah {
+  id  BigInt    @id @default(autoincrement())
+  nama_jamaah   String
+  no_hp   String
+}
+
 enum template_t {
   pengajian_bulanan
   pengajian_reminder

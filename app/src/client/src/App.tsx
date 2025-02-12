@@ -24,78 +24,30 @@ import { BASE_URL } from "./lib/constants";
 import { toast } from "./components/ui/use-toast";
 import useCustomization from "./hooks/customization";
 import CustomizeBrandingDialog from "./components/custom/customizeBrandingDialog";
+import {
+  HomeIcon,
+  KeyRoundIcon,
+  NotepadTextDashedIcon,
+  ScrollTextIcon,
+  SpeechIcon,
+  UsersIcon,
+} from "lucide-react";
 
 const menus = [
   {
     path: "/home",
     name: "Home",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5"
-        width="24"
-        height="24"
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
+    icon: <HomeIcon className="w-6 h-6 text-current" />,
   },
   {
     path: "/manage-admin",
     name: "Manage Admin",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5"
-        width="24"
-        height="24"
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
+    icon: <KeyRoundIcon className="w-6 h-6 text-current" />,
   },
   {
     path: "/template",
     name: "Template",
-    icon: (
-      <svg
-        xmlnsXlink="http://www.w3.org/1999/xlink"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 32 32"
-        x="0px"
-        y="0px"
-        width="20"
-        height="20"
-        stroke="currentColor"
-        fill="currentColor"
-      >
-        <g data-name="Layer 2">
-          <path d="M27,2H5A3,3,0,0,0,2,5v5a3,3,0,0,0,3,3H27a3,3,0,0,0,3-3V5A3,3,0,0,0,27,2Zm1,8a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V5A1,1,0,0,1,5,4H27a1,1,0,0,1,1,1Z"></path>
-          <path d="M13,16H5a3,3,0,0,0-3,3v8a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V19A3,3,0,0,0,13,16Zm1,11a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V19a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1Z"></path>
-          <path d="M29,17H20a1,1,0,0,0,0,2h9a1,1,0,0,0,0-2Z"></path>
-          <path d="M29,22H20a1,1,0,0,0,0,2h9a1,1,0,0,0,0-2Z"></path>
-          <path d="M29,27H20a1,1,0,0,0,0,2h9a1,1,0,0,0,0-2Z"></path>
-        </g>
-      </svg>
-    ),
+    icon: <NotepadTextDashedIcon className="w-6 h-6 text-current" />,
   },
   {
     path: "/waclient",
@@ -114,6 +66,11 @@ const menus = [
         />
       </svg>
     ),
+  },
+  {
+    path: "/jamaah",
+    name: "Jamaah",
+    icon: <UsersIcon className="w-6 h-6 text-current" />,
   },
   {
     path: "/masjid",
@@ -136,26 +93,7 @@ const menus = [
   {
     path: "/mubaligh",
     name: "Mubaligh",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5"
-        width="24"
-        height="24"
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
+    icon: <SpeechIcon className="w-6 h-6 text-current" />,
   },
   {
     path: "/jadwal-pengajian",
@@ -229,27 +167,7 @@ const menus = [
   {
     path: "/message-logs",
     name: "Message Logs",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        xmlnsXlink="http://www.w3.org/1999/xlink"
-        version="1.2"
-        baseProfile="tiny"
-        x="0px"
-        y="0px"
-        viewBox="7.5 5 87.5 90"
-        xmlSpace="preserve"
-        width="20"
-        height="20"
-        stroke="currentColor"
-        fill="currentColor"
-      >
-        <path d="M77.5,25c-7.81-7.81-12.189-12.189-20-20h-40c-5.523,0-10,4.477-10,10v70c0,5.523,4.477,10,10,10h50   c5.523,0,10-4.477,10-10v-5H95V40H77.5V25z M55,13.107L69.393,27.5H57.5c-1.378,0-2.5-1.122-2.5-2.5V13.107z M70,85   c0,1.378-1.121,2.5-2.5,2.5h-50c-1.378,0-2.5-1.122-2.5-2.5V15c0-1.379,1.122-2.5,2.5-2.5h30V25c0,5.523,4.477,10,10,10H70v5H27.5   v40H70V85z M90,45v30H32.5V45H90z"></path>
-        <path d="M60,70c4.136,0,7.5-3.364,7.5-7.5v-5c0-4.136-3.364-7.5-7.5-7.5s-7.5,3.364-7.5,7.5v5   C52.5,66.636,55.864,70,60,70z M57.5,57.5c0-1.378,1.122-2.5,2.5-2.5s2.5,1.122,2.5,2.5v5c0,1.378-1.122,2.5-2.5,2.5   s-2.5-1.122-2.5-2.5V57.5z"></path>
-        <polygon points="50,65 42.5,65 42.5,50 37.5,50 37.5,70 50,70  "></polygon>
-        <path d="M77.5,70H85V57.5h-7.5v5H80V65h-2.5c-1.378,0-2.5-1.122-2.5-2.5v-5c0-1.378,1.122-2.5,2.5-2.5H85v-5h-7.5   c-4.136,0-7.5,3.364-7.5,7.5v5C70,66.636,73.364,70,77.5,70z"></path>
-      </svg>
-    ),
+    icon: <ScrollTextIcon className="w-6 h-6 text-current" />,
   },
 ];
 

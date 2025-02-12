@@ -68,11 +68,11 @@ export const columns: (
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    header: (header) => CellHeaderSortable(header, "ID"),
-    enableSorting: true,
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: (header) => CellHeaderSortable(header, "ID"),
+  //   enableSorting: true,
+  // },
   {
     accessorKey: "tanggal",
     header: (header) => CellHeaderSortable(header, "Tanggal Jumatan"),

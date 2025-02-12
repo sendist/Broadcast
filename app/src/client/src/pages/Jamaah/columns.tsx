@@ -17,9 +17,9 @@ import ConfirmDialogContent from "@/components/custom/confirmDialogContent";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Mubaligh = {
+export type Jamaah = {
   id: string;
-  nama_mubaligh: string;
+  nama_jamaah: string;
   no_hp: string;
 };
 
@@ -27,7 +27,7 @@ interface CustomTableMeta<T extends { id: string }> extends TableMeta<T> {
   removeData?: (id: string) => void;
 }
 
-export const columns: ColumnDef<Mubaligh>[] = [
+export const columns: ColumnDef<Jamaah>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -53,8 +53,8 @@ export const columns: ColumnDef<Mubaligh>[] = [
   //   enableSorting: true,
   // },
   {
-    accessorKey: "nama_mubaligh",
-    header: (header) => CellHeaderSortable(header, "Nama Mubaligh"),
+    accessorKey: "nama_jamaah",
+    header: (header) => CellHeaderSortable(header, "Nama Jamaah"),
     cell: EditCell,
     enableSorting: true,
   },
@@ -67,7 +67,7 @@ export const columns: ColumnDef<Mubaligh>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const mubaligh = row.original;
+      const jamaah = row.original;
 
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const [alertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -92,13 +92,13 @@ export const columns: ColumnDef<Mubaligh>[] = [
             </DropdownMenuContent>
           </DropdownMenu>
           <ConfirmDialogContent
-            title={`Apakah Anda Yakin Untuk Menghapus Data Mubaligh ${mubaligh.nama_mubaligh}?`}
+            title={`Apakah Anda Yakin Untuk Menghapus Data Jamaah ${jamaah.nama_jamaah}?`}
             description="Data yang sudah dihapus tidak dapat dikembalikan"
             cancelText="Batal"
             confirmText="Hapus"
             onConfirm={() =>
-              (table.options.meta as CustomTableMeta<Mubaligh>)?.removeData?.(
-                mubaligh.id
+              (table.options.meta as CustomTableMeta<Jamaah>)?.removeData?.(
+                jamaah.id
               )
             }
             dangerous

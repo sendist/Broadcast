@@ -29,11 +29,11 @@ export const pengajianColumns: (
     label: string;
   }[],
 ) => ColumnDef<JadwalPengajian>[] = (masjid, mubaligh) => [
-  {
-    accessorKey: "id",
-    header: (header) => CellHeaderSortable(header, "ID"),
-    enableSorting: true,
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: (header) => CellHeaderSortable(header, "ID"),
+  //   enableSorting: true,
+  // },
   {
     accessorKey: "tanggal",
     header: (header) => CellHeaderSortable(header, "Tanggal Pengajian"),

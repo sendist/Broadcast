@@ -57,11 +57,11 @@ export const columns: ColumnDef<MessageLog>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    header: (header) => CellHeaderSortable(header, "ID"),
-    enableSorting: true,
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: (header) => CellHeaderSortable(header, "ID"),
+  //   enableSorting: true,
+  // },
   {
     accessorKey: "no_hp",
     header: (header) => CellHeaderSortable(header, "No. HP"),
