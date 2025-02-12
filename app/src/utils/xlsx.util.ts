@@ -2,21 +2,24 @@ import ExcelJS from "exceljs";
 const path = require("path");
 
 export async function getFilledTemplate(
-  tipeJadwal: "jumatan" | "pengajian",
-  listMasjid: { id: bigint; nama_masjid: string }[],
-  listMubaligh: { id: bigint; nama_mubaligh: string }[]
+  tipeJadwal: "jumatan" | "pengajian" | "jamaah",
+  listMasjid: { id: bigint; nama_masjid: string }[] = [],
+  listMubaligh: { id: bigint; nama_mubaligh: string }[] = [],
+  listJamaah: { id: bigint; nama_jamaah: string }[] = []
 ) {
   const templateName =
     tipeJadwal === "jumatan"
       ? "template_jadwaljumatan"
-      : "template_jadwalpengajian";
+      : tipeJadwal === "pengajian"
+      ? "template_jadwalpengajian"
+      : "template_jamaah";
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(
     path.join("excelTemplates", templateName + ".xlsx")
   );
   const worksheet = workbook.getWorksheet(2);
   const rowValues = [];
-  for (let i = 0; i < Math.max(listMasjid.length, listMubaligh.length); i++) {
+  for (let i = 0; i < Math.max(listMasjid.length, listMubaligh.length, listJamaah.length); i++) {
     const newRow = [];
     if (listMasjid[i]) {
       newRow[1] = listMasjid[i].id.toString();
@@ -26,6 +29,10 @@ export async function getFilledTemplate(
       newRow[5] = listMubaligh[i].id.toString();
       newRow[6] = listMubaligh[i].nama_mubaligh;
     }
+    if (listJamaah[i]) {
+      newRow[9] = listJamaah[i].id.toString();
+      newRow[10] = listJamaah[i].nama_jamaah;
+    }
     rowValues.push(newRow);
   }
   worksheet.addRows(rowValues);
@@ -33,24 +40,33 @@ export async function getFilledTemplate(
 
   // add validation to worksheet 1
   const worksheet1 = workbook.getWorksheet(1);
-  //@ts-ignore
-  worksheet1.dataValidations.add(
-    tipeJadwal === "jumatan" ? "B2:B1048576" : "C2:C1048576",
-    {
+  if (tipeJadwal === "jumatan" || tipeJadwal === "pengajian") {
+    //@ts-ignore
+    worksheet1.dataValidations.add(
+      tipeJadwal === "jumatan" ? "B2:B1048576" : "C2:C1048576",
+      {
+        type: "list",
+        allowBlank: true,
+        formulae: [`='INFO KODE (JANGAN DIUBAH)'!$B$2:$B$1048576`],
+      }
+    );
+    //@ts-ignore
+    worksheet1.dataValidations.add(
+      tipeJadwal === "jumatan" ? "C2:C1048576" : "D2:D1048576",
+      {
+        type: "list",
+        allowBlank: true,
+        formulae: [`='INFO KODE (JANGAN DIUBAH)'!$F$2:$F$1048576`],
+      }
+    );
+  } else if (tipeJadwal === "jamaah") {
+    //@ts-ignore
+    worksheet1.dataValidations.add("B2:B1048576", {
       type: "list",
       allowBlank: true,
-      formulae: [`='INFO KODE (JANGAN DIUBAH)'!$B$2:$B$1048576`],
-    }
-  );
-  //@ts-ignore
-  worksheet1.dataValidations.add(
-    tipeJadwal === "jumatan" ? "C2:C1048576" : "D2:D1048576",
-    {
-      type: "list",
-      allowBlank: true,
-      formulae: [`='INFO KODE (JANGAN DIUBAH)'!$F$2:$F$1048576`],
-    }
-  );
+      formulae: [`='INFO KODE (JANGAN DIUBAH)'!$J$2:$J$1048576`],
+    });
+  }
 
   return await workbook.xlsx.writeBuffer({
     useStyles: true,
@@ -99,7 +115,16 @@ export async function getExcelContent(
 >;
 export async function getExcelContent(
   buffer: Buffer,
-  type: "jumatan" | "pengajian" | "masjid" | "mubaligh"
+  type: "jamaah"
+): Promise<
+  {
+    nama_jamaah: string;
+    no_hp: string;
+  }[]
+>;
+export async function getExcelContent(
+  buffer: Buffer,
+  type: "jumatan" | "pengajian" | "masjid" | "mubaligh" | "jamaah"
 ) {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer);
@@ -183,6 +208,20 @@ export async function getExcelContent(
       (row) => {
         data.push({
           nama_mubaligh: (row.values as string[])[1],
+          no_hp: (row.values as string[])[2],
+        });
+      }
+    );
+    return data;
+  } else if (type === "jamaah") {
+    const data: {
+      nama_jamaah: string;
+      no_hp: string;
+    }[] = [];
+    (dataWorksheet.getRows(2, dataWorksheet.rowCount - 1) ?? []).forEach(
+      (row) => {
+        data.push({
+          nama_jamaah: (row.values as string[])[1],
           no_hp: (row.values as string[])[2],
         });
       }

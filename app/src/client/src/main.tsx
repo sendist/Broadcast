@@ -6,6 +6,7 @@ import "./index.css";
 import Login from "./pages/Login/index.tsx";
 import { AccountProvider } from "./context/account.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
+import JamaahPage from "./pages/Jamaah/index.tsx";
 import MasjidPage from "./pages/Masjid/index.tsx";
 import MubalighPage from "./pages/Mubaligh/index.tsx";
 import NotFound from "./pages/NotFound/index.tsx";
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: "waclient",
         element: <WaClient />,
+      },
+      {
+        path: "jamaah",
+        element: <JamaahPage />,
       },
       {
         path: "masjid",

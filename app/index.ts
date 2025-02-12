@@ -10,6 +10,7 @@ import templateRoute from "./src/routes/template.route";
 import waClientRoute, { waClientWs } from "./src/routes/waclient.route";
 import rebrandRoute from "./src/routes/rebrand.route";
 import publicRoute from "./src/routes/public.route";
+import jamaahRoute from "./src/routes/jamaah.route";
 import masjidRoute from "./src/routes/masjid.route";
 import jadwalPengajianRoute from "./src/routes/jadwalpengajian.route";
 import jadwalJumatanRoute from "./src/routes/jadwaljumatan.route";
@@ -80,6 +81,8 @@ router.use(authentication);
 router.use("/template", templateRoute);
 
 router.use("/waclient", waClientRoute);
+
+router.use("/jamaah", jamaahRoute);
 
 router.use("/masjid", masjidRoute);
 
