@@ -57,11 +57,11 @@ export const columns: (
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    header: (header) => CellHeaderSortable(header, "ID"),
-    enableSorting: true,
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: (header) => CellHeaderSortable(header, "ID"),
+  //   enableSorting: true,
+  // },
   {
     accessorKey: "nama_template",
     header: (header) => CellHeaderSortable(header, "Nama Template"),

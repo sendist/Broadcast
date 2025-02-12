@@ -47,11 +47,11 @@ export const columns: ColumnDef<Mubaligh>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    header: (header) => CellHeaderSortable(header, "ID"),
-    enableSorting: true,
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: (header) => CellHeaderSortable(header, "ID"),
+  //   enableSorting: true,
+  // },
   {
     accessorKey: "nama_mubaligh",
     header: (header) => CellHeaderSortable(header, "Nama Mubaligh"),
